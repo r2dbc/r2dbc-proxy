@@ -4,8 +4,6 @@ This project contains the proxy framework of the [R2DBC SPI][r].
 
 [r]: https://github.com/r2dbc/r2dbc-spi
 
-**THIS IS ONLY AN EXPERIMENT AND NOT SUPPORTED SOFTWARE**
-
 ## Maven
 Both milestone and snapshot artifacts (library, source, and javadoc) can be found in Maven repositories.
 
