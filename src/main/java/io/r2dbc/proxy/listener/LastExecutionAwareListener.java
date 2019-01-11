@@ -63,22 +63,47 @@ public class LastExecutionAwareListener implements ProxyExecutionListener {
         this.afterMethodExecutionInfo = executionInfo;
     }
 
+    /**
+     * Get the last used {@link QueryExecutionInfo} in {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)}.
+     *
+     * @return last used {@link QueryExecutionInfo}. Can be {@code null} if not invoked yet.
+     */
     public QueryExecutionInfo getBeforeQueryExecutionInfo() {
         return beforeQueryExecutionInfo;
     }
 
+    /**
+     * Get the last used {@link QueryExecutionInfo} in {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}.
+     *
+     * @return last used {@link QueryExecutionInfo}. Can be {@code null} if not invoked yet.
+     */
     public QueryExecutionInfo getAfterQueryExecutionInfo() {
         return afterQueryExecutionInfo;
     }
 
+    /**
+     * Get the last used {@link QueryExecutionInfo} in {@link ProxyExecutionListener#eachQueryResult(QueryExecutionInfo)}.
+     *
+     * @return last used {@link QueryExecutionInfo}. Can be {@code null} if not invoked yet.
+     */
     public QueryExecutionInfo getEachQueryResultExecutionInfo() {
         return eachQueryResultExecutionInfo;
     }
 
+    /**
+     * Get the last used {@link MethodExecutionInfo} in {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)}.
+     *
+     * @return last used {@link MethodExecutionInfo}. Can be {@code null} if not invoked yet.
+     */
     public MethodExecutionInfo getBeforeMethodExecutionInfo() {
         return beforeMethodExecutionInfo;
     }
 
+    /**
+     * Get the last used {@link MethodExecutionInfo} in {@link ProxyExecutionListener#afterMethod(MethodExecutionInfo)}.
+     *
+     * @return last used {@link MethodExecutionInfo}. Can be {@code null} if not invoked yet.
+     */
     public MethodExecutionInfo getAfterMethodExecutionInfo() {
         return afterMethodExecutionInfo;
     }

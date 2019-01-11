@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
 public class ProxyUtilsTest {
 
     @Test
-    void getOriginalConnection() {
+    void unwrapConnection() {
         Connection originalConnection = mock(Connection.class);
         Batch<?> originalBatch = mock(Batch.class);
         Statement<?> originalStatement = mock(Statement.class);
@@ -48,28 +48,28 @@ public class ProxyUtilsTest {
 
         ConnectionInfo connectionInfo = new ConnectionInfo();
 
-        Connection proxyConnection = proxyConfig.getProxyFactory().createProxyConnection(originalConnection, connectionInfo);
+        Connection proxyConnection = proxyConfig.getProxyFactory().wrapConnection(originalConnection, connectionInfo);
         connectionInfo.setOriginalConnection(originalConnection);
 
         QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
         queryExecutionInfo.setConnectionInfo(connectionInfo);
 
-        Batch<?> proxyBatch = proxyConfig.getProxyFactory().createProxyBatch(originalBatch, connectionInfo);
-        Statement<?> proxyStatement = proxyConfig.getProxyFactory().createProxyStatement(originalStatement, query, connectionInfo);
-        Result proxyResult = proxyConfig.getProxyFactory().createProxyResult(originalResult, queryExecutionInfo);
+        Batch<?> proxyBatch = proxyConfig.getProxyFactory().wrapBatch(originalBatch, connectionInfo);
+        Statement<?> proxyStatement = proxyConfig.getProxyFactory().wrapStatement(originalStatement, query, connectionInfo);
+        Result proxyResult = proxyConfig.getProxyFactory().wrapResult(originalResult, queryExecutionInfo);
 
         Optional<Connection> result;
 
-        result = ProxyUtils.getOriginalConnection(proxyConnection);
+        result = ProxyUtils.unwrapConnection(proxyConnection);
         assertThat(result).hasValue(originalConnection);
 
-        result = ProxyUtils.getOriginalConnection(proxyBatch);
+        result = ProxyUtils.unwrapConnection(proxyBatch);
         assertThat(result).hasValue(originalConnection);
 
-        result = ProxyUtils.getOriginalConnection(proxyStatement);
+        result = ProxyUtils.unwrapConnection(proxyStatement);
         assertThat(result).hasValue(originalConnection);
 
-        result = ProxyUtils.getOriginalConnection(proxyResult);
+        result = ProxyUtils.unwrapConnection(proxyResult);
         assertThat(result).hasValue(originalConnection);
     }
 

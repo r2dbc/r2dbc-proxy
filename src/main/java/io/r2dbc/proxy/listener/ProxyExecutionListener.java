@@ -24,8 +24,7 @@ import io.r2dbc.spi.Statement;
 import java.util.function.BiFunction;
 
 /**
- * Listener interface that is called by proxy on {@link io.r2dbc.spi.Connection},
- * {@link io.r2dbc.spi.Statement}, or {@link io.r2dbc.spi.Batch}.
+ * Listener interface that is called when proxy is invoked.
  *
  * @author Tadaya Tsuyukubo
  */

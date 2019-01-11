@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveConnectionFactoryCallbackTest {
+public class ConnectionFactoryCallbackHandlerTest {
 
     private static Method CREATE_METHOD = ReflectionUtils.findMethod(ConnectionFactory.class, "create");
 
@@ -66,7 +66,7 @@ public class ReactiveConnectionFactoryCallbackTest {
         when(idManager.getId(originalConnection)).thenReturn(connectionId);
 
         // mock where it creates proxied connection
-        when(proxyFactory.createProxyConnection(any(Connection.class), any(ConnectionInfo.class))).thenReturn(mockedConnection);
+        when(proxyFactory.wrapConnection(any(Connection.class), any(ConnectionInfo.class))).thenReturn(mockedConnection);
 
 
         ProxyConfig proxyConfig = new ProxyConfig();
@@ -74,9 +74,9 @@ public class ReactiveConnectionFactoryCallbackTest {
         proxyConfig.setProxyFactory(proxyFactory);
         proxyConfig.addListener(listener);
 
-        ReactiveConnectionFactoryCallback callback = new ReactiveConnectionFactoryCallback(connectionFactory, proxyConfig);
+        ConnectionFactoryCallbackHandler callback = new ConnectionFactoryCallbackHandler(connectionFactory, proxyConfig);
 
-        Object result = callback.invoke(null, CREATE_METHOD, null);
+        Object result = callback.invoke(connectionFactory, CREATE_METHOD, null);
 
         assertThat(result).isInstanceOf(Publisher.class);
 
@@ -108,9 +108,9 @@ public class ReactiveConnectionFactoryCallbackTest {
         when(connectionFactory.getMetadata()).thenReturn(metadata);
 
         ProxyConfig proxyConfig = new ProxyConfig();
-        ReactiveConnectionFactoryCallback callback = new ReactiveConnectionFactoryCallback(connectionFactory, proxyConfig);
+        ConnectionFactoryCallbackHandler callback = new ConnectionFactoryCallbackHandler(connectionFactory, proxyConfig);
 
-        Object result = callback.invoke(null, GET_METADATA_METHOD, null);
+        Object result = callback.invoke(connectionFactory, GET_METADATA_METHOD, null);
 
         assertThat(result).isSameAs(metadata);
 
@@ -121,9 +121,9 @@ public class ReactiveConnectionFactoryCallbackTest {
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
         ProxyConfig proxyConfig = new ProxyConfig();
 
-        ReactiveConnectionFactoryCallback callback = new ReactiveConnectionFactoryCallback(connectionFactory, proxyConfig);
+        ConnectionFactoryCallbackHandler callback = new ConnectionFactoryCallbackHandler(connectionFactory, proxyConfig);
 
-        Object result = callback.invoke(null, UNWRAP_METHOD, null);
+        Object result = callback.invoke(connectionFactory, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(connectionFactory);
     }
 

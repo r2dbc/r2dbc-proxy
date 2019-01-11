@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveStatementCallbackTest {
+public class StatementCallbackHandlerTest {
 
     private static Method ADD_METHOD = ReflectionUtils.findMethod(Statement.class, "add");
 
@@ -71,9 +71,9 @@ public class ReactiveStatementCallbackTest {
 
         doReturn(mockResult).when(statement).add();
 
-        ReactiveStatementCallback callback = new ReactiveStatementCallback(statement, null, connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, "", connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, ADD_METHOD, null);
+        Object result = callback.invoke(statement, ADD_METHOD, null);
 
         assertThat(result).isSameAs(mockResult);
     }
@@ -87,16 +87,16 @@ public class ReactiveStatementCallbackTest {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
         Statement<?> statement = mock(Statement.class);
-        ReactiveStatementCallback callback = new ReactiveStatementCallback(statement, query, connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
 
         when(statement.execute()).thenReturn(Flux.empty());
 
-        callback.invoke(null, BIND_BY_INDEX_METHOD, new Object[]{1, 100});
-        callback.invoke(null, BIND_NULL_BY_INDEX_METHOD, new Object[]{2, String.class});
-        callback.invoke(null, ADD_METHOD, null);
-        callback.invoke(null, BIND_NULL_BY_INDEX_METHOD, new Object[]{1, int.class});
-        callback.invoke(null, BIND_BY_INDEX_METHOD, new Object[]{2, 200});
-        Object result = callback.invoke(null, EXECUTE_METHOD, null);
+        callback.invoke(statement, BIND_BY_INDEX_METHOD, new Object[]{1, 100});
+        callback.invoke(statement, BIND_NULL_BY_INDEX_METHOD, new Object[]{2, String.class});
+        callback.invoke(statement, ADD_METHOD, null);
+        callback.invoke(statement, BIND_NULL_BY_INDEX_METHOD, new Object[]{1, int.class});
+        callback.invoke(statement, BIND_BY_INDEX_METHOD, new Object[]{2, 200});
+        Object result = callback.invoke(statement, EXECUTE_METHOD, null);
 
 
         StepVerifier.create((Publisher<?>) result)
@@ -175,16 +175,16 @@ public class ReactiveStatementCallbackTest {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
         Statement<?> statement = mock(Statement.class);
-        ReactiveStatementCallback callback = new ReactiveStatementCallback(statement, query, connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
 
         when(statement.execute()).thenReturn(Flux.empty());
 
-        callback.invoke(null, BIND_BY_ID_METHOD, new Object[]{"$1", 100});
-        callback.invoke(null, BIND_NULL_BY_ID_METHOD, new Object[]{"$2", String.class});
-        callback.invoke(null, ADD_METHOD, null);
-        callback.invoke(null, BIND_NULL_BY_ID_METHOD, new Object[]{"$1", int.class});
-        callback.invoke(null, BIND_BY_ID_METHOD, new Object[]{"$2", 200});
-        Object result = callback.invoke(null, EXECUTE_METHOD, null);
+        callback.invoke(statement, BIND_BY_ID_METHOD, new Object[]{"$1", 100});
+        callback.invoke(statement, BIND_NULL_BY_ID_METHOD, new Object[]{"$2", String.class});
+        callback.invoke(statement, ADD_METHOD, null);
+        callback.invoke(statement, BIND_NULL_BY_ID_METHOD, new Object[]{"$1", int.class});
+        callback.invoke(statement, BIND_BY_ID_METHOD, new Object[]{"$2", 200});
+        Object result = callback.invoke(statement, EXECUTE_METHOD, null);
 
 
         StepVerifier.create((Publisher<?>) result)
@@ -261,9 +261,9 @@ public class ReactiveStatementCallbackTest {
         ProxyConfig proxyConfig = new ProxyConfig();
         String query = "QUERY";
 
-        ReactiveStatementCallback callback = new ReactiveStatementCallback(statement, query, connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, UNWRAP_METHOD, null);
+        Object result = callback.invoke(statement, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(statement);
     }
 

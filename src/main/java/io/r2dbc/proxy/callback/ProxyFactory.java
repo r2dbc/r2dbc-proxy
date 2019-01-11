@@ -33,14 +33,49 @@ public interface ProxyFactory {
 
     void setProxyConfig(ProxyConfig proxyConfig);
 
-    ConnectionFactory createProxyConnectionFactory(ConnectionFactory connectionFactory);
+    /**
+     * Create a proxy {@link ConnectionFactory}.
+     *
+     * @param connectionFactory original connectionFactory
+     * @return proxy connectionFactory
+     */
+    ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory);
 
-    Connection createProxyConnection(Connection connection, ConnectionInfo connectionInfo);
+    /**
+     * Create a proxy {@link Connection}.
+     *
+     * @param connection     original connection
+     * @param connectionInfo connectionInfo
+     * @return proxy connection
+     */
+    Connection wrapConnection(Connection connection, ConnectionInfo connectionInfo);
 
-    Batch<?> createProxyBatch(Batch<?> batch, ConnectionInfo connectionInfo);
+    /**
+     * Create a proxy {@link Batch}.
+     *
+     * @param batch          original batch
+     * @param connectionInfo connectionInfo
+     * @return proxy batch
+     */
+    Batch<?> wrapBatch(Batch<?> batch, ConnectionInfo connectionInfo);
 
-    Statement<?> createProxyStatement(Statement<?> statement, String query, ConnectionInfo connectionInfo);
+    /**
+     * Create a proxy {@link Statement}.
+     *
+     * @param statement      original statement
+     * @param query          query string
+     * @param connectionInfo connectionInfo
+     * @return proxy statement
+     */
+    Statement<?> wrapStatement(Statement<?> statement, String query, ConnectionInfo connectionInfo);
 
-    Result createProxyResult(Result result, QueryExecutionInfo executionInfo);
+    /**
+     * Create a proxy {@link Result}.
+     *
+     * @param result        original result
+     * @param executionInfo executionInfo
+     * @return proxy result
+     */
+    Result wrapResult(Result result, QueryExecutionInfo executionInfo);
 
 }

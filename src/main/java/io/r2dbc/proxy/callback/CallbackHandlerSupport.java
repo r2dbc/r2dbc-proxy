@@ -21,6 +21,7 @@ import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -43,7 +44,7 @@ import static java.util.stream.Collectors.toSet;
  *
  * @author Tadaya Tsuyukubo
  */
-public abstract class CallbackSupport {
+public abstract class CallbackHandlerSupport implements CallbackHandler {
 
     private static final Set<Method> PASS_THROUGH_METHODS;
 
@@ -88,8 +89,8 @@ public abstract class CallbackSupport {
     protected ProxyConfig proxyConfig;
 
 
-    public CallbackSupport(ProxyConfig proxyConfig) {
-        this.proxyConfig = proxyConfig;
+    public CallbackHandlerSupport(ProxyConfig proxyConfig) {
+        this.proxyConfig = Assert.requireNonNull(proxyConfig, "proxyConfig must not be null");
     }
 
     /**
@@ -232,6 +233,8 @@ public abstract class CallbackSupport {
      * @return query invocation result flux
      */
     protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> flux, QueryExecutionInfo executionInfo) {
+        Assert.requireNonNull(flux, "flux must not be null");
+        Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 
         ProxyExecutionListener listener = this.proxyConfig.getListeners();
 
@@ -274,7 +277,7 @@ public abstract class CallbackSupport {
 
         // return a publisher that returns proxy Result
         return Flux.from(queryExecutionFlux)
-            .flatMap(queryResult -> Mono.just(proxyFactory.createProxyResult(queryResult, executionInfo)));
+            .flatMap(queryResult -> Mono.just(proxyFactory.wrapResult(queryResult, executionInfo)));
 
     }
 

@@ -24,6 +24,7 @@ import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
 import org.reactivestreams.Publisher;
@@ -36,11 +37,11 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Proxy callback for {@link Statement}.
+ * Proxy callback handler for {@link Statement}.
  *
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveStatementCallback extends CallbackSupport {
+public class StatementCallbackHandler extends CallbackHandlerSupport {
 
     private Statement<?> statement;
 
@@ -52,21 +53,24 @@ public class ReactiveStatementCallback extends CallbackSupport {
 
     private int currentBindingsIndex = 0;
 
-    public ReactiveStatementCallback(Statement<?> statement, String query, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
+    public StatementCallbackHandler(Statement<?> statement, String query, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
-        this.statement = statement;
-        this.query = query;
-        this.connectionInfo = connectionInfo;
+        this.statement = Assert.requireNonNull(statement, "statement must not be null");
+        this.query = Assert.requireNonNull(query, "query must not be null");
+        this.connectionInfo = Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Assert.requireNonNull(proxy, "proxy must not be null");
+        Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
 
         if ("unwrap".equals(methodName)) {
             return this.statement;
-        } else if ("getOriginalConnection".equals(methodName)) {
+        } else if ("unwrapConnection".equals(methodName)) {
             return this.connectionInfo.getOriginalConnection();
         }
 

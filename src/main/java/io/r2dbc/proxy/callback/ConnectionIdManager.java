@@ -25,6 +25,21 @@ import io.r2dbc.spi.Connection;
  */
 public interface ConnectionIdManager {
 
+    /**
+     * Create a default {@link ConnectionIdManager}.
+     *
+     * @return default connectionIdManager
+     */
+    static ConnectionIdManager create() {
+        return new DefaultConnectionIdManager();
+    }
+
+    /**
+     * Get ID for the input {@link Connection}.
+     *
+     * @param connection connection
+     * @return ID
+     */
     String getId(Connection connection);
 
 }

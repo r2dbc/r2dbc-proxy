@@ -19,6 +19,7 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -27,33 +28,35 @@ import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Proxy callback for {@link Result}.
+ * Proxy callback handler for {@link Result}.
  *
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveResultCallback extends CallbackSupport {
+public class ResultCallbackHandler extends CallbackHandlerSupport {
 
     private Result result;
 
     private QueryExecutionInfo queryExecutionInfo;
 
-    public ReactiveResultCallback(Result result, QueryExecutionInfo queryExecutionInfo, ProxyConfig proxyConfig) {
+    public ResultCallbackHandler(Result result, QueryExecutionInfo queryExecutionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
-        this.result = result;
-        this.queryExecutionInfo = queryExecutionInfo;
+        this.result = Assert.requireNonNull(result, "result must not be null");
+        this.queryExecutionInfo = Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
     }
 
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Assert.requireNonNull(proxy, "proxy must not be null");
+        Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
         ConnectionInfo connectionInfo = this.queryExecutionInfo.getConnectionInfo();
 
         if ("unwrap".equals(methodName)) {  // for Wrapped
             return this.result;
-        } else if ("getOriginalConnection".equals(methodName)) {  // for ConnectionHolder
+        } else if ("unwrapConnection".equals(methodName)) {  // for ConnectionHolder
             return connectionInfo.getOriginalConnection();
         }
-
 
         Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null, null);
 
@@ -100,7 +103,6 @@ public class ReactiveResultCallback extends CallbackSupport {
                 });
 
         }
-
 
         return invocationResult;
 

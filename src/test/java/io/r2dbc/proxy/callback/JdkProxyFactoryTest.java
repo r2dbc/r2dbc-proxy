@@ -54,22 +54,22 @@ public class JdkProxyFactoryTest {
 
         Object result;
 
-        result = this.proxyFactory.createProxyConnectionFactory(connectionFactory);
+        result = this.proxyFactory.wrapConnectionFactory(connectionFactory);
         assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
         assertThat(result).isInstanceOf(Wrapped.class);
         assertThat(result).isNotInstanceOf(ConnectionHolder.class);
 
-        result = this.proxyFactory.createProxyConnection(connection, connectionInfo);
+        result = this.proxyFactory.wrapConnection(connection, connectionInfo);
         assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
         assertThat(result).isInstanceOf(Wrapped.class);
         assertThat(result).isInstanceOf(ConnectionHolder.class);
 
-        result = this.proxyFactory.createProxyBatch(batch, connectionInfo);
+        result = this.proxyFactory.wrapBatch(batch, connectionInfo);
         assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
         assertThat(result).isInstanceOf(Wrapped.class);
         assertThat(result).isInstanceOf(ConnectionHolder.class);
 
-        result = this.proxyFactory.createProxyStatement(statement, query, connectionInfo);
+        result = this.proxyFactory.wrapStatement(statement, query, connectionInfo);
         assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
         assertThat(result).isInstanceOf(Wrapped.class);
         assertThat(result).isInstanceOf(ConnectionHolder.class);
@@ -87,19 +87,19 @@ public class JdkProxyFactoryTest {
         String expected;
         Object result;
 
-        result = this.proxyFactory.createProxyConnectionFactory(connectionFactory);
+        result = this.proxyFactory.wrapConnectionFactory(connectionFactory);
         expected = getExpectedToString(connectionFactory);
         assertThat(result.toString()).isEqualTo(expected);
 
-        result = this.proxyFactory.createProxyConnection(connection, connectionInfo);
+        result = this.proxyFactory.wrapConnection(connection, connectionInfo);
         expected = getExpectedToString(connection);
         assertThat(result.toString()).isEqualTo(expected);
 
-        result = this.proxyFactory.createProxyBatch(batch, connectionInfo);
+        result = this.proxyFactory.wrapBatch(batch, connectionInfo);
         expected = getExpectedToString(batch);
         assertThat(result.toString()).isEqualTo(expected);
 
-        result = this.proxyFactory.createProxyStatement(statement, query, connectionInfo);
+        result = this.proxyFactory.wrapStatement(statement, query, connectionInfo);
         expected = getExpectedToString(statement);
         assertThat(result.toString()).isEqualTo(expected);
 

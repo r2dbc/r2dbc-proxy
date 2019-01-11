@@ -18,6 +18,7 @@ package io.r2dbc.proxy.listener;
 
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,14 +63,35 @@ public class CompositeProxyExecutionListener implements ProxyExecutionListener {
         this.listeners.forEach(listener -> listener.eachQueryResult(execInfo));
     }
 
+    /**
+     * Add a {@link ProxyExecutionListener}.
+     *
+     * @param listener a listener
+     * @return {@code true} as specified by {@link List#add(Object)}
+     */
     public boolean add(ProxyExecutionListener listener) {
+        Assert.requireNonNull(listener, "listener must not be null");
+
         return this.listeners.add(listener);
     }
 
+    /**
+     * Add a list of {@link ProxyExecutionListener}.
+     *
+     * @param listeners collection of listeners
+     * @return {@code true} if this list changed as a result of the call
+     */
     public boolean addAll(Collection<ProxyExecutionListener> listeners) {
+        Assert.requireNonNull(listeners, "listeners must not be null");
+
         return this.listeners.addAll(listeners);
     }
 
+    /**
+     * Get registered listeners.
+     *
+     * @return registered listeners
+     */
     public List<ProxyExecutionListener> getListeners() {
         return this.listeners;
     }

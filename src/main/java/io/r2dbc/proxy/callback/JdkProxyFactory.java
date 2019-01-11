@@ -18,6 +18,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
@@ -44,107 +45,77 @@ public class JdkProxyFactory implements ProxyFactory {
     }
 
     @Override
-    public ConnectionFactory createProxyConnectionFactory(ConnectionFactory connectionFactory) {
+    public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
+        Assert.requireNonNull(connectionFactory, "connectionFactory must not be null");
+
+        CallbackHandler logic = new ConnectionFactoryCallbackHandler(connectionFactory, this.proxyConfig);
+        CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (ConnectionFactory) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{ConnectionFactory.class, Wrapped.class},
-            new ConnectionFactoryInvocationHandler(connectionFactory, this.proxyConfig));
+            new Class<?>[]{ConnectionFactory.class, Wrapped.class}, invocationHandler);
     }
 
     @Override
-    public Connection createProxyConnection(Connection connection, ConnectionInfo connectionInfo) {
+    public Connection wrapConnection(Connection connection, ConnectionInfo connectionInfo) {
+        Assert.requireNonNull(connection, "connection must not be null");
+        Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
+
+        CallbackHandler logic = new ConnectionCallbackHandler(connection, connectionInfo, this.proxyConfig);
+        CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Connection) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Connection.class, Wrapped.class, ConnectionHolder.class},
-            new ConnectionInvocationHandler(connection, connectionInfo, this.proxyConfig));
+            new Class<?>[]{Connection.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
     }
 
     @Override
-    public Batch<?> createProxyBatch(Batch<?> batch, ConnectionInfo connectionInfo) {
+    public Batch<?> wrapBatch(Batch<?> batch, ConnectionInfo connectionInfo) {
+        Assert.requireNonNull(batch, "batch must not be null");
+        Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
+
+        CallbackHandler logic = new BatchCallbackHandler(batch, connectionInfo, this.proxyConfig);
+        CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Batch<?>) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Batch.class, Wrapped.class, ConnectionHolder.class},
-            new BatchInvocationHandler(batch, connectionInfo, this.proxyConfig));
+            new Class<?>[]{Batch.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
     }
 
     @Override
-    public Statement<?> createProxyStatement(Statement<?> statement, String query, ConnectionInfo connectionInfo) {
+    public Statement<?> wrapStatement(Statement<?> statement, String query, ConnectionInfo connectionInfo) {
+        Assert.requireNonNull(statement, "statement must not be null");
+        Assert.requireNonNull(query, "query must not be null");
+        Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
+
+        CallbackHandler logic = new StatementCallbackHandler(statement, query, connectionInfo, this.proxyConfig);
+        CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Statement<?>) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Statement.class, Wrapped.class, ConnectionHolder.class},
-            new StatementInvocationHandler(statement, query, connectionInfo, this.proxyConfig));
+            new Class<?>[]{Statement.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
     }
 
     @Override
-    public Result createProxyResult(Result result, QueryExecutionInfo queryExecutionInfo) {
+    public Result wrapResult(Result result, QueryExecutionInfo queryExecutionInfo) {
+        Assert.requireNonNull(result, "result must not be null");
+        Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
+
+        CallbackHandler logic = new ResultCallbackHandler(result, queryExecutionInfo, this.proxyConfig);
+        CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Result) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Result.class, Wrapped.class, ConnectionHolder.class},
-            new ResultInvocationHandler(result, queryExecutionInfo, this.proxyConfig));
+            new Class<?>[]{Result.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
     }
 
-    static class ConnectionFactoryInvocationHandler implements InvocationHandler {
 
-        private ReactiveConnectionFactoryCallback delegate;
+    /**
+     * {@link InvocationHandler} implementation that delegates to {@link CallbackHandler}.
+     */
+    static class CallbackInvocationHandler implements InvocationHandler {
 
-        public ConnectionFactoryInvocationHandler(ConnectionFactory connectionFactory, ProxyConfig proxyConfig) {
-            this.delegate = new ReactiveConnectionFactoryCallback(connectionFactory, proxyConfig);
+        private CallbackHandler delegate;
+
+        public CallbackInvocationHandler(CallbackHandler delegate) {
+            Assert.requireNonNull(delegate, "delegate must not be null");
+
+            this.delegate = delegate;
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            return delegate.invoke(proxy, method, args);
-        }
-    }
-
-    static class ConnectionInvocationHandler implements InvocationHandler {
-
-        private ReactiveConnectionCallback delegate;
-
-        public ConnectionInvocationHandler(Connection connection, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
-            this.delegate = new ReactiveConnectionCallback(connection, connectionInfo, proxyConfig);
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            return delegate.invoke(proxy, method, args);
-        }
-    }
-
-    static class BatchInvocationHandler implements InvocationHandler {
-
-        private ReactiveBatchCallback delegate;
-
-        public BatchInvocationHandler(Batch<?> batch, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
-            this.delegate = new ReactiveBatchCallback(batch, connectionInfo, proxyConfig);
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            return delegate.invoke(proxy, method, args);
-        }
-    }
-
-    static class StatementInvocationHandler implements InvocationHandler {
-
-        private ReactiveStatementCallback delegate;
-
-        public StatementInvocationHandler(Statement<?> statement, String query, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
-            this.delegate = new ReactiveStatementCallback(statement, query, connectionInfo, proxyConfig);
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            return delegate.invoke(proxy, method, args);
-        }
-    }
-
-    static class ResultInvocationHandler implements InvocationHandler {
-
-        private ReactiveResultCallback delegate;
-
-        public ResultInvocationHandler(Result result, QueryExecutionInfo queryExecutionInfo, ProxyConfig proxyConfig) {
-            this.delegate = new ReactiveResultCallback(result, queryExecutionInfo, proxyConfig);
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            return delegate.invoke(proxy, method, args);
+            return this.delegate.invoke(proxy, method, args);
         }
     }
 

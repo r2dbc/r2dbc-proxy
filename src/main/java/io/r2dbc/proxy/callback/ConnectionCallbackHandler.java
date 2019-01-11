@@ -18,6 +18,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Statement;
@@ -26,29 +27,32 @@ import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 /**
- * Proxy callback for {@link Connection}.
+ * Proxy callback handler for {@link Connection}.
  *
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveConnectionCallback extends CallbackSupport {
+public class ConnectionCallbackHandler extends CallbackHandlerSupport {
 
     private Connection connection;
 
     private ConnectionInfo connectionInfo;
 
-    public ReactiveConnectionCallback(Connection connection, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
+    public ConnectionCallbackHandler(Connection connection, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
-        this.connection = connection;
-        this.connectionInfo = connectionInfo;
+        this.connection = Assert.requireNonNull(connection, "connection must not be null");
+        this.connectionInfo = Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
     }
 
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Assert.requireNonNull(proxy, "proxy must not be null");
+        Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
 
         if ("unwrap".equals(methodName)) {
             return this.connection;
-        } else if ("getOriginalConnection".equals(methodName)) {
+        } else if ("unwrapConnection".equals(methodName)) {
             return this.connection;
         }
 
@@ -77,10 +81,10 @@ public class ReactiveConnectionCallback extends CallbackSupport {
         Object result = proceedExecution(method, this.connection, args, this.proxyConfig.getListeners(), this.connectionInfo, null, onComplete);
 
         if ("createBatch".equals(methodName)) {
-            return this.proxyConfig.getProxyFactory().createProxyBatch((Batch) result, this.connectionInfo);
+            return this.proxyConfig.getProxyFactory().wrapBatch((Batch) result, this.connectionInfo);
         } else if ("createStatement".equals(methodName)) {
             String query = (String) args[0];
-            return this.proxyConfig.getProxyFactory().createProxyStatement((Statement) result, query, this.connectionInfo);
+            return this.proxyConfig.getProxyFactory().wrapStatement((Statement) result, query, this.connectionInfo);
         }
 
         return result;

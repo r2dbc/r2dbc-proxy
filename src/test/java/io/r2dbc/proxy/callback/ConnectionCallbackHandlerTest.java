@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveConnectionCallbackTest {
+public class ConnectionCallbackHandlerTest {
 
     private static Method CREATE_BATCH_METHOD = ReflectionUtils.findMethod(Connection.class, "createBatch");
 
@@ -72,11 +72,11 @@ public class ReactiveConnectionCallbackTest {
         Batch<?> resultBatch = mock(Batch.class);
         doReturn(originalBatch).when(connection).createBatch();
 
-        doReturn(resultBatch).when(proxyFactory).createProxyBatch(originalBatch, connectionInfo);
+        doReturn(resultBatch).when(proxyFactory).wrapBatch(originalBatch, connectionInfo);
 
-        ReactiveConnectionCallback callback = new ReactiveConnectionCallback(connection, connectionInfo, proxyConfig);
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, CREATE_BATCH_METHOD, null);
+        Object result = callback.invoke(connection, CREATE_BATCH_METHOD, null);
 
         assertThat(result).isSameAs(resultBatch);
 
@@ -102,11 +102,11 @@ public class ReactiveConnectionCallbackTest {
         Statement<?> resultStatement = mock(Statement.class);
         doReturn(originalStatement).when(connection).createStatement(query);
 
-        doReturn(resultStatement).when(proxyFactory).createProxyStatement(originalStatement, query, connectionInfo);
+        doReturn(resultStatement).when(proxyFactory).wrapStatement(originalStatement, query, connectionInfo);
 
-        ReactiveConnectionCallback callback = new ReactiveConnectionCallback(connection, connectionInfo, proxyConfig);
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, CREATE_STATEMENT_METHOD, new Object[]{query});
+        Object result = callback.invoke(connection, CREATE_STATEMENT_METHOD, new Object[]{query});
 
         assertThat(result).isSameAs(resultStatement);
 
@@ -126,9 +126,9 @@ public class ReactiveConnectionCallbackTest {
 
         when(connection.beginTransaction()).thenReturn(Mono.empty());
 
-        ReactiveConnectionCallback callback = new ReactiveConnectionCallback(connection, connectionInfo, proxyConfig);
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, BEGIN_TRANSACTION_METHOD, null);
+        Object result = callback.invoke(connection, BEGIN_TRANSACTION_METHOD, null);
 
         StepVerifier.create((Publisher<Void>) result)
             .expectSubscription()
@@ -153,9 +153,9 @@ public class ReactiveConnectionCallbackTest {
 
         when(connection.commitTransaction()).thenReturn(Mono.empty());
 
-        ReactiveConnectionCallback callback = new ReactiveConnectionCallback(connection, connectionInfo, proxyConfig);
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, COMMIT_TRANSACTION_METHOD, null);
+        Object result = callback.invoke(connection, COMMIT_TRANSACTION_METHOD, null);
 
         StepVerifier.create((Publisher<Void>) result)
             .expectSubscription()
@@ -180,9 +180,9 @@ public class ReactiveConnectionCallbackTest {
 
         when(connection.rollbackTransaction()).thenReturn(Mono.empty());
 
-        ReactiveConnectionCallback callback = new ReactiveConnectionCallback(connection, connectionInfo, proxyConfig);
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, ROLLBACK_TRANSACTION_METHOD, null);
+        Object result = callback.invoke(connection, ROLLBACK_TRANSACTION_METHOD, null);
 
         StepVerifier.create((Publisher<Void>) result)
             .expectSubscription()
@@ -207,9 +207,9 @@ public class ReactiveConnectionCallbackTest {
 
         when(connection.close()).thenReturn(Mono.empty());
 
-        ReactiveConnectionCallback callback = new ReactiveConnectionCallback(connection, connectionInfo, proxyConfig);
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, CLOSE_METHOD, null);
+        Object result = callback.invoke(connection, CLOSE_METHOD, null);
 
         StepVerifier.create((Publisher<Void>) result)
             .expectSubscription()
@@ -228,9 +228,9 @@ public class ReactiveConnectionCallbackTest {
         ConnectionInfo connectionInfo = new ConnectionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
 
-        ReactiveConnectionCallback callback = new ReactiveConnectionCallback(connection, connectionInfo, proxyConfig);
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, UNWRAP_METHOD, null);
+        Object result = callback.invoke(connection, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(connection);
     }
 

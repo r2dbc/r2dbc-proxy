@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveResultCallbackTest {
+public class ResultCallbackHandlerTest {
 
     private static Method MAP_METHOD = ReflectionUtils.findMethod(Result.class, "map", BiFunction.class);
 
@@ -60,11 +60,11 @@ public class ReactiveResultCallbackTest {
         Result mockResult = mock(Result.class);
         when(mockResult.map(any())).thenReturn(source);
 
-        ReactiveResultCallback callback = new ReactiveResultCallback(mockResult, queryExecutionInfo, proxyConfig);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{null};
-        Object result = callback.invoke(null, MAP_METHOD, args);
+        Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
         assertThat(result)
             .isInstanceOf(Publisher.class)
@@ -132,11 +132,11 @@ public class ReactiveResultCallbackTest {
         Result mockResult = mock(Result.class);
         when(mockResult.map(any())).thenReturn(publisher);
 
-        ReactiveResultCallback callback = new ReactiveResultCallback(mockResult, queryExecutionInfo, proxyConfig);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{null};
-        Object result = callback.invoke(null, MAP_METHOD, args);
+        Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
         assertThat(result).isInstanceOf(Publisher.class);
         assertThat(result).isNotSameAs(publisher);
@@ -175,11 +175,11 @@ public class ReactiveResultCallbackTest {
         Result mockResult = mock(Result.class);
         when(mockResult.map(any())).thenReturn(publisher);
 
-        ReactiveResultCallback callback = new ReactiveResultCallback(mockResult, queryExecutionInfo, proxyConfig);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{null};
-        Object result = callback.invoke(null, MAP_METHOD, args);
+        Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
         assertThat(result)
             .isInstanceOf(Publisher.class)
@@ -218,11 +218,11 @@ public class ReactiveResultCallbackTest {
         Result mockResult = mock(Result.class);
         when(mockResult.map(any())).thenReturn(source);
 
-        ReactiveResultCallback callback = new ReactiveResultCallback(mockResult, queryExecutionInfo, proxyConfig);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{null};
-        Object result = callback.invoke(null, MAP_METHOD, args);
+        Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
         assertThat(result)
             .isInstanceOf(Publisher.class)
@@ -258,9 +258,9 @@ public class ReactiveResultCallbackTest {
         QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
 
-        ReactiveResultCallback callback = new ReactiveResultCallback(mockResult, queryExecutionInfo, proxyConfig);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, UNWRAP_METHOD, null);
+        Object result = callback.invoke(mockResult, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(mockResult);
     }
 

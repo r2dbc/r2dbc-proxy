@@ -28,7 +28,7 @@ public class ProxyConfig {
 
     private CompositeProxyExecutionListener listeners = new CompositeProxyExecutionListener();
 
-    private ConnectionIdManager connectionIdManager = new DefaultConnectionIdManager();
+    private ConnectionIdManager connectionIdManager = ConnectionIdManager.create();
 
     private ProxyFactory proxyFactory = new JdkProxyFactory();
 

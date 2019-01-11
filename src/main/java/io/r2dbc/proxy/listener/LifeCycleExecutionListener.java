@@ -19,6 +19,7 @@ package io.r2dbc.proxy.listener;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
@@ -33,15 +34,16 @@ import java.lang.reflect.Method;
  * @author Tadaya Tsuyukubo
  * @see LifeCycleListener
  */
-public class LifeCycleExecutionListener implements ProxyExecutionListener {
+public final class LifeCycleExecutionListener implements ProxyExecutionListener {
 
     private LifeCycleListener delegate;
 
     public static LifeCycleExecutionListener of(LifeCycleListener lifeCycleListener) {
+        Assert.requireNonNull(lifeCycleListener, "lifeCycleListener must not be null");
         return new LifeCycleExecutionListener(lifeCycleListener);
     }
 
-    public LifeCycleExecutionListener(LifeCycleListener delegate) {
+    private LifeCycleExecutionListener(LifeCycleListener delegate) {
         this.delegate = delegate;
     }
 
@@ -61,7 +63,6 @@ public class LifeCycleExecutionListener implements ProxyExecutionListener {
         Method method = executionInfo.getMethod();
         String methodName = method.getName();
         Class<?> methodDeclaringClass = method.getDeclaringClass();
-
 
         if (ConnectionFactory.class.equals(methodDeclaringClass)) {
             // ConnectionFactory methods

@@ -18,6 +18,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 
@@ -25,20 +26,23 @@ import java.lang.reflect.Method;
 import java.util.function.BiFunction;
 
 /**
- * Proxy callback for {@link ConnectionFactory}.
+ * Proxy callback handler for {@link ConnectionFactory}.
  *
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveConnectionFactoryCallback extends CallbackSupport {
+public class ConnectionFactoryCallbackHandler extends CallbackHandlerSupport {
 
     private ConnectionFactory connectionFactory;
 
-    public ReactiveConnectionFactoryCallback(ConnectionFactory connectionFactory, ProxyConfig proxyConfig) {
+    public ConnectionFactoryCallbackHandler(ConnectionFactory connectionFactory, ProxyConfig proxyConfig) {
         super(proxyConfig);
-        this.connectionFactory = connectionFactory;
+        this.connectionFactory = Assert.requireNonNull(connectionFactory, "connectionFactory must not be null");
     }
 
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Assert.requireNonNull(proxy, "proxy must not be null");
+        Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
 
@@ -64,7 +68,7 @@ public class ReactiveConnectionFactoryCallback extends CallbackSupport {
 
                 executionInfo.setConnectionInfo(connectionInfo);
 
-                Connection proxyConnection = proxyConfig.getProxyFactory().createProxyConnection(connection, connectionInfo);
+                Connection proxyConnection = proxyConfig.getProxyFactory().wrapConnection(connection, connectionInfo);
 
                 return proxyConnection;
             };

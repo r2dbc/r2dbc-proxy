@@ -58,21 +58,24 @@ import static org.mockito.Mockito.when;
  * @author Tadaya Tsuyukubo
  */
 @ExtendWith(MockitoExtension.class)
-public class CallbackSupportTest {
+public class CallbackHandlerSupportTest {
 
-    private CallbackSupport callbackSupport;
+    private CallbackHandlerSupport callbackHandlerSupport;
 
     @Mock
     private ProxyConfig proxyConfig;
 
     @BeforeEach
     void setUp() {
-        this.callbackSupport = new CallbackSupport(this.proxyConfig) {
-
+        this.callbackHandlerSupport = new CallbackHandlerSupport(this.proxyConfig) {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return null;
+            }
         };
 
         Clock clock = Clock.fixed(Instant.ofEpochSecond(100), ZoneId.systemDefault());
-        this.callbackSupport.setClock(clock);
+        this.callbackHandlerSupport.setClock(clock);
     }
 
 
@@ -90,13 +93,13 @@ public class CallbackSupportTest {
 
         // when it creates a proxy for Result
         Result mockResultProxy = mock(Result.class);
-        when(proxyFactory.createProxyResult(any(), any())).thenReturn(mockResultProxy);
+        when(proxyFactory.wrapResult(any(), any())).thenReturn(mockResultProxy);
 
         // produce single result
         Result mockResult = mock(Result.class);
         Mono<Result> resultPublisher = Mono.just(mockResult);
 
-        Flux<? extends Result> result = this.callbackSupport.interceptQueryExecution(resultPublisher, executionInfo);
+        Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(resultPublisher, executionInfo);
 
         // verifies result flux
         StepVerifier.create(result)
@@ -134,7 +137,7 @@ public class CallbackSupportTest {
 
         // verify the call to create a proxy result
         ArgumentCaptor<Result> resultCaptor = ArgumentCaptor.forClass(Result.class);
-        verify(proxyFactory).createProxyResult(resultCaptor.capture(), eq(executionInfo));
+        verify(proxyFactory).wrapResult(resultCaptor.capture(), eq(executionInfo));
 
         Result captureResult = resultCaptor.getValue();
         assertThat(captureResult).isSameAs(mockResult);
@@ -154,7 +157,7 @@ public class CallbackSupportTest {
         RuntimeException exception = new RuntimeException();
         Publisher<Result> publisher = TestPublisher.<Result>create().error(exception);
 
-        Flux<? extends Result> result = this.callbackSupport.interceptQueryExecution(publisher, executionInfo);
+        Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(publisher, executionInfo);
 
         // verifies result flux
         StepVerifier.create(result)
@@ -198,7 +201,7 @@ public class CallbackSupportTest {
 
         // when it creates a proxy for Result
         Result mockResultProxy = mock(Result.class);
-        when(proxyFactory.createProxyResult(any(), any())).thenReturn(mockResultProxy);
+        when(proxyFactory.wrapResult(any(), any())).thenReturn(mockResultProxy);
 
         // produce multiple results
         Result mockResult1 = mock(Result.class);
@@ -215,7 +218,7 @@ public class CallbackSupportTest {
                 assertThat(executionInfo.getCurrentMappedResult()).isNull();
             });
 
-        Flux<? extends Result> result = this.callbackSupport.interceptQueryExecution(publisher, executionInfo);
+        Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(publisher, executionInfo);
 
         // result should return a publisher that emits 3 proxy results
         // verifies result flux
@@ -260,7 +263,7 @@ public class CallbackSupportTest {
 
         // verify the call to create proxy result
         ArgumentCaptor<Result> resultCaptor = ArgumentCaptor.forClass(Result.class);
-        verify(proxyFactory, times(3)).createProxyResult(resultCaptor.capture(), eq(executionInfo));
+        verify(proxyFactory, times(3)).wrapResult(resultCaptor.capture(), eq(executionInfo));
 
         List<Result> captured = resultCaptor.getAllValues();
         assertThat(captured).hasSize(3).containsExactly(mockResult1, mockResult2, mockResult3);
@@ -288,7 +291,7 @@ public class CallbackSupportTest {
             });
         ;
 
-        Flux<? extends Result> result = this.callbackSupport.interceptQueryExecution(publisher, executionInfo);
+        Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(publisher, executionInfo);
 
         // verifies result flux
         StepVerifier.create(result)
@@ -340,7 +343,7 @@ public class CallbackSupportTest {
 
         doReturn(publisher).when(target).execute();
 
-        Object result = this.callbackSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null, null);
+        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null, null);
 
         // verify method on target is invoked
         verify(target).execute();
@@ -404,7 +407,7 @@ public class CallbackSupportTest {
 
         doReturn(publisher).when(target).execute();
 
-        Object result = this.callbackSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null, null);
+        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null, null);
 
         // verify method on target is invoked
         verify(target).execute();
@@ -458,7 +461,7 @@ public class CallbackSupportTest {
 
         doReturn(mockBatch).when(target).add("QUERY");
 
-        Object result = this.callbackSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null, null);
+        Object result = this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null, null);
 
         // verify method on target is invoked
         verify(target).add("QUERY");
@@ -506,7 +509,7 @@ public class CallbackSupportTest {
         when(target.add("QUERY")).thenThrow(exception);
 
         assertThatThrownBy(() -> {
-            this.callbackSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null, null);
+            this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null, null);
         }).isInstanceOf(RuntimeException.class);
 
         verify(target).add("QUERY");
@@ -560,19 +563,19 @@ public class CallbackSupportTest {
         Object result;
 
         // verify toString()
-        result = this.callbackSupport.proceedExecution(toStringMethod, target, null, listener, null, null, null);
+        result = this.callbackHandlerSupport.proceedExecution(toStringMethod, target, null, listener, null, null, null);
         assertThat(result).isEqualTo("MyStub-proxy [FOO]");
 
         // verify hashCode()
-        result = this.callbackSupport.proceedExecution(hashCodeMethod, target, null, listener, null, null, null);
+        result = this.callbackHandlerSupport.proceedExecution(hashCodeMethod, target, null, listener, null, null, null);
         assertThat(result).isEqualTo(target.hashCode());
 
         // verify equals() with null
-        result = this.callbackSupport.proceedExecution(equalsMethod, target, new Object[]{null}, listener, null, null, null);
+        result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{null}, listener, null, null, null);
         assertThat(result).isEqualTo(false);
 
         // verify equals() with target
-        result = this.callbackSupport.proceedExecution(equalsMethod, target, new Object[]{target}, listener, null, null, null);
+        result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{target}, listener, null, null, null);
         assertThat(result).isEqualTo(true);
     }
 

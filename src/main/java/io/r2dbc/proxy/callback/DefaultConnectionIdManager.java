@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.callback;
 
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,12 +28,14 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Tadaya Tsuyukubo
  */
-public class DefaultConnectionIdManager implements ConnectionIdManager {
+final class DefaultConnectionIdManager implements ConnectionIdManager {
 
     private AtomicLong idCounter = new AtomicLong(0);
 
     @Override
     public String getId(Connection connection) {
+        Assert.requireNonNull(connection, "connection must not be null");
+
         return String.valueOf(this.idCounter.incrementAndGet());
     }
 

@@ -18,6 +18,7 @@ package io.r2dbc.proxy.support;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
+import io.r2dbc.proxy.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,22 +58,43 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
     private String delimiter = DEFAULT_DELIMITER;
 
 
+    /**
+     * Create a {@link MethodExecutionInfoFormatter} with default consumers that format the {@link MethodExecutionInfo}.
+     *
+     * @return a formatter
+     */
     public static MethodExecutionInfoFormatter withDefault() {
         MethodExecutionInfoFormatter formatter = new MethodExecutionInfoFormatter();
         formatter.addConsumer(formatter.defaultConsumer);
         return formatter;
     }
 
+    public MethodExecutionInfoFormatter() {
+    }
+
+    private MethodExecutionInfoFormatter(MethodExecutionInfoFormatter formatter) {
+        this.delimiter = formatter.delimiter;
+        this.consumers.addAll(formatter.consumers);
+    }
+
     @Override
     public String apply(MethodExecutionInfo executionInfo) {
+        Assert.requireNonNull(executionInfo, "executionInfo must not be null");
         return format(executionInfo);
     }
 
+    /**
+     * Convert the given {@link MethodExecutionInfo} to {@code String} using registered consumers.
+     *
+     * @param executionInfo input
+     * @return formatted sting
+     */
     public String format(MethodExecutionInfo executionInfo) {
+        Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 
         StringBuilder sb = new StringBuilder();
 
-        consumers.forEach(consumer -> {
+        this.consumers.forEach(consumer -> {
             consumer.accept(executionInfo, sb);
             sb.append(this.delimiter);
         });
@@ -80,12 +102,18 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
         chompIfEndWith(sb, this.delimiter);
 
         return sb.toString();
-
     }
 
+    /**
+     * Register a consumer that converts {@link MethodExecutionInfo} to a {@code String}.
+     *
+     * @param consumer a {@code BiConsumer} that takes a {@link MethodExecutionInfo} and write to the {@code StringBuilder}.
+     * @return this formatter
+     */
     public MethodExecutionInfoFormatter addConsumer(BiConsumer<MethodExecutionInfo, StringBuilder> consumer) {
+        Assert.requireNonNull(consumer, "consumer must not be null");
         this.consumers.add(consumer);
-        return this;
+        return new MethodExecutionInfoFormatter(this);
     }
 
     // TODO: share this with QueryExecutionInfoFormatter

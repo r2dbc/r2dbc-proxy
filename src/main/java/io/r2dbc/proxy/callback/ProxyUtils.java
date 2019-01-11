@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.callback;
 
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Result;
@@ -34,34 +35,74 @@ public class ProxyUtils {
     private ProxyUtils() {
     }
 
+    /**
+     * Get original {@link Connection} if given {@link Connection} has implemented {@link Wrapped}.
+     *
+     * @param connection a connection
+     * @return optional of original connection or give connection
+     */
     @SuppressWarnings("unchecked")
-    public static Optional<Connection> getOriginalConnection(Connection connection) {
+    public static Optional<Connection> unwrapConnection(Connection connection) {
+        Assert.requireNonNull(connection, "connection must not be null");
+
         if (connection instanceof Wrapped) {
             return Optional.of(((Wrapped<Connection>) connection).unwrap());
         }
         return Optional.of(connection);
     }
 
-    public static Optional<Connection> getOriginalConnection(Batch<?> batch) {
+    /**
+     * Get original {@link Connection} from proxy {@link Batch}.
+     *
+     * When provided {@link Batch} is a proxy that implements {@link ConnectionHolder}, retrieves original
+     * {@link Connection}; otherwise, returns empty {@code Optional}.
+     *
+     * @param batch a batch
+     * @return optional of original connection or empty
+     */
+    public static Optional<Connection> unwrapConnection(Batch<?> batch) {
+        Assert.requireNonNull(batch, "batch must not be null");
+
         if (batch instanceof ConnectionHolder) {
-            return Optional.of(((ConnectionHolder) batch).getOriginalConnection());
+            return Optional.of(((ConnectionHolder) batch).unwrapConnection());
         }
         return Optional.empty();
     }
 
-    public static Optional<Connection> getOriginalConnection(Statement<?> statement) {
+    /**
+     * Get original {@link Connection} from proxy {@link Statement}.
+     *
+     * When provided {@link Statement} is a proxy that implements {@link ConnectionHolder}, retrieves original
+     * {@link Connection}; otherwise, returns empty {@code Optional}.
+     *
+     * @param statement a statement
+     * @return optional of original connection or empty
+     */
+    public static Optional<Connection> unwrapConnection(Statement<?> statement) {
+        Assert.requireNonNull(statement, "statement must not be null");
+
         if (statement instanceof ConnectionHolder) {
-            return Optional.of(((ConnectionHolder) statement).getOriginalConnection());
+            return Optional.of(((ConnectionHolder) statement).unwrapConnection());
         }
         return Optional.empty();
     }
 
-    public static Optional<Connection> getOriginalConnection(Result result) {
+    /**
+     * Get original {@link Connection} from proxy {@link Result}.
+     *
+     * When provided {@link Result} is a proxy that implements {@link ConnectionHolder}, retrieves original
+     * {@link Connection}; otherwise, returns empty {@code Optional}.
+     *
+     * @param result a statement
+     * @return optional of original connection or empty
+     */
+    public static Optional<Connection> unwrapConnection(Result result) {
+        Assert.requireNonNull(result, "result must not be null");
+
         if (result instanceof ConnectionHolder) {
-            return Optional.of(((ConnectionHolder) result).getOriginalConnection());
+            return Optional.of(((ConnectionHolder) result).unwrapConnection());
         }
         return Optional.empty();
     }
-
 
 }

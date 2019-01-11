@@ -53,7 +53,7 @@ public class LifeCycleExecutionListenerTest {
 
         List<Method> invokedMethods = new ArrayList<>();
         LifeCycleListener lifeCycleListener = createLifeCycleListener(invokedMethods);
-        LifeCycleExecutionListener listener = new LifeCycleExecutionListener(lifeCycleListener);
+        LifeCycleExecutionListener listener = LifeCycleExecutionListener.of(lifeCycleListener);
 
         MethodExecutionInfo methodExecutionInfo = mock(MethodExecutionInfo.class);
 
@@ -112,7 +112,7 @@ public class LifeCycleExecutionListenerTest {
 
         List<Method> invokedMethods = new ArrayList<>();
         LifeCycleListener lifeCycleListener = createLifeCycleListener(invokedMethods);
-        LifeCycleExecutionListener listener = new LifeCycleExecutionListener(lifeCycleListener);
+        LifeCycleExecutionListener listener = LifeCycleExecutionListener.of(lifeCycleListener);
 
         QueryExecutionInfo queryExecutionInfo;
 

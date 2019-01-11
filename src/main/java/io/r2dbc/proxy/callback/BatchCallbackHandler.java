@@ -20,6 +20,7 @@ import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
+import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
@@ -31,11 +32,11 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Proxy callback for {@link Batch}.
+ * Proxy callback handler for {@link Batch}.
  *
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveBatchCallback extends CallbackSupport {
+public class BatchCallbackHandler extends CallbackHandlerSupport {
 
     private Batch<?> batch;
 
@@ -43,20 +44,23 @@ public class ReactiveBatchCallback extends CallbackSupport {
 
     private List<String> queries = new ArrayList<>();
 
-    public ReactiveBatchCallback(Batch<?> batch, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
+    public BatchCallbackHandler(Batch<?> batch, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
-        this.batch = batch;
-        this.connectionInfo = connectionInfo;
+        this.batch = Assert.requireNonNull(batch, "batch must not be null");
+        this.connectionInfo = Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Assert.requireNonNull(proxy, "proxy must not be null");
+        Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
 
         if ("unwrap".equals(methodName)) {
             return this.batch;
-        } else if ("getOriginalConnection".equals(methodName)) {
+        } else if ("unwrapConnection".equals(methodName)) {
             return this.connectionInfo.getOriginalConnection();
         }
 

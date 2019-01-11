@@ -23,6 +23,7 @@ import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
+import io.r2dbc.proxy.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -224,6 +225,11 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     private List<BiConsumer<QueryExecutionInfo, StringBuilder>> consumers = new ArrayList<>();
 
 
+    /**
+     * Create a {@link QueryExecutionInfoFormatter} which writes out all attributes on {@link QueryExecutionInfo}.
+     *
+     * @return a formatter
+     */
     public static QueryExecutionInfoFormatter showAll() {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.addConsumer(formatter.onThread);
@@ -239,11 +245,23 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
         return formatter;
     }
 
+    /**
+     * Register a {@code BiConsumer} that convert {@link QueryExecutionInfo} to {@code String}.
+     *
+     * @param consumer a {@code BiConsumer} that takes a {@link QueryExecutionInfo} and write to the {@code StringBuilder}.
+     * @return this formatter
+     */
     public QueryExecutionInfoFormatter addConsumer(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
         this.consumers.add(consumer);
         return this;
     }
 
+    /**
+     * Convert the given {@link QueryExecutionInfo} to {@code String} using registered consumers.
+     *
+     * @param executionInfo input
+     * @return formatted sting
+     */
     public String format(QueryExecutionInfo executionInfo) {
 
         StringBuilder sb = new StringBuilder();
@@ -278,12 +296,21 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
         }
     }
 
+    /**
+     * Set a delimiter between each consumer
+     *
+     * @param delimiter delimiter
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter delimiter(String delimiter) {
         this.delimiter = delimiter;
         return this;
     }
 
-
+    /**
+     *
+     * @return
+     */
     public QueryExecutionInfoFormatter showThread() {
         this.consumers.add(this.onThread);
         return this;
@@ -405,6 +432,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      * @return formatter
      */
     public QueryExecutionInfoFormatter bindingValue(BiConsumer<BindingValue, StringBuilder> onBindingValue) {
+        Assert.requireNonNull(onBindingValue, "onBindingValue must not be null");
         this.onBindingValue = onBindingValue;
         return this;
     }
@@ -416,6 +444,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      * @return formatter
      */
     public QueryExecutionInfoFormatter indexBindings(BiConsumer<SortedSet<Binding>, StringBuilder> onIndexBindings) {
+        Assert.requireNonNull(onIndexBindings, "onIndexBindings must not be null");
         this.onIndexBindings = onIndexBindings;
         return this;
     }
@@ -427,6 +456,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      * @return formatter
      */
     public QueryExecutionInfoFormatter identifierBindings(BiConsumer<SortedSet<Binding>, StringBuilder> onIdentifierBindings) {
+        Assert.requireNonNull(onIdentifierBindings, "onIdentifierBindings must not be null");
         this.onIdentifierBindings = onIdentifierBindings;
         return this;
     }

@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tadaya Tsuyukubo
  */
-public class ReactiveBatchCallbackTest {
+public class BatchCallbackHandlerTest {
 
     private static Method ADD_METHOD = ReflectionUtils.findMethod(Batch.class, "add", String.class);
 
@@ -56,7 +56,7 @@ public class ReactiveBatchCallbackTest {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
         Batch<?> batch = mock(Batch.class);
-        ReactiveBatchCallback callback = new ReactiveBatchCallback(batch, connectionInfo, proxyConfig);
+        BatchCallbackHandler callback = new BatchCallbackHandler(batch, connectionInfo, proxyConfig);
 
         // mock batch execution
         when(batch.execute()).thenReturn(Flux.empty());
@@ -64,10 +64,10 @@ public class ReactiveBatchCallbackTest {
         String query1 = "QUERY-1";
         String query2 = "QUERY-2";
 
-        callback.invoke(null, ADD_METHOD, new String[]{query1});
-        callback.invoke(null, ADD_METHOD, new String[]{query2});
+        callback.invoke(batch, ADD_METHOD, new String[]{query1});
+        callback.invoke(batch, ADD_METHOD, new String[]{query2});
 
-        Object result = callback.invoke(null, EXECUTE_METHOD, new String[]{});
+        Object result = callback.invoke(batch, EXECUTE_METHOD, new String[]{});
 
 
         StepVerifier.create((Publisher<? extends Result>) result)
@@ -104,9 +104,9 @@ public class ReactiveBatchCallbackTest {
         ConnectionInfo connectionInfo = new ConnectionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
 
-        ReactiveBatchCallback callback = new ReactiveBatchCallback(batch, connectionInfo, proxyConfig);
+        BatchCallbackHandler callback = new BatchCallbackHandler(batch, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(null, UNWRAP_METHOD, null);
+        Object result = callback.invoke(batch, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(batch);
     }
 
