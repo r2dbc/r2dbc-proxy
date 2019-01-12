@@ -16,10 +16,8 @@
 
 package io.r2dbc.proxy.callback;
 
-import io.r2dbc.proxy.core.BindingValue;
-import io.r2dbc.proxy.core.BindingValue.NullBindingValue;
-import io.r2dbc.proxy.core.BindingValue.SimpleBindingValue;
 import io.r2dbc.proxy.core.Bindings;
+import io.r2dbc.proxy.core.BoundValue;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
@@ -86,17 +84,17 @@ public class StatementCallbackHandler extends CallbackHandlerSupport {
             }
             Bindings bindings = this.bindings.get(this.currentBindingsIndex);
 
-            BindingValue bindingValue;
+            BoundValue boundValue;
             if ("bind".equals(methodName)) {
-                bindingValue = new SimpleBindingValue(args[1]);
+                boundValue = BoundValue.value(args[1]);
             } else {
-                bindingValue = new NullBindingValue((Class<?>) args[1]);
+                boundValue = BoundValue.nullValue((Class<?>) args[1]);
             }
 
             if (args[0] instanceof Integer) {
-                bindings.addIndexBinding((int) args[0], bindingValue);
+                bindings.addIndexBinding((int) args[0], boundValue);
             } else {
-                bindings.addIdentifierBinding(args[0], bindingValue);
+                bindings.addIdentifierBinding(args[0], boundValue);
             }
         } else if ("execute".equals(methodName)) {
 

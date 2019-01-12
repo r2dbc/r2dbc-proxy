@@ -17,8 +17,7 @@
 package io.r2dbc.proxy.support;
 
 import io.r2dbc.proxy.core.Binding;
-import io.r2dbc.proxy.core.BindingValue;
-import io.r2dbc.proxy.core.BindingValue.NullBindingValue;
+import io.r2dbc.proxy.core.BoundValue;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
@@ -136,14 +135,14 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting binding value.
      */
-    public BiConsumer<BindingValue, StringBuilder> onBindingValue = (bindingValue, sb) -> {
-        if (bindingValue instanceof NullBindingValue) {
-            Class<?> type = ((NullBindingValue) bindingValue).getType();
+    public BiConsumer<BoundValue, StringBuilder> onBoundValue = (boundValue, sb) -> {
+        if (boundValue.isNull()) {
+            Class<?> type = boundValue.getNullType();
             sb.append("null(");
             sb.append(type.getSimpleName());
             sb.append(")");
         } else {
-            sb.append(bindingValue.getValue());
+            sb.append(boundValue.getValue());
         }
     };
 
@@ -154,10 +153,10 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      */
     public BiConsumer<SortedSet<Binding>, StringBuilder> onIndexBindings = (indexBindings, sb) -> {
         String s = indexBindings.stream()
-            .map(Binding::getBindingValue)
-            .map(bindingValue -> {
+            .map(Binding::getBoundValue)
+            .map(boundValue -> {
                 StringBuilder sbuilder = new StringBuilder();
-                this.onBindingValue.accept(bindingValue, sbuilder);
+                this.onBoundValue.accept(boundValue, sbuilder);
                 return sbuilder.toString();
             })
             .collect(joining(","));
@@ -176,7 +175,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
                 StringBuilder sbuilder = new StringBuilder();
                 sbuilder.append(binding.getKey());
                 sbuilder.append("=");
-                this.onBindingValue.accept(binding.getBindingValue(), sbuilder);
+                this.onBoundValue.accept(binding.getBoundValue(), sbuilder);
                 return sbuilder.toString();
             })
             .collect(joining(","));
@@ -309,7 +308,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
 
     /**
      *
-     * @return
+     * @return formatter
      */
     public QueryExecutionInfoFormatter showThread() {
         this.consumers.add(this.onThread);
@@ -426,14 +425,14 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
 
 
     /**
-     * Set a consumer for converting {@link BindingValue}.
+     * Set a consumer for converting {@link BoundValue}.
      *
-     * @param onBindingValue bi-consumer for binding value
+     * @param onBoundValue bi-consumer for binding value
      * @return formatter
      */
-    public QueryExecutionInfoFormatter bindingValue(BiConsumer<BindingValue, StringBuilder> onBindingValue) {
-        Assert.requireNonNull(onBindingValue, "onBindingValue must not be null");
-        this.onBindingValue = onBindingValue;
+    public QueryExecutionInfoFormatter boundValue(BiConsumer<BoundValue, StringBuilder> onBoundValue) {
+        Assert.requireNonNull(onBoundValue, "onBoundValue must not be null");
+        this.onBoundValue = onBoundValue;
         return this;
     }
 

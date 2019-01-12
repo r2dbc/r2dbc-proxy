@@ -16,9 +16,8 @@
 
 package io.r2dbc.proxy.support;
 
-import io.r2dbc.proxy.core.BindingValue.NullBindingValue;
-import io.r2dbc.proxy.core.BindingValue.SimpleBindingValue;
 import io.r2dbc.proxy.core.Bindings;
+import io.r2dbc.proxy.core.BoundValue;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
@@ -69,25 +68,25 @@ public class QueryExecutionInfoFormatterTest {
     void statementExecution() {
 
         Bindings indexBindings1 = new Bindings();
-        indexBindings1.addIndexBinding(0, new SimpleBindingValue("100"));
-        indexBindings1.addIndexBinding(1, new SimpleBindingValue("101"));
-        indexBindings1.addIndexBinding(2, new SimpleBindingValue("102"));
+        indexBindings1.addIndexBinding(0, BoundValue.value("100"));
+        indexBindings1.addIndexBinding(1, BoundValue.value("101"));
+        indexBindings1.addIndexBinding(2, BoundValue.value("102"));
 
         Bindings indexBindings2 = new Bindings();
-        indexBindings2.addIndexBinding(2, new SimpleBindingValue("202"));
-        indexBindings2.addIndexBinding(1, new NullBindingValue(String.class));
-        indexBindings2.addIndexBinding(0, new SimpleBindingValue("200"));
+        indexBindings2.addIndexBinding(2, BoundValue.value("202"));
+        indexBindings2.addIndexBinding(1, BoundValue.nullValue(String.class));
+        indexBindings2.addIndexBinding(0, BoundValue.value("200"));
 
 
         Bindings idBindings1 = new Bindings();
-        idBindings1.addIdentifierBinding("$0", new SimpleBindingValue("100"));
-        idBindings1.addIdentifierBinding("$1", new SimpleBindingValue("101"));
-        idBindings1.addIdentifierBinding("$2", new SimpleBindingValue("102"));
+        idBindings1.addIdentifierBinding("$0", BoundValue.value("100"));
+        idBindings1.addIdentifierBinding("$1", BoundValue.value("101"));
+        idBindings1.addIdentifierBinding("$2", BoundValue.value("102"));
 
         Bindings idBindings2 = new Bindings();
-        idBindings2.addIdentifierBinding("$2", new SimpleBindingValue("202"));
-        idBindings2.addIdentifierBinding("$1", new NullBindingValue(Integer.class));
-        idBindings2.addIdentifierBinding("$0", new SimpleBindingValue("200"));
+        idBindings2.addIdentifierBinding("$2", BoundValue.value("202"));
+        idBindings2.addIdentifierBinding("$1", BoundValue.nullValue(Integer.class));
+        idBindings2.addIdentifierBinding("$0", BoundValue.value("200"));
 
         QueryInfo queryWithIndexBindings = new QueryInfo("SELECT WITH-INDEX");
         QueryInfo queryWithIdBindings = new QueryInfo("SELECT WITH-IDENTIFIER");
@@ -296,19 +295,19 @@ public class QueryExecutionInfoFormatterTest {
         formatter.showBindings();
 
         Bindings bindings1 = new Bindings();
-        bindings1.addIndexBinding(0, new SimpleBindingValue("100"));
-        bindings1.addIndexBinding(1, new SimpleBindingValue("101"));
-        bindings1.addIndexBinding(2, new SimpleBindingValue("102"));
+        bindings1.addIndexBinding(0, BoundValue.value("100"));
+        bindings1.addIndexBinding(1, BoundValue.value("101"));
+        bindings1.addIndexBinding(2, BoundValue.value("102"));
 
         Bindings bindings2 = new Bindings();
-        bindings2.addIndexBinding(2, new SimpleBindingValue("202"));
-        bindings2.addIndexBinding(1, new NullBindingValue(String.class));
-        bindings2.addIndexBinding(0, new SimpleBindingValue("200"));
+        bindings2.addIndexBinding(2, BoundValue.value("202"));
+        bindings2.addIndexBinding(1, BoundValue.nullValue(String.class));
+        bindings2.addIndexBinding(0, BoundValue.value("200"));
 
         Bindings bindings3 = new Bindings();
-        bindings3.addIndexBinding(1, new SimpleBindingValue("300"));
-        bindings3.addIndexBinding(2, new SimpleBindingValue("302"));
-        bindings3.addIndexBinding(0, new NullBindingValue(Integer.class));
+        bindings3.addIndexBinding(1, BoundValue.value("300"));
+        bindings3.addIndexBinding(2, BoundValue.value("302"));
+        bindings3.addIndexBinding(0, BoundValue.nullValue(Integer.class));
 
         QueryInfo query1 = new QueryInfo();  // will have 3 bindings
         QueryInfo query2 = new QueryInfo();  // will have 1 bindings
@@ -345,19 +344,19 @@ public class QueryExecutionInfoFormatterTest {
         formatter.showBindings();
 
         Bindings bindings1 = new Bindings();
-        bindings1.addIdentifierBinding("$0", new SimpleBindingValue("100"));
-        bindings1.addIdentifierBinding("$1", new SimpleBindingValue("101"));
-        bindings1.addIdentifierBinding("$2", new SimpleBindingValue("102"));
+        bindings1.addIdentifierBinding("$0", BoundValue.value("100"));
+        bindings1.addIdentifierBinding("$1", BoundValue.value("101"));
+        bindings1.addIdentifierBinding("$2", BoundValue.value("102"));
 
         Bindings bindings2 = new Bindings();
-        bindings2.addIdentifierBinding("$2", new SimpleBindingValue("202"));
-        bindings2.addIdentifierBinding("$1", new NullBindingValue(Long.class));
-        bindings2.addIdentifierBinding("$0", new SimpleBindingValue("200"));
+        bindings2.addIdentifierBinding("$2", BoundValue.value("202"));
+        bindings2.addIdentifierBinding("$1", BoundValue.nullValue(Long.class));
+        bindings2.addIdentifierBinding("$0", BoundValue.value("200"));
 
         Bindings bindings3 = new Bindings();
-        bindings3.addIdentifierBinding("$1", new SimpleBindingValue("300"));
-        bindings3.addIdentifierBinding("$2", new SimpleBindingValue("302"));
-        bindings3.addIdentifierBinding("$0", new NullBindingValue(String.class));
+        bindings3.addIdentifierBinding("$1", BoundValue.value("300"));
+        bindings3.addIdentifierBinding("$2", BoundValue.value("302"));
+        bindings3.addIdentifierBinding("$0", BoundValue.nullValue(String.class));
 
         QueryInfo query1 = new QueryInfo();  // will have 3 bindings
         QueryInfo query2 = new QueryInfo();  // will have 1 bindings
@@ -534,20 +533,20 @@ public class QueryExecutionInfoFormatterTest {
 
 
     @Test
-    void bindingValue() {
+    void boundValue() {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
-        formatter.bindingValue((bindingValue, sb) -> {
+        formatter.boundValue((boundValue, sb) -> {
             sb.append("FOO");
         });
         formatter.showBindings();
 
         Bindings bindingsByIndex = new Bindings();
-        bindingsByIndex.addIndexBinding(0, new SimpleBindingValue("100"));
-        bindingsByIndex.addIndexBinding(1, new NullBindingValue(Object.class));
+        bindingsByIndex.addIndexBinding(0, BoundValue.value("100"));
+        bindingsByIndex.addIndexBinding(1, BoundValue.nullValue(Object.class));
 
         Bindings bindingsByIdentifier = new Bindings();
-        bindingsByIdentifier.addIdentifierBinding("$0", new SimpleBindingValue("100"));
-        bindingsByIdentifier.addIdentifierBinding("$1", new NullBindingValue(Object.class));
+        bindingsByIdentifier.addIdentifierBinding("$0", BoundValue.value("100"));
+        bindingsByIdentifier.addIdentifierBinding("$1", BoundValue.nullValue(Object.class));
 
         QueryInfo queryWithIndexBindings = new QueryInfo();
         QueryInfo queryWithIdentifierBindings = new QueryInfo();
@@ -578,8 +577,8 @@ public class QueryExecutionInfoFormatterTest {
         formatter.showBindings();
 
         Bindings bindingsByIndex = new Bindings();
-        bindingsByIndex.addIndexBinding(0, new SimpleBindingValue("100"));
-        bindingsByIndex.addIndexBinding(1, new NullBindingValue(Object.class));
+        bindingsByIndex.addIndexBinding(0, BoundValue.value("100"));
+        bindingsByIndex.addIndexBinding(1, BoundValue.nullValue(Object.class));
 
         QueryInfo queryWithIndexBindings = new QueryInfo();
 
@@ -598,14 +597,14 @@ public class QueryExecutionInfoFormatterTest {
     @Test
     void identifierBindings() {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
-        formatter.identifierBindings((bindingValue, sb) -> {
+        formatter.identifierBindings((boundValue, sb) -> {
             sb.append("FOO");
         });
         formatter.showBindings();
 
         Bindings bindingsByIdentifier = new Bindings();
-        bindingsByIdentifier.addIdentifierBinding("$0", new SimpleBindingValue("100"));
-        bindingsByIdentifier.addIdentifierBinding("$1", new NullBindingValue(Object.class));
+        bindingsByIdentifier.addIdentifierBinding("$0", BoundValue.value("100"));
+        bindingsByIdentifier.addIdentifierBinding("$1", BoundValue.nullValue(Object.class));
 
         QueryInfo queryWithIdentifierBindings = new QueryInfo();
 

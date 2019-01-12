@@ -17,6 +17,7 @@
 package io.r2dbc.proxy.core;
 
 
+import io.r2dbc.proxy.util.Assert;
 import reactor.util.annotation.NonNull;
 
 import java.util.Objects;
@@ -36,31 +37,66 @@ public class Bindings {
 
     private SortedSet<Binding> identifierBindings = new TreeSet<>();
 
-    public void addIndexBinding(int index, BindingValue value) {
-        this.indexBindings.add(new IndexBinding(index, value));
+    /**
+     * Add an index binding.
+     *
+     * @param index      index
+     * @param boundValue boundValue
+     * @throws IllegalArgumentException if {@code boundValue} is {@code null}
+     */
+    public void addIndexBinding(int index, BoundValue boundValue) {
+        Assert.requireNonNull(boundValue, "boundValue must not be null");
+
+        this.indexBindings.add(new IndexBinding(index, boundValue));
     }
 
-    public void addIdentifierBinding(Object identifier, BindingValue value) {
-        this.identifierBindings.add(new IdentifierBinding(identifier, value));
+    /**
+     * Add an identifier binding.
+     *
+     * @param identifier identifier
+     * @param boundValue boundValue
+     * @throws IllegalArgumentException if {@code identifier} is {@code null}
+     * @throws IllegalArgumentException if {@code boundValue} is {@code null}
+     */
+    public void addIdentifierBinding(Object identifier, BoundValue boundValue) {
+        Assert.requireNonNull(identifier, "identifier must not be null");
+        Assert.requireNonNull(boundValue, "boundValue must not be null");
+
+        this.identifierBindings.add(new IdentifierBinding(identifier, boundValue));
     }
 
+    /**
+     * Get a sorted set of index bindings.
+     *
+     * @return index bindings
+     */
     public SortedSet<Binding> getIndexBindings() {
-        return indexBindings;
+        return this.indexBindings;
     }
 
+    /**
+     * Get a sorted set of identifier bindings.
+     *
+     * @return identifier bindings
+     */
     public SortedSet<Binding> getIdentifierBindings() {
-        return identifierBindings;
+        return this.identifierBindings;
     }
 
+    /**
+     * Represents index binding.
+     */
     public static class IndexBinding implements Binding, Comparable<IndexBinding> {
 
         private int index;
 
-        private BindingValue value;
+        private BoundValue boundValue;
 
-        public IndexBinding(int index, BindingValue value) {
+        public IndexBinding(int index, BoundValue boundValue) {
+            Assert.requireNonNull(boundValue, "boundValue must not be null");
+
             this.index = index;
-            this.value = value;
+            this.boundValue = boundValue;
         }
 
         @Override
@@ -74,20 +110,26 @@ public class Bindings {
         }
 
         @Override
-        public BindingValue getBindingValue() {
-            return this.value;
+        public BoundValue getBoundValue() {
+            return this.boundValue;
         }
     }
 
+    /**
+     * Represents identifier binding.
+     */
     public static class IdentifierBinding implements Binding, Comparable<IdentifierBinding> {
 
         private Object identifier;
 
-        private BindingValue value;
+        private BoundValue boundValue;
 
-        public IdentifierBinding(Object identifier, BindingValue value) {
+        public IdentifierBinding(Object identifier, BoundValue boundValue) {
+            Assert.requireNonNull(identifier, "identifier must not be null");
+            Assert.requireNonNull(boundValue, "boundValue must not be null");
+
             this.identifier = identifier;
-            this.value = value;
+            this.boundValue = boundValue;
         }
 
         @Override
@@ -102,8 +144,8 @@ public class Bindings {
         }
 
         @Override
-        public BindingValue getBindingValue() {
-            return this.value;
+        public BoundValue getBoundValue() {
+            return this.boundValue;
         }
 
     }

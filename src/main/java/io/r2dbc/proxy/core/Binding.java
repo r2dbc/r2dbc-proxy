@@ -17,7 +17,7 @@
 package io.r2dbc.proxy.core;
 
 /**
- * Represent an operation of {@link io.r2dbc.spi.Statement#bind}.
+ * Represent an operation of {@link io.r2dbc.spi.Statement#bind} and {@link io.r2dbc.spi.Statement#bindNull}.
  *
  * @author Tadaya Tsuyukubo
  * @see Bindings.IndexBinding
@@ -25,8 +25,18 @@ package io.r2dbc.proxy.core;
  */
 public interface Binding {
 
+    /**
+     * Get a key which represents index or identifier.
+     *
+     * @return an index or identifier
+     */
     Object getKey();
 
-    BindingValue getBindingValue();
+    /**
+     * Get a {@link BoundValue}.
+     *
+     * @return a bound value
+     */
+    BoundValue getBoundValue();
 
 }

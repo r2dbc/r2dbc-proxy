@@ -17,8 +17,8 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.Binding;
-import io.r2dbc.proxy.core.BindingValue;
 import io.r2dbc.proxy.core.Bindings;
+import io.r2dbc.proxy.core.BoundValue;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
@@ -125,21 +125,21 @@ public class StatementCallbackHandlerTest {
             .containsExactly(1, 2);
         assertThat(firstBindings.getIdentifierBindings()).isEmpty();
 
-        List<BindingValue> bindingValues = firstBindings.getIndexBindings().stream()
-            .map(Binding::getBindingValue)
+        List<BoundValue> boundValues = firstBindings.getIndexBindings().stream()
+            .map(Binding::getBoundValue)
             .collect(toList());
 
         // for "bind(1, 100)"
-        assertThat(bindingValues.get(0))
-            .isExactlyInstanceOf(BindingValue.SimpleBindingValue.class)
-            .extracting(BindingValue::getValue)
+        assertThat(boundValues.get(0))
+            .isExactlyInstanceOf(BoundValue.DefaultBoundValue.class)
+            .extracting(BoundValue::getValue)
             .isEqualTo(100);
 
         // for "bindNull(2, String.class)"
-        assertThat(bindingValues.get(1))
-            .isExactlyInstanceOf(BindingValue.NullBindingValue.class);
-        BindingValue.NullBindingValue nullBindValue = (BindingValue.NullBindingValue) bindingValues.get(1);
-        assertThat(nullBindValue.getType()).isEqualTo(String.class);
+        assertThat(boundValues.get(1))
+            .isExactlyInstanceOf(BoundValue.DefaultBoundValue.class);
+        BoundValue nullBindValue = boundValues.get(1);
+        assertThat(nullBindValue.getNullType()).isEqualTo(String.class);
 
 
         assertThat(secondBindings.getIndexBindings())
@@ -148,20 +148,20 @@ public class StatementCallbackHandlerTest {
             .containsExactly(1, 2);
         assertThat(secondBindings.getIdentifierBindings()).isEmpty();
 
-        bindingValues = secondBindings.getIndexBindings().stream()
-            .map(Binding::getBindingValue)
+        boundValues = secondBindings.getIndexBindings().stream()
+            .map(Binding::getBoundValue)
             .collect(toList());
 
         // for "bindNull(1, int.class)"
-        assertThat(bindingValues.get(0))
-            .isExactlyInstanceOf(BindingValue.NullBindingValue.class);
-        nullBindValue = (BindingValue.NullBindingValue) bindingValues.get(0);
-        assertThat(nullBindValue.getType()).isEqualTo(int.class);
+        assertThat(boundValues.get(0))
+            .isExactlyInstanceOf(BoundValue.DefaultBoundValue.class);
+        nullBindValue = boundValues.get(0);
+        assertThat(nullBindValue.getNullType()).isEqualTo(int.class);
 
         // for "bind(2, 200)"
-        assertThat(bindingValues.get(1))
-            .isExactlyInstanceOf(BindingValue.SimpleBindingValue.class)
-            .extracting(BindingValue::getValue)
+        assertThat(boundValues.get(1))
+            .isExactlyInstanceOf(BoundValue.DefaultBoundValue.class)
+            .extracting(BoundValue::getValue)
             .isEqualTo(200);
 
     }
@@ -213,21 +213,21 @@ public class StatementCallbackHandlerTest {
             .extracting(Binding::getKey)
             .containsExactly("$1", "$2");
 
-        List<BindingValue> bindingValues = firstBindings.getIdentifierBindings().stream()
-            .map(Binding::getBindingValue)
+        List<BoundValue> boundValues = firstBindings.getIdentifierBindings().stream()
+            .map(Binding::getBoundValue)
             .collect(toList());
 
         // for "bind(1, 100)"
-        assertThat(bindingValues.get(0))
-            .isExactlyInstanceOf(BindingValue.SimpleBindingValue.class)
-            .extracting(BindingValue::getValue)
+        assertThat(boundValues.get(0))
+            .isExactlyInstanceOf(BoundValue.DefaultBoundValue.class)
+            .extracting(BoundValue::getValue)
             .isEqualTo(100);
 
         // for "bindNull(2, String.class)"
-        assertThat(bindingValues.get(1))
-            .isExactlyInstanceOf(BindingValue.NullBindingValue.class);
-        BindingValue.NullBindingValue nullBindValue = (BindingValue.NullBindingValue) bindingValues.get(1);
-        assertThat(nullBindValue.getType()).isEqualTo(String.class);
+        assertThat(boundValues.get(1))
+            .isExactlyInstanceOf(BoundValue.DefaultBoundValue.class);
+        BoundValue nullBindValue = boundValues.get(1);
+        assertThat(nullBindValue.getNullType()).isEqualTo(String.class);
 
 
         assertThat(secondBindings.getIndexBindings()).isEmpty();
@@ -236,20 +236,20 @@ public class StatementCallbackHandlerTest {
             .extracting(Binding::getKey)
             .containsExactly("$1", "$2");
 
-        bindingValues = secondBindings.getIdentifierBindings().stream()
-            .map(Binding::getBindingValue)
+        boundValues = secondBindings.getIdentifierBindings().stream()
+            .map(Binding::getBoundValue)
             .collect(toList());
 
         // for "bindNull(1, int.class)"
-        assertThat(bindingValues.get(0))
-            .isExactlyInstanceOf(BindingValue.NullBindingValue.class);
-        nullBindValue = (BindingValue.NullBindingValue) bindingValues.get(0);
-        assertThat(nullBindValue.getType()).isEqualTo(int.class);
+        assertThat(boundValues.get(0))
+            .isExactlyInstanceOf(BoundValue.DefaultBoundValue.class);
+        nullBindValue = boundValues.get(0);
+        assertThat(nullBindValue.getNullType()).isEqualTo(int.class);
 
         // for "bind(2, 200)"
-        assertThat(bindingValues.get(1))
-            .isExactlyInstanceOf(BindingValue.SimpleBindingValue.class)
-            .extracting(BindingValue::getValue)
+        assertThat(boundValues.get(1))
+            .isExactlyInstanceOf(BoundValue.DefaultBoundValue.class)
+            .extracting(BoundValue::getValue)
             .isEqualTo(200);
 
     }
