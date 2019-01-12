@@ -46,12 +46,12 @@ public class MethodExecutionInfoFormatterTest {
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         when(connectionInfo.getConnectionId()).thenReturn("ABC");
 
-        MethodExecutionInfo executionInfo = new MethodExecutionInfo();
-        executionInfo.setThreadId(5);
-        executionInfo.setConnectionInfo(connectionInfo);
-        executionInfo.setExecuteDuration(Duration.of(23, ChronoUnit.MILLIS));
-        executionInfo.setMethod(method);
-        executionInfo.setTarget(target);
+        MethodExecutionInfo executionInfo = mock(MethodExecutionInfo.class);
+        when(executionInfo.getThreadId()).thenReturn(5L);
+        when(executionInfo.getConnectionInfo()).thenReturn(connectionInfo);
+        when(executionInfo.getExecuteDuration()).thenReturn(Duration.of(23, ChronoUnit.MILLIS));
+        when(executionInfo.getMethod()).thenReturn(method);
+        when(executionInfo.getTarget()).thenReturn(target);
 
         MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
         String result = formatter.format(executionInfo);
@@ -73,12 +73,12 @@ public class MethodExecutionInfoFormatterTest {
         Long target = 100L;
 
         // null ConnectionInfo
-        MethodExecutionInfo executionInfo = new MethodExecutionInfo();
-        executionInfo.setThreadId(5);
-        executionInfo.setConnectionInfo(null);
-        executionInfo.setExecuteDuration(Duration.of(23, ChronoUnit.MILLIS));
-        executionInfo.setMethod(method);
-        executionInfo.setTarget(target);
+        MethodExecutionInfo executionInfo = mock(MethodExecutionInfo.class);
+        when(executionInfo.getThreadId()).thenReturn(5L);
+        when(executionInfo.getConnectionInfo()).thenReturn(null);
+        when(executionInfo.getExecuteDuration()).thenReturn(Duration.of(23, ChronoUnit.MILLIS));
+        when(executionInfo.getMethod()).thenReturn(method);
+        when(executionInfo.getTarget()).thenReturn(target);
 
         MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
         String result = formatter.format(executionInfo);
@@ -88,7 +88,7 @@ public class MethodExecutionInfoFormatterTest {
         // null ConnectionId
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         when(connectionInfo.getConnectionId()).thenReturn(null);
-        executionInfo.setConnectionInfo(connectionInfo);
+        when(executionInfo.getConnectionInfo()).thenReturn(connectionInfo);
 
         result = formatter.format(executionInfo);
 
@@ -98,11 +98,13 @@ public class MethodExecutionInfoFormatterTest {
     @Test
     void customConsumer() {
 
+        MethodExecutionInfo methodExecutionInfo = mock(MethodExecutionInfo.class);
+
         MethodExecutionInfoFormatter formatter = new MethodExecutionInfoFormatter();
         formatter.addConsumer((executionInfo, sb) -> {
             sb.append("ABC");
         });
-        String result = formatter.format(new MethodExecutionInfo());
+        String result = formatter.format(methodExecutionInfo);
 
         assertThat(result).isEqualTo("ABC");
 

@@ -23,6 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -46,8 +48,8 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void beforeMethod() {
 
-        MethodExecutionInfo executionInfo = new MethodExecutionInfo();
-        executionInfo.setProxyEventType(ProxyEventType.BEFORE_METHOD);
+        MethodExecutionInfo executionInfo = mock(MethodExecutionInfo.class);
+        when(executionInfo.getProxyEventType()).thenReturn(ProxyEventType.BEFORE_METHOD);
 
         this.compositeListener.beforeMethod(executionInfo);
 
@@ -59,8 +61,8 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void afterMethod() {
 
-        MethodExecutionInfo executionInfo = new MethodExecutionInfo();
-        executionInfo.setProxyEventType(ProxyEventType.AFTER_METHOD);
+        MethodExecutionInfo executionInfo = mock(MethodExecutionInfo.class);
+        when(executionInfo.getProxyEventType()).thenReturn(ProxyEventType.AFTER_METHOD);
 
         this.compositeListener.afterMethod(executionInfo);
 

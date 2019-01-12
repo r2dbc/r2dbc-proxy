@@ -16,133 +16,118 @@
 
 package io.r2dbc.proxy.core;
 
+import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.spi.Connection;
+
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Hold method execution related information.
  *
  * @author Tadaya Tsuyukubo
  */
-public class MethodExecutionInfo {
+public interface MethodExecutionInfo {
 
-    private Object target;
+    /**
+     * Get the invoked object.
+     *
+     * @return the proxy instance that the method was invoked on
+     */
+    Object getTarget();
 
-    private Method method;
+    /**
+     * Get the invoked {@code Method}.
+     *
+     * @return invoked method
+     */
+    Method getMethod();
 
-    private Object[] methodArgs;
+    /**
+     * Get the arguments of the invocation.
+     *
+     * This can be {@code null} when method is invoked with no argument.
+     *
+     * @return argument lists or {@code null} if the invoked method did not take any arguments
+     */
+    Object[] getMethodArgs();
 
-    private Object result;
+    /**
+     * Get the result of invocation.
+     * For {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback, this returns {@code null}.
+     *
+     * @return result
+     */
+    Object getResult();
 
-    private Throwable thrown;
+    /**
+     * Get the thrown exception.
+     * For {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback or when the invocation
+     * did't throw any error, this returns {@code null}.
+     *
+     * @return thrown exception
+     */
+    Throwable getThrown();
 
-    private ConnectionInfo connectionInfo;
+    /**
+     * Get the {@link ConnectionInfo}.
+     * When invoked operation is not associated to the {@link Connection}, this returns {@code null}.
+     *
+     * @return connection info
+     */
+    ConnectionInfo getConnectionInfo();
 
-    private Duration executeDuration = Duration.ZERO;
+    /**
+     * Get the duration of the method invocation.
+     * For {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback, this returns {@code null}.
+     *
+     * @return execution duration
+     */
+    Duration getExecuteDuration();
 
-    private String threadName;
+    /**
+     * Get the thread name.
+     *
+     * @return thread name
+     */
+    String getThreadName();
 
-    private long threadId;
+    /**
+     * Get the thread ID.
+     *
+     * @return thread ID
+     */
+    long getThreadId();
 
-    private ProxyEventType proxyEventType;
-
-    private Map<String, Object> customValues = new HashMap<>();
+    /**
+     * Get the proxy event type.
+     *
+     * @return proxy event type; either {@link ProxyEventType#BEFORE_METHOD} or {@link ProxyEventType#AFTER_METHOD}
+     */
+    ProxyEventType getProxyEventType();
 
     /**
      * Store key/value pair.
      *
-     * Mainly used for passing values between before and after listener callback.
+     * Mainly used for passing values between {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} and
+     * {@link ProxyExecutionListener#afterMethod(MethodExecutionInfo)}.
      *
      * @param key   key
      * @param value value
+     * @throws IllegalArgumentException if {@code key} is {@code null}
      */
-    public void addCustomValue(String key, Object value) {
-        this.customValues.put(key, value);
-    }
+    void addCustomValue(String key, Object value);
 
-    public <T> T getCustomValue(String key, Class<T> type) {
-        return type.cast(this.customValues.get(key));
-    }
+    /**
+     * Retrieve value from key/value store.
+     *
+     * @param key  key
+     * @param type value class
+     * @param <T>  return type
+     * @return value
+     * @throws IllegalArgumentException if {@code key} is {@code null}
+     * @throws IllegalArgumentException if {@code type} is {@code null}
+     */
+    <T> T getCustomValue(String key, Class<T> type);
 
-    public Object getTarget() {
-        return target;
-    }
-
-    public void setTarget(Object target) {
-        this.target = target;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public void setMethod(Method method) {
-        this.method = method;
-    }
-
-    public Object[] getMethodArgs() {
-        return methodArgs;
-    }
-
-    public void setMethodArgs(Object[] methodArgs) {
-        this.methodArgs = methodArgs;
-    }
-
-    public Object getResult() {
-        return result;
-    }
-
-    public void setResult(Object result) {
-        this.result = result;
-    }
-
-    public Throwable getThrown() {
-        return thrown;
-    }
-
-    public void setThrown(Throwable thrown) {
-        this.thrown = thrown;
-    }
-
-    public ConnectionInfo getConnectionInfo() {
-        return this.connectionInfo;
-    }
-
-    public void setConnectionInfo(ConnectionInfo connectionInfo) {
-        this.connectionInfo = connectionInfo;
-    }
-
-    public Duration getExecuteDuration() {
-        return executeDuration;
-    }
-
-    public void setExecuteDuration(Duration executeDuration) {
-        this.executeDuration = executeDuration;
-    }
-
-    public String getThreadName() {
-        return threadName;
-    }
-
-    public void setThreadName(String threadName) {
-        this.threadName = threadName;
-    }
-
-    public long getThreadId() {
-        return threadId;
-    }
-
-    public void setThreadId(long threadId) {
-        this.threadId = threadId;
-    }
-
-    public ProxyEventType getProxyEventType() {
-        return proxyEventType;
-    }
-
-    public void setProxyEventType(ProxyEventType proxyEventType) {
-        this.proxyEventType = proxyEventType;
-    }
 }

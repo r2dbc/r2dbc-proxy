@@ -108,7 +108,7 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
      */
     protected Object proceedExecution(Method method, Object target, Object[] args,
                                       ProxyExecutionListener listener, ConnectionInfo connectionInfo,
-                                      BiFunction<Object, MethodExecutionInfo, Object> onMap,
+                                      BiFunction<Object, DefaultMethodExecutionInfo, Object> onMap,
                                       Consumer<MethodExecutionInfo> onComplete) throws Throwable {
 
         if (PASS_THROUGH_METHODS.contains(method)) {
@@ -132,7 +132,7 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
 
         StopWatch stopWatch = new StopWatch(this.clock);
 
-        MethodExecutionInfo executionInfo = new MethodExecutionInfo();
+        DefaultMethodExecutionInfo executionInfo = new DefaultMethodExecutionInfo();
         executionInfo.setMethod(method);
         executionInfo.setMethodArgs(args);
         executionInfo.setTarget(target);

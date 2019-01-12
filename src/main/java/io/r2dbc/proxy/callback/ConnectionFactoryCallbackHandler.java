@@ -49,7 +49,7 @@ public class ConnectionFactoryCallbackHandler extends CallbackHandlerSupport {
             return this.connectionFactory;
         }
 
-        BiFunction<Object, MethodExecutionInfo, Object> onMap = null;
+        BiFunction<Object, DefaultMethodExecutionInfo, Object> onMap = null;
 
         if ("create".equals(methodName)) {
 
