@@ -49,7 +49,7 @@ public class JdkProxyFactoryTest {
         Connection connection = mock(Connection.class);
         Batch<?> batch = mock(Batch.class);
         Statement<?> statement = mock(Statement.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         String query = "query";
 
         Object result;
@@ -81,7 +81,7 @@ public class JdkProxyFactoryTest {
         Connection connection = mock(Connection.class);
         Batch<?> batch = mock(Batch.class);
         Statement<?> statement = mock(Statement.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         String query = "query";
 
         String expected;

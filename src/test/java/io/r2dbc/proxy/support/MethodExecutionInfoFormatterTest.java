@@ -27,6 +27,8 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -41,8 +43,8 @@ public class MethodExecutionInfoFormatterTest {
 
         Long target = 100L;
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
-        connectionInfo.setConnectionId("ABC");
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        when(connectionInfo.getConnectionId()).thenReturn("ABC");
 
         MethodExecutionInfo executionInfo = new MethodExecutionInfo();
         executionInfo.setThreadId(5);
@@ -84,7 +86,10 @@ public class MethodExecutionInfoFormatterTest {
         assertThat(result).isEqualTo("  1: Thread:5 Connection:n/a Time:23  Long#create()");
 
         // null ConnectionId
-        executionInfo.setConnectionInfo(new ConnectionInfo());
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        when(connectionInfo.getConnectionId()).thenReturn(null);
+        executionInfo.setConnectionInfo(connectionInfo);
+
         result = formatter.format(executionInfo);
 
         assertThat(result).isEqualTo("  2: Thread:5 Connection:n/a Time:23  Long#create()");

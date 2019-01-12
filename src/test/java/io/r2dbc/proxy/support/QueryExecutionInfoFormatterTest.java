@@ -31,6 +31,8 @@ import java.util.Collections;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -40,8 +42,8 @@ public class QueryExecutionInfoFormatterTest {
     @Test
     void batchExecution() {
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
-        connectionInfo.setConnectionId("conn-id");
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        when(connectionInfo.getConnectionId()).thenReturn("conn-id");
 
         // Batch Query
         QueryExecutionInfo execInfo = new QueryExecutionInfo();
@@ -95,8 +97,8 @@ public class QueryExecutionInfoFormatterTest {
         queryWithIndexBindings.getBindingsList().addAll(Arrays.asList(indexBindings1, indexBindings2));
         queryWithIdBindings.getBindingsList().addAll(Arrays.asList(idBindings1, idBindings2));
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
-        connectionInfo.setConnectionId("conn-id");
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        when(connectionInfo.getConnectionId()).thenReturn("conn-id");
 
         // Statement Query
         QueryExecutionInfo execInfo = new QueryExecutionInfo();
@@ -158,8 +160,8 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showConnection();
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
-        connectionInfo.setConnectionId("99");
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        when(connectionInfo.getConnectionId()).thenReturn("99");
 
         QueryExecutionInfo execInfo = new QueryExecutionInfo();
         execInfo.setConnectionInfo(connectionInfo);
@@ -174,13 +176,10 @@ public class QueryExecutionInfoFormatterTest {
         formatter.showTransaction();
 
         // 1 transaction, 2 rollback, 3 commit
-        ConnectionInfo connectionInfo = new ConnectionInfo();
-        connectionInfo.incrementTransactionCount();
-        connectionInfo.incrementRollbackCount();
-        connectionInfo.incrementRollbackCount();
-        connectionInfo.incrementCommitCount();
-        connectionInfo.incrementCommitCount();
-        connectionInfo.incrementCommitCount();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        when(connectionInfo.getTransactionCount()).thenReturn(1);
+        when(connectionInfo.getRollbackCount()).thenReturn(2);
+        when(connectionInfo.getCommitCount()).thenReturn(3);
 
         QueryExecutionInfo execInfo = new QueryExecutionInfo();
         execInfo.setConnectionInfo(connectionInfo);
@@ -391,7 +390,7 @@ public class QueryExecutionInfoFormatterTest {
     void showAll() {
         QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
         queryExecutionInfo.setConnectionInfo(connectionInfo);
 
@@ -423,7 +422,7 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showConnection(((executionInfo, sb) -> sb.append("my-connection")));
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
         queryExecutionInfo.setConnectionInfo(connectionInfo);
 
@@ -436,7 +435,7 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showTransaction(((executionInfo, sb) -> sb.append("my-transaction")));
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
         queryExecutionInfo.setConnectionInfo(connectionInfo);
 

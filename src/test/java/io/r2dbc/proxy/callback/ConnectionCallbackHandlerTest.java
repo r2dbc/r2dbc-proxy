@@ -16,7 +16,6 @@
 
 package io.r2dbc.proxy.callback;
 
-import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.spi.Batch;
@@ -60,7 +59,7 @@ public class ConnectionCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
 
         Connection connection = mock(Connection.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
 
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
 
@@ -90,7 +89,7 @@ public class ConnectionCallbackHandlerTest {
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
 
         Connection connection = mock(Connection.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
 
         String query = "MY-QUERY";
 
@@ -120,7 +119,7 @@ public class ConnectionCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
 
         Connection connection = mock(Connection.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(listener);
 
@@ -147,7 +146,7 @@ public class ConnectionCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
 
         Connection connection = mock(Connection.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(listener);
 
@@ -174,7 +173,7 @@ public class ConnectionCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
 
         Connection connection = mock(Connection.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(listener);
 
@@ -201,7 +200,7 @@ public class ConnectionCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
 
         Connection connection = mock(Connection.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(listener);
 
@@ -225,7 +224,7 @@ public class ConnectionCallbackHandlerTest {
     @Test
     void unwrap() throws Throwable {
         Connection connection = mock(Connection.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
 
         ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);

@@ -68,6 +68,7 @@ public class CallbackHandlerSupportTest {
     @BeforeEach
     void setUp() {
         this.callbackHandlerSupport = new CallbackHandlerSupport(this.proxyConfig) {
+
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 return null;
@@ -335,7 +336,7 @@ public class CallbackHandlerSupportTest {
         Batch<?> target = mock(Batch.class);
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
 
         // produce single result in order to trigger StepVerifier#consumeNextWith.
         Result mockResult = mock(Result.class);
@@ -399,7 +400,7 @@ public class CallbackHandlerSupportTest {
         Batch<?> target = mock(Batch.class);
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
 
         // publisher that throws exception
         RuntimeException exception = new RuntimeException();
@@ -454,7 +455,7 @@ public class CallbackHandlerSupportTest {
         Batch<?> target = mock(Batch.class);
         Object[] args = new Object[]{"QUERY"};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
 
         // produce single result in order to trigger StepVerifier#consumeNextWith.
         Batch<?> mockBatch = mock(Batch.class);
@@ -502,7 +503,7 @@ public class CallbackHandlerSupportTest {
         Batch<?> target = mock(Batch.class);
         Object[] args = new Object[]{"QUERY"};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
 
         // method invocation throws exception
         RuntimeException exception = new RuntimeException();

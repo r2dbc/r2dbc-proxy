@@ -73,7 +73,7 @@ public class ConnectionCallbackHandler extends CallbackHandlerSupport {
             };
         } else if ("close".equals(methodName)) {
             onComplete = executionInfo -> {
-                executionInfo.getConnectionInfo().setClosed(true);
+                ((DefaultConnectionInfo) executionInfo.getConnectionInfo()).setClosed(true);
             };
         }
         // TODO: createSavepoint, releaseSavepoint, rollbackTransactionToSavepoint

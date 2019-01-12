@@ -16,7 +16,6 @@
 
 package io.r2dbc.proxy.callback;
 
-import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
@@ -61,14 +60,14 @@ public class ConnectionFactoryCallbackHandler extends CallbackHandlerSupport {
                 Connection connection = (Connection) resultObj;  // original connection
                 String connectionId = this.proxyConfig.getConnectionIdManager().getId(connection);
 
-                ConnectionInfo connectionInfo = new ConnectionInfo();
+                DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
                 connectionInfo.setConnectionId(connectionId);
                 connectionInfo.setClosed(false);
                 connectionInfo.setOriginalConnection(connection);
 
                 executionInfo.setConnectionInfo(connectionInfo);
 
-                Connection proxyConnection = proxyConfig.getProxyFactory().wrapConnection(connection, connectionInfo);
+                Connection proxyConnection = this.proxyConfig.getProxyFactory().wrapConnection(connection, connectionInfo);
 
                 return proxyConnection;
             };

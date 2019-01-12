@@ -63,7 +63,7 @@ public class StatementCallbackHandlerTest {
     void add() throws Throwable {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
         Statement<?> statement = mock(Statement.class);
@@ -83,7 +83,7 @@ public class StatementCallbackHandlerTest {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
         String query = "QUERY";
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
         Statement<?> statement = mock(Statement.class);
@@ -171,7 +171,7 @@ public class StatementCallbackHandlerTest {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
         String query = "QUERY";
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
         Statement<?> statement = mock(Statement.class);
@@ -257,7 +257,7 @@ public class StatementCallbackHandlerTest {
     @Test
     void unwrap() throws Throwable {
         Statement<?> statement = mock(Statement.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         String query = "QUERY";
 

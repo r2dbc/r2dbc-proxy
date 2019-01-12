@@ -52,7 +52,7 @@ public class BatchCallbackHandlerTest {
     void batchOperation() throws Throwable {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
         Batch<?> batch = mock(Batch.class);
@@ -101,7 +101,7 @@ public class BatchCallbackHandlerTest {
     @Test
     void unwrap() throws Throwable {
         Batch<?> batch = mock(Batch.class);
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
 
         BatchCallbackHandler callback = new BatchCallbackHandler(batch, connectionInfo, proxyConfig);
