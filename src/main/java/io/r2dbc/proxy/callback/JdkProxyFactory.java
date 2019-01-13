@@ -34,13 +34,21 @@ import java.lang.reflect.Proxy;
  * {@link ProxyFactory} implementation using JDK dynamic proxy.
  *
  * @author Tadaya Tsuyukubo
+ * @see JdkProxyFactoryFactory
  */
 public class JdkProxyFactory implements ProxyFactory {
 
     private ProxyConfig proxyConfig;
 
-    @Override
-    public void setProxyConfig(ProxyConfig proxyConfig) {
+    /**
+     * Constructor
+     *
+     * @param proxyConfig proxyConfig
+     * @throws IllegalArgumentException if {@code proxyConfig} is {@code null}
+     */
+    JdkProxyFactory(ProxyConfig proxyConfig) {
+        Assert.requireNonNull(proxyConfig, "proxyConfig must not be null");
+
         this.proxyConfig = proxyConfig;
     }
 

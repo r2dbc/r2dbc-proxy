@@ -56,6 +56,8 @@ public class ConnectionFactoryCallbackHandlerTest {
         Connection mockedConnection = mock(Connection.class);
         ConnectionIdManager idManager = mock(ConnectionIdManager.class);
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
+        ProxyFactoryFactory proxyFactoryFactory = mock(ProxyFactoryFactory.class);
+        when(proxyFactoryFactory.create(any())).thenReturn(proxyFactory);
 
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
 
@@ -71,7 +73,7 @@ public class ConnectionFactoryCallbackHandlerTest {
 
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setConnectionIdManager(idManager);
-        proxyConfig.setProxyFactory(proxyFactory);
+        proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
         proxyConfig.addListener(listener);
 
         ConnectionFactoryCallbackHandler callback = new ConnectionFactoryCallbackHandler(connectionFactory, proxyConfig);

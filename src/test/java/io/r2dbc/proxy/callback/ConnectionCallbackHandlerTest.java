@@ -31,6 +31,7 @@ import reactor.test.StepVerifier;
 import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -62,10 +63,12 @@ public class ConnectionCallbackHandlerTest {
         DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
 
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
+        ProxyFactoryFactory proxyFactoryFactory = mock(ProxyFactoryFactory.class);
+        when(proxyFactoryFactory.create(any())).thenReturn(proxyFactory);
 
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(listener);
-        proxyConfig.setProxyFactory(proxyFactory);
+        proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
 
         Batch<?> originalBatch = mock(Batch.class);
         Batch<?> resultBatch = mock(Batch.class);
@@ -87,6 +90,8 @@ public class ConnectionCallbackHandlerTest {
     void createStatement() throws Throwable {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
+        ProxyFactoryFactory proxyFactoryFactory = mock(ProxyFactoryFactory.class);
+        when(proxyFactoryFactory.create(any())).thenReturn(proxyFactory);
 
         Connection connection = mock(Connection.class);
         DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
@@ -95,7 +100,7 @@ public class ConnectionCallbackHandlerTest {
 
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(listener);
-        proxyConfig.setProxyFactory(proxyFactory);
+        proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
 
         Statement<?> originalStatement = mock(Statement.class);
         Statement<?> resultStatement = mock(Statement.class);

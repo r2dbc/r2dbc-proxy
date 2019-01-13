@@ -31,13 +31,12 @@ import io.r2dbc.spi.Statement;
  */
 public interface ProxyFactory {
 
-    void setProxyConfig(ProxyConfig proxyConfig);
-
     /**
      * Create a proxy {@link ConnectionFactory}.
      *
      * @param connectionFactory original connectionFactory
      * @return proxy connectionFactory
+     * @throws IllegalArgumentException if {@code connectionFactory} is {@code null}
      */
     ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory);
 
@@ -47,6 +46,8 @@ public interface ProxyFactory {
      * @param connection     original connection
      * @param connectionInfo connectionInfo
      * @return proxy connection
+     * @throws IllegalArgumentException if {@code connection} is {@code null}
+     * @throws IllegalArgumentException if {@code connectionInfo} is {@code null}
      */
     Connection wrapConnection(Connection connection, ConnectionInfo connectionInfo);
 
@@ -56,6 +57,8 @@ public interface ProxyFactory {
      * @param batch          original batch
      * @param connectionInfo connectionInfo
      * @return proxy batch
+     * @throws IllegalArgumentException if {@code batch} is {@code null}
+     * @throws IllegalArgumentException if {@code connectionInfo} is {@code null}
      */
     Batch<?> wrapBatch(Batch<?> batch, ConnectionInfo connectionInfo);
 
@@ -66,6 +69,9 @@ public interface ProxyFactory {
      * @param query          query string
      * @param connectionInfo connectionInfo
      * @return proxy statement
+     * @throws IllegalArgumentException if {@code statement} is {@code null}
+     * @throws IllegalArgumentException if {@code query} is {@code null}
+     * @throws IllegalArgumentException if {@code connectionInfo} is {@code null}
      */
     Statement<?> wrapStatement(Statement<?> statement, String query, ConnectionInfo connectionInfo);
 
@@ -75,6 +81,8 @@ public interface ProxyFactory {
      * @param result        original result
      * @param executionInfo executionInfo
      * @return proxy result
+     * @throws IllegalArgumentException if {@code result} is {@code null}
+     * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
     Result wrapResult(Result result, QueryExecutionInfo executionInfo);
 

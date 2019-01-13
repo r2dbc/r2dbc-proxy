@@ -40,6 +40,7 @@ public class ProxyUtils {
      *
      * @param connection a connection
      * @return optional of original connection or give connection
+     * @throws IllegalArgumentException if {@code connection} is {@code null}
      */
     @SuppressWarnings("unchecked")
     public static Optional<Connection> unwrapConnection(Connection connection) {
@@ -59,6 +60,7 @@ public class ProxyUtils {
      *
      * @param batch a batch
      * @return optional of original connection or empty
+     * @throws IllegalArgumentException if {@code batch} is {@code null}
      */
     public static Optional<Connection> unwrapConnection(Batch<?> batch) {
         Assert.requireNonNull(batch, "batch must not be null");
@@ -77,6 +79,7 @@ public class ProxyUtils {
      *
      * @param statement a statement
      * @return optional of original connection or empty
+     * @throws IllegalArgumentException if {@code statement} is {@code null}
      */
     public static Optional<Connection> unwrapConnection(Statement<?> statement) {
         Assert.requireNonNull(statement, "statement must not be null");
@@ -95,6 +98,7 @@ public class ProxyUtils {
      *
      * @param result a statement
      * @return optional of original connection or empty
+     * @throws IllegalArgumentException if {@code result} is {@code null}
      */
     public static Optional<Connection> unwrapConnection(Result result) {
         Assert.requireNonNull(result, "result must not be null");

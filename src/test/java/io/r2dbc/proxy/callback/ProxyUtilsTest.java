@@ -42,7 +42,6 @@ public class ProxyUtilsTest {
         String query = "QUERY";
 
         ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.setProxyFactory(new JdkProxyFactory());
 
         DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
         connectionInfo.setOriginalConnection(originalConnection);

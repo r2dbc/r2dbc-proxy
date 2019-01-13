@@ -18,6 +18,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.proxy.util.Assert;
 
 /**
  * Central configuration object for proxy.
@@ -30,34 +31,75 @@ public class ProxyConfig {
 
     private ConnectionIdManager connectionIdManager = ConnectionIdManager.create();
 
-    private ProxyFactory proxyFactory = new JdkProxyFactory();
+    private ProxyFactory proxyFactory = new JdkProxyFactoryFactory().create(this);
 
-    public ProxyConfig() {
-        this.proxyFactory.setProxyConfig(this);
+    /**
+     * Set {@link ProxyFactoryFactory}.
+     *
+     * When {@link ProxyFactoryFactory} is set, {@link ProxyFactoryFactory#create(ProxyConfig)} method
+     * is called once to generate {@link ProxyFactory}. The generated {@link ProxyFactory} instance is
+     * always returned by {@link #getProxyFactory()} unless this method is called to set a new
+     * {@link ProxyFactoryFactory}.
+     *
+     * @param proxyFactoryFactory factory for {@link ProxyFactory}
+     * @throws IllegalArgumentException if {@code proxyFactoryFactory} is {@code null}
+     */
+    public void setProxyFactoryFactory(ProxyFactoryFactory proxyFactoryFactory) {
+        Assert.requireNonNull(proxyFactoryFactory, "proxyFactoryFactory must not be null");
+
+        this.proxyFactory = proxyFactoryFactory.create(this);
     }
 
+    /**
+     * Get {@link ProxyFactory} which is generated from the specified {@link ProxyFactoryFactory}.
+     *
+     * Always same instance of {@link ProxyFactory} is returned.
+     *
+     * @return proxy factory
+     */
     public ProxyFactory getProxyFactory() {
-        return proxyFactory;
+        return this.proxyFactory;
     }
 
-    public void setProxyFactory(ProxyFactory proxyFactory) {
-        this.proxyFactory = proxyFactory;
-        this.proxyFactory.setProxyConfig(this);
-    }
-
+    /**
+     * Returns {@link CompositeProxyExecutionListener} that contains registered {@link ProxyExecutionListener}.
+     *
+     * @return composite proxy execution listener
+     */
     public CompositeProxyExecutionListener getListeners() {
         return this.listeners;
     }
 
+    /**
+     * Register {@link ProxyExecutionListener}.
+     *
+     * @param listener listner to register
+     * @throws IllegalArgumentException if {@code proxyFactoryFactory} is {@code null}
+     */
     public void addListener(ProxyExecutionListener listener) {
+        Assert.requireNonNull(listener, "listener must not be null");
+
         this.listeners.add(listener);
     }
 
+    /**
+     * Get {@link ConnectionIdManager}.
+     *
+     * @return connection id manager
+     */
     public ConnectionIdManager getConnectionIdManager() {
-        return connectionIdManager;
+        return this.connectionIdManager;
     }
 
+    /**
+     * Set {@link ConnectionIdManager}.
+     *
+     * @param connectionIdManager connection id manager
+     * @throws IllegalArgumentException if {@code connectionIdManager} is {@code null}
+     */
     public void setConnectionIdManager(ConnectionIdManager connectionIdManager) {
+        Assert.requireNonNull(connectionIdManager, "connectionIdManager must not be null");
+
         this.connectionIdManager = connectionIdManager;
     }
 }

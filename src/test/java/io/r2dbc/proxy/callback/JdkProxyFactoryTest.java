@@ -29,6 +29,7 @@ import java.lang.reflect.Proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -39,8 +40,15 @@ public class JdkProxyFactoryTest {
 
     @BeforeEach
     void setUp() {
-        this.proxyFactory = new JdkProxyFactory();
-        this.proxyFactory.setProxyConfig(new ProxyConfig());
+        ProxyConfig proxyConfig = new ProxyConfig();
+        JdkProxyFactory jdkProxyFactory = new JdkProxyFactory(proxyConfig);
+
+        // solve the circular reference between ProxyConfig and JdkProxyFactory
+        ProxyFactoryFactory proxyFactoryFactory = mock(ProxyFactoryFactory.class);
+        when(proxyFactoryFactory.create(proxyConfig)).thenReturn(jdkProxyFactory);
+        proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
+
+        this.proxyFactory = jdkProxyFactory;
     }
 
     @Test
