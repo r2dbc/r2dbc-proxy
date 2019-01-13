@@ -308,9 +308,9 @@ public class QueryExecutionInfoFormatterTest {
         bindings3.addIndexBinding(2, BoundValue.value("302"));
         bindings3.addIndexBinding(0, BoundValue.nullValue(Integer.class));
 
-        QueryInfo query1 = new QueryInfo();  // will have 3 bindings
-        QueryInfo query2 = new QueryInfo();  // will have 1 bindings
-        QueryInfo query3 = new QueryInfo();  // will have empty bindings
+        QueryInfo query1 = new QueryInfo("SELECT 1");  // will have 3 bindings
+        QueryInfo query2 = new QueryInfo("SELECT 1");  // will have 1 bindings
+        QueryInfo query3 = new QueryInfo("SELECT 1");  // will have empty bindings
 
         query1.getBindingsList().addAll(Arrays.asList(bindings1, bindings2, bindings3));
         query2.getBindingsList().addAll(Arrays.asList(bindings2));
@@ -357,9 +357,9 @@ public class QueryExecutionInfoFormatterTest {
         bindings3.addIdentifierBinding("$2", BoundValue.value("302"));
         bindings3.addIdentifierBinding("$0", BoundValue.nullValue(String.class));
 
-        QueryInfo query1 = new QueryInfo();  // will have 3 bindings
-        QueryInfo query2 = new QueryInfo();  // will have 1 bindings
-        QueryInfo query3 = new QueryInfo();  // will have empty bindings
+        QueryInfo query1 = new QueryInfo("SELECT 1");  // will have 3 bindings
+        QueryInfo query2 = new QueryInfo("SELECT 1");  // will have 1 bindings
+        QueryInfo query3 = new QueryInfo("SELECT 1");  // will have empty bindings
 
         query1.getBindingsList().addAll(Arrays.asList(bindings1, bindings2, bindings3));
         query2.getBindingsList().addAll(Arrays.asList(bindings2));
@@ -583,8 +583,8 @@ public class QueryExecutionInfoFormatterTest {
         bindingsByIdentifier.addIdentifierBinding("$0", BoundValue.value("100"));
         bindingsByIdentifier.addIdentifierBinding("$1", BoundValue.nullValue(Object.class));
 
-        QueryInfo queryWithIndexBindings = new QueryInfo();
-        QueryInfo queryWithIdentifierBindings = new QueryInfo();
+        QueryInfo queryWithIndexBindings = new QueryInfo("SELECT 1");
+        QueryInfo queryWithIdentifierBindings = new QueryInfo("SELECT 1");
 
         queryWithIndexBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIndex));
         queryWithIdentifierBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIdentifier));
@@ -615,7 +615,7 @@ public class QueryExecutionInfoFormatterTest {
         bindingsByIndex.addIndexBinding(0, BoundValue.value("100"));
         bindingsByIndex.addIndexBinding(1, BoundValue.nullValue(Object.class));
 
-        QueryInfo queryWithIndexBindings = new QueryInfo();
+        QueryInfo queryWithIndexBindings = new QueryInfo("SELECT 1");
 
         queryWithIndexBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIndex));
 
@@ -641,7 +641,7 @@ public class QueryExecutionInfoFormatterTest {
         bindingsByIdentifier.addIdentifierBinding("$0", BoundValue.value("100"));
         bindingsByIdentifier.addIdentifierBinding("$1", BoundValue.nullValue(Object.class));
 
-        QueryInfo queryWithIdentifierBindings = new QueryInfo();
+        QueryInfo queryWithIdentifierBindings = new QueryInfo("SELECT 1");
 
         queryWithIdentifierBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIdentifier));
 

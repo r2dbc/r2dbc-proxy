@@ -16,6 +16,8 @@
 
 package io.r2dbc.proxy.core;
 
+import io.r2dbc.proxy.util.Assert;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,23 +32,16 @@ public class QueryInfo {
 
     private List<Bindings> bindingsList = new ArrayList<>();
 
-    public QueryInfo() {
-    }
-
     public QueryInfo(String query) {
-        this.query = query;
+        this.query = Assert.requireNonNull(query, "query must not be null");
     }
 
     public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
+        return this.query;
     }
 
     // TODO: improve
     public List<Bindings> getBindingsList() {
-        return bindingsList;
+        return this.bindingsList;
     }
 }
