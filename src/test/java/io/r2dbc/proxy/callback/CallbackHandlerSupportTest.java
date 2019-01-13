@@ -19,7 +19,6 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
-import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.spi.Batch;
@@ -62,11 +61,15 @@ public class CallbackHandlerSupportTest {
 
     private CallbackHandlerSupport callbackHandlerSupport;
 
-    @Mock
+    @Mock(lenient = true)
     private ProxyConfig proxyConfig;
 
     @BeforeEach
     void setUp() {
+
+        Clock clock = Clock.fixed(Instant.ofEpochSecond(100), ZoneId.systemDefault());
+        when(this.proxyConfig.getClock()).thenReturn(clock);
+
         this.callbackHandlerSupport = new CallbackHandlerSupport(this.proxyConfig) {
 
             @Override
@@ -75,8 +78,6 @@ public class CallbackHandlerSupportTest {
             }
         };
 
-        Clock clock = Clock.fixed(Instant.ofEpochSecond(100), ZoneId.systemDefault());
-        this.callbackHandlerSupport.setClock(clock);
     }
 
 

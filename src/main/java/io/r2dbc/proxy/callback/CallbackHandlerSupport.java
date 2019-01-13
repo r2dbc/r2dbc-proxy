@@ -83,8 +83,6 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
 
     }
 
-    protected Clock clock = Clock.systemUTC();
-
     protected ProxyConfig proxyConfig;
 
 
@@ -103,12 +101,18 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
      * @param onMap          a callback that will be chained on "map()" right after the result of the method invocation
      * @param onComplete     a callback that will be chained as the first doOnComplete on the result of the method invocation
      * @return result of invoking the original object
-     * @throws Throwable thrown exception during the invocation
+     * @throws Throwable                thrown exception during the invocation
+     * @throws IllegalArgumentException if {@code method} is {@code null}
+     * @throws IllegalArgumentException if {@code target} is {@code null}
+     * @throws IllegalArgumentException if {@code listener} is {@code null}
      */
     protected Object proceedExecution(Method method, Object target, Object[] args,
                                       ProxyExecutionListener listener, ConnectionInfo connectionInfo,
                                       BiFunction<Object, DefaultMethodExecutionInfo, Object> onMap,
                                       Consumer<MethodExecutionInfo> onComplete) throws Throwable {
+        Assert.requireNonNull(method, "method must not be null");
+        Assert.requireNonNull(target, "target must not be null");
+        Assert.requireNonNull(listener, "listener must not be null");
 
         if (PASS_THROUGH_METHODS.contains(method)) {
             try {
@@ -129,7 +133,7 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
         }
 
 
-        StopWatch stopWatch = new StopWatch(this.clock);
+        StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
 
         DefaultMethodExecutionInfo executionInfo = new DefaultMethodExecutionInfo();
         executionInfo.setMethod(method);
@@ -230,6 +234,8 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
      * @param flux          query invocation result publisher
      * @param executionInfo query execution context info
      * @return query invocation result flux
+     * @throws IllegalArgumentException if {@code flux} is {@code null}
+     * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
     protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> flux, DefaultQueryExecutionInfo executionInfo) {
         Assert.requireNonNull(flux, "flux must not be null");
@@ -237,7 +243,7 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
 
         ProxyExecutionListener listener = this.proxyConfig.getListeners();
 
-        StopWatch stopWatch = new StopWatch(this.clock);
+        StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
 
         Flux<? extends Result> queryExecutionFlux = Flux.empty()
             .ofType(Result.class)
@@ -280,7 +286,4 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
 
     }
 
-    public void setClock(Clock clock) {
-        this.clock = clock;
-    }
 }

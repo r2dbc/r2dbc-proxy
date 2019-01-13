@@ -20,6 +20,8 @@ import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.util.Assert;
 
+import java.time.Clock;
+
 /**
  * Central configuration object for proxy.
  *
@@ -32,6 +34,8 @@ public class ProxyConfig {
     private ConnectionIdManager connectionIdManager = ConnectionIdManager.create();
 
     private ProxyFactory proxyFactory = new JdkProxyFactoryFactory().create(this);
+
+    private Clock clock = Clock.systemUTC();
 
     /**
      * Set {@link ProxyFactoryFactory}.
@@ -98,8 +102,26 @@ public class ProxyConfig {
      * @throws IllegalArgumentException if {@code connectionIdManager} is {@code null}
      */
     public void setConnectionIdManager(ConnectionIdManager connectionIdManager) {
-        Assert.requireNonNull(connectionIdManager, "connectionIdManager must not be null");
+        this.connectionIdManager = Assert.requireNonNull(connectionIdManager, "connectionIdManager must not be null");
+    }
 
-        this.connectionIdManager = connectionIdManager;
+    /**
+     * Get {@link Clock}.
+     *
+     * @return clock to use
+     */
+    public Clock getClock() {
+        return clock;
+    }
+
+    /**
+     * Set {@link Clock} to use to calculate the elapsed time.
+     *
+     * @param clock clock to use
+     * @throws IllegalArgumentException if {@code clock} is {@code null}
+     * @see CallbackHandlerSupport
+     */
+    public void setClock(Clock clock) {
+        this.clock = Assert.requireNonNull(clock, "clock must not be null");
     }
 }
