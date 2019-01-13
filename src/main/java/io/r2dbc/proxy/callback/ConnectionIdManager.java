@@ -39,6 +39,7 @@ public interface ConnectionIdManager {
      *
      * @param connection connection
      * @return ID
+     * @throws IllegalArgumentException if {@code connection} is {@code null}
      */
     String getId(Connection connection);
 

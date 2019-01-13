@@ -38,7 +38,9 @@ public interface CallbackHandler {
      * @param args   an array of objects that has passed to the method invocation.
      *               this can be {@code null} when method is invoked with no argument.
      * @return result returned from the method invocation on the proxy instance
-     * @throws Throwable the exception thrown from the method invocation on the proxy instance.
+     * @throws Throwable                the exception thrown from the method invocation on the proxy instance.
+     * @throws IllegalArgumentException if {@code proxy} is {@code null}
+     * @throws IllegalArgumentException if {@code method} is {@code null}
      */
     Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
 

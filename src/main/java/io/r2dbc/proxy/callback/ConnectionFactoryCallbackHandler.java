@@ -16,7 +16,6 @@
 
 package io.r2dbc.proxy.callback;
 
-import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;

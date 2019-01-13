@@ -68,6 +68,7 @@ public class CompositeProxyExecutionListener implements ProxyExecutionListener {
      *
      * @param listener a listener
      * @return {@code true} as specified by {@link List#add(Object)}
+     * @throws IllegalArgumentException if {@code listener} is {@code null}
      */
     public boolean add(ProxyExecutionListener listener) {
         Assert.requireNonNull(listener, "listener must not be null");
@@ -80,6 +81,7 @@ public class CompositeProxyExecutionListener implements ProxyExecutionListener {
      *
      * @param listeners collection of listeners
      * @return {@code true} if this list changed as a result of the call
+     * @throws IllegalArgumentException if {@code listeners} is {@code null}
      */
     public boolean addAll(Collection<ProxyExecutionListener> listeners) {
         Assert.requireNonNull(listeners, "listeners must not be null");
