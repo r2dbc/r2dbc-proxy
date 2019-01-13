@@ -17,107 +17,52 @@
 package io.r2dbc.proxy.core;
 
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Statement;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Hold query execution related information.
  *
  * @author Tadaya Tsuyukubo
  */
-public class QueryExecutionInfo {
-
-    private ConnectionInfo connectionInfo;
-
-    private Method method;
-
-    private Object[] methodArgs;
-
-    private Throwable throwable;
-
-    private boolean isSuccess;
-
-    private int batchSize;  // num of Batch#add
-
-    private ExecutionType type;
-
-    private int bindingsSize;  // num of Statement#add
-
-    private Duration executeDuration = Duration.ZERO;
-
-    private String threadName = "";
-
-    private long threadId;
-
-    private ProxyEventType proxyEventType;
-
-    private int currentResultCount;
-
-    private Object currentMappedResult;
-
-    private List<QueryInfo> queries = new ArrayList<>();
-
-    private Map<String, Object> customValues = new HashMap<>();
+public interface QueryExecutionInfo {
 
     /**
-     * Store key/value pair.
+     * Get the invoked query execution {@code Method}.
      *
-     * Mainly used for passing values between before and after listener callback.
-     *
-     * @param key   key
-     * @param value value
+     * @return invoked method
      */
-    public void addCustomValue(String key, Object value) {
-        this.customValues.put(key, value);
-    }
-
-    public <T> T getCustomValue(String key, Class<T> type) {
-        return type.cast(this.customValues.get(key));
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public void setMethod(Method method) {
-        this.method = method;
-    }
-
-    public Object[] getMethodArgs() {
-        return methodArgs;
-    }
-
-    public void setMethodArgs(Object[] methodArgs) {
-        this.methodArgs = methodArgs;
-    }
-
-    public ConnectionInfo getConnectionInfo() {
-        return this.connectionInfo;
-    }
-
-    public void setConnectionInfo(ConnectionInfo connectionInfo) {
-        this.connectionInfo = connectionInfo;
-    }
-
-    public Throwable getThrowable() {
-        return throwable;
-    }
+    Method getMethod();
 
     /**
-     * Contains an exception thrown while query was executed.
-     * Contains value only when an exception has thrown, otherwise {@code null}.
+     * Get the arguments of the invocation.
      *
-     * @param throwable an error thrown while executing a query
+     * This can be {@code null} when method is invoked with no argument.
+     *
+     * @return argument lists or {@code null} if the invoked method did not take any arguments
      */
-    public void setThrowable(Throwable throwable) {
-        this.throwable = throwable;
-    }
+    Object[] getMethodArgs();
+
+    /**
+     * Get the thrown exception.
+     * For {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)} callback or query execution
+     * did't throw any error, this returns {@code null}.
+     *
+     * @return thrown exception
+     */
+    Throwable getThrowable();
+
+    /**
+     * Get the associated {@link ConnectionInfo}.
+     *
+     * @return connection info
+     */
+    ConnectionInfo getConnectionInfo();
 
     /**
      * Indicate whether the query execution was successful or not.
@@ -125,87 +70,70 @@ public class QueryExecutionInfo {
      *
      * @return true when query has successfully executed
      */
-    public boolean isSuccess() {
-        return isSuccess;
-    }
-
-    public void setSuccess(boolean isSuccess) {
-        this.isSuccess = isSuccess;
-    }
-
-    public int getBatchSize() {
-        return batchSize;
-    }
-
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-    }
+    boolean isSuccess();
 
     /**
-     * Returns list of {@link QueryInfo}.
+     * Get the size of the batch query.
      *
-     * @return list of queries. This will NOT return null.
+     * i.e. Number of the calls of {@link Batch#add(String)}.
+     *
+     * @return batch size
      */
-    public List<QueryInfo> getQueries() {
-        return this.queries;
-    }
-
-    public void setQueries(List<QueryInfo> queries) {
-        this.queries = queries;
-    }
-
-    public ExecutionType getType() {
-        return type;
-    }
-
-    public void setType(ExecutionType type) {
-        this.type = type;
-    }
-
-    public int getBindingsSize() {
-        return bindingsSize;
-    }
-
-    public void setBindingsSize(int bindingsSize) {
-        this.bindingsSize = bindingsSize;
-    }
+    int getBatchSize();
 
     /**
-     * Time that took queries to execute.
+     * Get the list of {@link QueryInfo}.
+     *
+     * @return list of queries. This will NOT return {@code null}.
+     */
+    List<QueryInfo> getQueries();
+
+    /**
+     * Get the type of query execution.
+     *
+     * @return type of query execution
+     */
+    ExecutionType getType();
+
+    /**
+     * Get the number of the binding.
+     *
+     * i.e. Number of the calls of {@link Statement#add()}.
+     *
+     * @return size of the binding
+     */
+    int getBindingsSize();
+
+    /**
+     * Get the time that took queries to execute.
      *
      * @return query execution duration
      */
-    public Duration getExecuteDuration() {
-        return executeDuration;
-    }
+    Duration getExecuteDuration();
 
-    public void setExecuteDuration(Duration executeDuration) {
-        this.executeDuration = executeDuration;
-    }
 
-    public String getThreadName() {
-        return threadName;
-    }
+    /**
+     * Get the currently executed thread name.
+     *
+     * @return thread name
+     */
+    String getThreadName();
 
-    public void setThreadName(String threadName) {
-        this.threadName = threadName;
-    }
+    /**
+     * Get the currently executed thread ID.
+     *
+     * @return thread ID
+     */
+    long getThreadId();
 
-    public long getThreadId() {
-        return threadId;
-    }
 
-    public void setThreadId(long threadId) {
-        this.threadId = threadId;
-    }
-
-    public ProxyEventType getProxyEventType() {
-        return proxyEventType;
-    }
-
-    public void setProxyEventType(ProxyEventType proxyEventType) {
-        this.proxyEventType = proxyEventType;
-    }
+    /**
+     * Get the proxy event type for query execution.
+     *
+     * @return proxy event type; one of {@link ProxyEventType#BEFORE_QUERY}, {@link ProxyEventType#AFTER_QUERY},
+     * or {@link ProxyEventType#EACH_QUERY_RESULT}
+     */
+    ProxyEventType getProxyEventType();
 
     /**
      * Represent Nth {@link io.r2dbc.spi.Result}.
@@ -220,13 +148,8 @@ public class QueryExecutionInfo {
      *
      * @return Nth number of query result
      */
-    public int getCurrentResultCount() {
-        return currentResultCount;
-    }
+    int getCurrentResultCount();
 
-    public void setCurrentResultCount(int currentResultCount) {
-        this.currentResultCount = currentResultCount;
-    }
 
     /**
      * Mapped query result available for each-query-result-callback({@link ProxyExecutionListener#eachQueryResult(QueryExecutionInfo)}).
@@ -236,11 +159,30 @@ public class QueryExecutionInfo {
      *
      * @return currently mapped result
      */
-    public Object getCurrentMappedResult() {
-        return currentMappedResult;
-    }
+    Object getCurrentMappedResult();
 
-    public void setCurrentMappedResult(Object currentResult) {
-        this.currentMappedResult = currentResult;
-    }
+    /**
+     * Store key/value pair.
+     *
+     * Mainly used for passing values between {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)} and
+     * {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}.
+     *
+     * @param key   key
+     * @param value value
+     * @throws IllegalArgumentException if {@code key} is {@code null}
+     */
+    void addCustomValue(String key, Object value);
+
+    /**
+     * Retrieve value from key/value store.
+     *
+     * @param key  key
+     * @param type value class
+     * @param <T>  return type
+     * @return value
+     * @throws IllegalArgumentException if {@code key} is {@code null}
+     * @throws IllegalArgumentException if {@code type} is {@code null}
+     */
+    <T> T getCustomValue(String key, Class<T> type);
+
 }

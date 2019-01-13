@@ -20,7 +20,6 @@ import io.r2dbc.proxy.core.Bindings;
 import io.r2dbc.proxy.core.BoundValue;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
-import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
@@ -103,7 +102,7 @@ public class StatementCallbackHandler extends CallbackHandlerSupport {
             queryInfo.getBindingsList().addAll(this.bindings);
             List<QueryInfo> queries = Stream.of(queryInfo).collect(toList());
 
-            QueryExecutionInfo execInfo = new QueryExecutionInfo();
+            DefaultQueryExecutionInfo execInfo = new DefaultQueryExecutionInfo();
             execInfo.setType(ExecutionType.STATEMENT);
             execInfo.setQueries(queries);
             execInfo.setBindingsSize(this.bindings.size());

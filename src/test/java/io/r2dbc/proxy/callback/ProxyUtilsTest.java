@@ -16,8 +16,6 @@
 
 package io.r2dbc.proxy.callback;
 
-import io.r2dbc.proxy.core.ConnectionInfo;
-import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Result;
@@ -51,7 +49,7 @@ public class ProxyUtilsTest {
 
         Connection proxyConnection = proxyConfig.getProxyFactory().wrapConnection(originalConnection, connectionInfo);
 
-        QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
+        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
         queryExecutionInfo.setConnectionInfo(connectionInfo);
 
         Batch<?> proxyBatch = proxyConfig.getProxyFactory().wrapBatch(originalBatch, connectionInfo);

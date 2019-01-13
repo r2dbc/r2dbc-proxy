@@ -52,7 +52,7 @@ public class ResultCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
-        QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
+        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
@@ -120,7 +120,7 @@ public class ResultCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
-        QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
+        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
@@ -166,7 +166,7 @@ public class ResultCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
-        QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
+        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
@@ -202,7 +202,7 @@ public class ResultCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
-        QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
+        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
@@ -255,7 +255,7 @@ public class ResultCallbackHandlerTest {
     @Test
     void unwrap() throws Throwable {
         Result mockResult = mock(Result.class);
-        QueryExecutionInfo queryExecutionInfo = new QueryExecutionInfo();
+        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
 
         ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);

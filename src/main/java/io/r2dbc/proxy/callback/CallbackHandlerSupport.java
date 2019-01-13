@@ -19,7 +19,6 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
-import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
@@ -232,7 +231,7 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
      * @param executionInfo query execution context info
      * @return query invocation result flux
      */
-    protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> flux, QueryExecutionInfo executionInfo) {
+    protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> flux, DefaultQueryExecutionInfo executionInfo) {
         Assert.requireNonNull(flux, "flux must not be null");
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 

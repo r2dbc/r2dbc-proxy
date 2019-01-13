@@ -74,8 +74,7 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void beforeQuery() {
 
-        QueryExecutionInfo executionInfo = new QueryExecutionInfo();
-        executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
+        QueryExecutionInfo executionInfo = mock(QueryExecutionInfo.class);
 
         this.compositeListener.beforeQuery(executionInfo);
 
@@ -86,8 +85,7 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void afterQuery() {
 
-        QueryExecutionInfo executionInfo = new QueryExecutionInfo();
-        executionInfo.setProxyEventType(ProxyEventType.AFTER_QUERY);
+        QueryExecutionInfo executionInfo = mock(QueryExecutionInfo.class);
 
         this.compositeListener.afterQuery(executionInfo);
 
@@ -99,8 +97,7 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void eachQueryResult() {
 
-        QueryExecutionInfo executionInfo = new QueryExecutionInfo();
-        executionInfo.setProxyEventType(ProxyEventType.EACH_QUERY_RESULT);
+        QueryExecutionInfo executionInfo = mock(QueryExecutionInfo.class);
 
         this.compositeListener.eachQueryResult(executionInfo);
 

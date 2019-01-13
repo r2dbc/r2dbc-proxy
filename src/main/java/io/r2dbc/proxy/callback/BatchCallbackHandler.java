@@ -18,7 +18,6 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
-import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
@@ -47,7 +46,7 @@ public class BatchCallbackHandler extends CallbackHandlerSupport {
     public BatchCallbackHandler(Batch<?> batch, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
         this.batch = Assert.requireNonNull(batch, "batch must not be null");
-        this.connectionInfo = Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");;
+        this.connectionInfo = Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
     }
 
     @Override
@@ -74,7 +73,7 @@ public class BatchCallbackHandler extends CallbackHandlerSupport {
                 .map(QueryInfo::new)
                 .collect(toList());
 
-            QueryExecutionInfo execInfo = new QueryExecutionInfo();
+            DefaultQueryExecutionInfo execInfo = new DefaultQueryExecutionInfo();
             execInfo.setType(ExecutionType.BATCH);
             execInfo.setQueries(queryInfoList);
             execInfo.setBatchSize(this.queries.size());

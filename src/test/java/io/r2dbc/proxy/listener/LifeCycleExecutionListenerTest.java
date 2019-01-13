@@ -117,8 +117,8 @@ public class LifeCycleExecutionListenerTest {
         QueryExecutionInfo queryExecutionInfo;
 
         // for Statement#execute
-        queryExecutionInfo = new QueryExecutionInfo();
-        queryExecutionInfo.setType(ExecutionType.STATEMENT);
+        queryExecutionInfo = mock(QueryExecutionInfo.class);
+        when(queryExecutionInfo.getType()).thenReturn(ExecutionType.STATEMENT);
 
         // test beforeQuery
         listener.beforeQuery(queryExecutionInfo);
@@ -137,8 +137,8 @@ public class LifeCycleExecutionListenerTest {
 
 
         // for Batch#execute
-        queryExecutionInfo = new QueryExecutionInfo();
-        queryExecutionInfo.setType(ExecutionType.BATCH);
+        queryExecutionInfo = mock(QueryExecutionInfo.class);
+        when(queryExecutionInfo.getType()).thenReturn(ExecutionType.BATCH);
 
         // test beforeQuery
         listener.beforeQuery(queryExecutionInfo);

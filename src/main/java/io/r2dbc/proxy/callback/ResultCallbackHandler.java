@@ -36,12 +36,28 @@ public class ResultCallbackHandler extends CallbackHandlerSupport {
 
     private Result result;
 
-    private QueryExecutionInfo queryExecutionInfo;
+    private DefaultQueryExecutionInfo queryExecutionInfo;
 
+    /**
+     * Callback handler logic for {@link Result}.
+     *
+     * This constructor purposely uses {@link QueryExecutionInfo} interface for arguments instead of {@link DefaultQueryExecutionInfo} implementation.
+     * This way, creator of this callback handler ({@link ProxyFactory}) does not depend on {@link DefaultQueryExecutionInfo} implementation which
+     * is scoped to package private.
+     *
+     * @param result             query result
+     * @param queryExecutionInfo query execution info
+     * @param proxyConfig        proxy config
+     * @throws IllegalArgumentException if {@code result} is {@code null}
+     * @throws IllegalArgumentException if {@code queryExecutionInfo} is {@code null}
+     * @throws IllegalArgumentException if {@code proxyConfig} is {@code null}
+     * @throws IllegalArgumentException if {@code queryExecutionInfo} is not an instance of {@link DefaultQueryExecutionInfo}
+     */
     public ResultCallbackHandler(Result result, QueryExecutionInfo queryExecutionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
         this.result = Assert.requireNonNull(result, "result must not be null");
-        this.queryExecutionInfo = Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
+        Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
+        this.queryExecutionInfo = Assert.requireType(queryExecutionInfo, DefaultQueryExecutionInfo.class, "queryExecutionInfo must be DefaultQueryExecutionInfo");
     }
 
     @Override
