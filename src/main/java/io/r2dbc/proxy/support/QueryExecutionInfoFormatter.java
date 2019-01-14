@@ -23,6 +23,8 @@ import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.util.Assert;
+import io.r2dbc.spi.Batch;
+import io.r2dbc.spi.Statement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,29 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * Convert {@link QueryExecutionInfo} to {@code String}.
+ *
+ * <p>Sample usage:
+ * <pre>{@code
+ *   // convert all info
+ *   QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
+ *   String str = formatter.format(queryExecutionInfo);
+ *
+ *   // customize conversion
+ *   QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
+ *   formatter.addConsumer((execInfo, sb) -> {
+ *     sb.append("MY-QUERY-EXECUTION="); // add prefix
+ *   };
+ *   formatter.newLine();  // new line
+ *   formatter.showSuccess();
+ *   formatter.addConsumer((execInfo, sb)  -> {
+ *       // custom conversion
+ *       sb.append("MY-ID=" + executionInfo.getConnectionInfo().getConnectionId());
+ *   });
+ *   formatter.showQuery();
+ *
+ *   // convert it
+ *   String str = formatter.format(queryExecutionInfo);
+ * }</pre>
  *
  * @author Tadaya Tsuyukubo
  */
@@ -133,7 +158,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     };
 
     /**
-     * Default implementation for formatting binding value.
+     * Default implementation for formatting bound value.
      */
     public BiConsumer<BoundValue, StringBuilder> onBoundValue = (boundValue, sb) -> {
         if (boundValue.isNull()) {
@@ -223,6 +248,14 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
 
     private List<BiConsumer<QueryExecutionInfo, StringBuilder>> consumers = new ArrayList<>();
 
+    public QueryExecutionInfoFormatter() {
+    }
+
+    private QueryExecutionInfoFormatter(QueryExecutionInfoFormatter formatter) {
+        this.newLine = formatter.newLine;
+        this.delimiter = formatter.delimiter;
+        this.consumers.addAll(formatter.consumers);
+    }
 
     /**
      * Create a {@link QueryExecutionInfoFormatter} which writes out all attributes on {@link QueryExecutionInfo}.
@@ -249,10 +282,13 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      *
      * @param consumer a {@code BiConsumer} that takes a {@link QueryExecutionInfo} and write to the {@code StringBuilder}.
      * @return this formatter
+     * @throws IllegalArgumentException if {@code consumer} is {@code null}
      */
     public QueryExecutionInfoFormatter addConsumer(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
+        Assert.requireNonNull(consumer, "consumer must not be null");
+
         this.consumers.add(consumer);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
     /**
@@ -260,12 +296,14 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      *
      * @param executionInfo input
      * @return formatted sting
+     * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
     public String format(QueryExecutionInfo executionInfo) {
+        Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 
         StringBuilder sb = new StringBuilder();
 
-        consumers.forEach(consumer -> {
+        this.consumers.forEach(consumer -> {
             consumer.accept(executionInfo, sb);
 
             // if it is for new line, skip adding delimiter
@@ -300,117 +338,116 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      *
      * @param delimiter delimiter
      * @return formatter
+     * @throws IllegalArgumentException if {@code delimiter} is {@code null}
      */
     public QueryExecutionInfoFormatter delimiter(String delimiter) {
-        this.delimiter = delimiter;
-        return this;
+        this.delimiter = Assert.requireNonNull(delimiter, "delimiter must not be null");
+        return new QueryExecutionInfoFormatter(this);
     }
 
     /**
+     * Show thread information with default format.
      *
      * @return formatter
      */
     public QueryExecutionInfoFormatter showThread() {
         this.consumers.add(this.onThread);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showThread(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onThread = consumer;
-        return showThread();
-    }
-
+    /**
+     * Show connection information with default format.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showConnection() {
         this.consumers.add(this.onConnection);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showConnection(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onConnection = consumer;
-        return showConnection();
-    }
-
+    /**
+     * Show transaction information with default format.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showTransaction() {
         this.consumers.add(this.onTransactionInfo);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showTransaction(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onTransactionInfo = consumer;
-        return showTransaction();
-    }
-
+    /**
+     * Show query success with default format.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showSuccess() {
         this.consumers.add(this.onSuccess);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showSuccess(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onSuccess = consumer;
-        return showSuccess();
-    }
 
+    /**
+     * Show query execution duration with default format.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showTime() {
         this.consumers.add(this.onTime);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showTime(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onTime = consumer;
-        return showTime();
-    }
-
+    /**
+     * Show statement type(batch or statement) with default format.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showType() {
         this.consumers.add(this.onType);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showType(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onType = consumer;
-        return showType();
-    }
-
-
+    /**
+     * Show batch size with default format.
+     *
+     * i.e. Number of the calls of {@link Batch#add(String)}}.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showBatchSize() {
         this.consumers.add(this.onBatchSize);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showBatchSize(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onBatchSize = consumer;
-        return showBatchSize();
-    }
-
+    /**
+     * Show binding size with default format.
+     *
+     * i.e. Number of the calls of {@link Statement#add()}}.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showBindingsSize() {
         this.consumers.add(this.onBindingsSize);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showBindingsSize(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onBindingsSize = consumer;
-        return showBindingsSize();
-    }
-
-
+    /**
+     * Show query with default format.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showQuery() {
         this.consumers.add(this.onQuery);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
-    public QueryExecutionInfoFormatter showQuery(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onQuery = consumer;
-        return showQuery();
-    }
-
-
+    /**
+     * Show bindings with default format.
+     *
+     * @return formatter
+     */
     public QueryExecutionInfoFormatter showBindings() {
         this.consumers.add(this.onBindings);
-        return this;
-    }
-
-    public QueryExecutionInfoFormatter showBindings(BiConsumer<QueryExecutionInfo, StringBuilder> consumer) {
-        this.onBindings = consumer;
-        return showBindings();
+        return new QueryExecutionInfoFormatter(this);
     }
 
     /**
@@ -420,7 +457,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      */
     public QueryExecutionInfoFormatter newLine() {
         this.consumers.add(this.newLine);
-        return this;
+        return new QueryExecutionInfoFormatter(this);
     }
 
 
@@ -429,11 +466,11 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      *
      * @param onBoundValue bi-consumer for binding value
      * @return formatter
+     * @throws IllegalArgumentException if {@code onBoundValue} is {@code null}
      */
     public QueryExecutionInfoFormatter boundValue(BiConsumer<BoundValue, StringBuilder> onBoundValue) {
-        Assert.requireNonNull(onBoundValue, "onBoundValue must not be null");
-        this.onBoundValue = onBoundValue;
-        return this;
+        this.onBoundValue = Assert.requireNonNull(onBoundValue, "onBoundValue must not be null");
+        return new QueryExecutionInfoFormatter(this);
     }
 
     /**
@@ -441,11 +478,11 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      *
      * @param onIndexBindings bi-consumer for index-bindings
      * @return formatter
+     * @throws IllegalArgumentException if {@code onIndexBindings} is {@code null}
      */
     public QueryExecutionInfoFormatter indexBindings(BiConsumer<SortedSet<Binding>, StringBuilder> onIndexBindings) {
-        Assert.requireNonNull(onIndexBindings, "onIndexBindings must not be null");
-        this.onIndexBindings = onIndexBindings;
-        return this;
+        this.onIndexBindings = Assert.requireNonNull(onIndexBindings, "onIndexBindings must not be null");
+        return new QueryExecutionInfoFormatter(this);
     }
 
     /**
@@ -453,11 +490,11 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
      *
      * @param onIdentifierBindings bi-consumer for identifier-bindings
      * @return formatter
+     * @throws IllegalArgumentException if {@code onIdentifierBindings} is {@code null}
      */
     public QueryExecutionInfoFormatter identifierBindings(BiConsumer<SortedSet<Binding>, StringBuilder> onIdentifierBindings) {
-        Assert.requireNonNull(onIdentifierBindings, "onIdentifierBindings must not be null");
-        this.onIdentifierBindings = onIdentifierBindings;
-        return this;
+        this.onIdentifierBindings = Assert.requireNonNull(onIdentifierBindings, "onIdentifierBindings must not be null");
+        return new QueryExecutionInfoFormatter(this);
     }
 
 }
