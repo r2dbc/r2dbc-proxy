@@ -29,6 +29,18 @@ import java.util.function.Function;
 /**
  * Convert {@link MethodExecutionInfo} to {@link String}.
  *
+ * <p>Sample usage:
+ * <pre>{@code
+ *   MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
+ *
+ *   ProxyConnectionFactoryBuilder.create(connectionFactory)
+ *     .onAfterMethod(execInfo ->
+ *        execInfo.map(methodExecutionFormatter::format)  // convert
+ *          .doOnNext(System.out::println)  // print out to sysout
+ *          .subscribe())
+ *     .build();
+ * }</pre>
+ *
  * @author Tadaya Tsuyukubo
  */
 public class MethodExecutionInfoFormatter implements Function<MethodExecutionInfo, String> {
@@ -80,6 +92,7 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
     @Override
     public String apply(MethodExecutionInfo executionInfo) {
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
+
         return format(executionInfo);
     }
 
@@ -88,6 +101,7 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
      *
      * @param executionInfo input
      * @return formatted sting
+     * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
     public String format(MethodExecutionInfo executionInfo) {
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
@@ -109,9 +123,11 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
      *
      * @param consumer a {@code BiConsumer} that takes a {@link MethodExecutionInfo} and write to the {@code StringBuilder}.
      * @return this formatter
+     * @throws IllegalArgumentException if {@code consumer} is {@code null}
      */
     public MethodExecutionInfoFormatter addConsumer(BiConsumer<MethodExecutionInfo, StringBuilder> consumer) {
         Assert.requireNonNull(consumer, "consumer must not be null");
+
         this.consumers.add(consumer);
         return new MethodExecutionInfoFormatter(this);
     }
