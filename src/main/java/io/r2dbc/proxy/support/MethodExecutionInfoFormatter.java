@@ -113,7 +113,7 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
             sb.append(this.delimiter);
         });
 
-        chompIfEndWith(sb, this.delimiter);
+        FormatterUtils.chompIfEndWith(sb, this.delimiter);
 
         return sb.toString();
     }
@@ -131,17 +131,5 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
         this.consumers.add(consumer);
         return new MethodExecutionInfoFormatter(this);
     }
-
-    // TODO: share this with QueryExecutionInfoFormatter
-    protected void chompIfEndWith(StringBuilder sb, String s) {
-        if (sb.length() < s.length()) {
-            return;
-        }
-        final int startIndex = sb.length() - s.length();
-        if (sb.substring(startIndex, sb.length()).equals(s)) {
-            sb.delete(startIndex, sb.length());
-        }
-    }
-
 
 }

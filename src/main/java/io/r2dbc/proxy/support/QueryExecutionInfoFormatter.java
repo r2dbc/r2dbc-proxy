@@ -312,25 +312,14 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
             }
         });
 
-        chompIfEndWith(sb, this.delimiter);
+        FormatterUtils.chompIfEndWith(sb, this.delimiter);
 
         return sb.toString();
-
     }
 
     @Override
     public String apply(QueryExecutionInfo executionInfo) {
         return format(executionInfo);
-    }
-
-    protected void chompIfEndWith(StringBuilder sb, String s) {
-        if (sb.length() < s.length()) {
-            return;
-        }
-        final int startIndex = sb.length() - s.length();
-        if (sb.substring(startIndex, sb.length()).equals(s)) {
-            sb.delete(startIndex, sb.length());
-        }
     }
 
     /**
