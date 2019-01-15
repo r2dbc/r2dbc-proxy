@@ -28,9 +28,9 @@ import java.util.List;
  */
 public class QueryInfo {
 
-    private String query;
+    private final String query;
 
-    private List<Bindings> bindingsList = new ArrayList<>();
+    private final List<Bindings> bindingsList = new ArrayList<>();
 
     public QueryInfo(String query) {
         this.query = Assert.requireNonNull(query, "query must not be null");
@@ -40,7 +40,6 @@ public class QueryInfo {
         return this.query;
     }
 
-    // TODO: improve
     public List<Bindings> getBindingsList() {
         return this.bindingsList;
     }

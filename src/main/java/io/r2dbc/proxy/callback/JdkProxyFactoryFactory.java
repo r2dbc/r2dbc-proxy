@@ -24,7 +24,7 @@ import io.r2dbc.proxy.util.Assert;
  *
  * @author Tadaya Tsuyukubo
  */
-public class JdkProxyFactoryFactory implements ProxyFactoryFactory {
+final class JdkProxyFactoryFactory implements ProxyFactoryFactory {
 
     @Override
     public ProxyFactory create(ProxyConfig proxyConfig) {

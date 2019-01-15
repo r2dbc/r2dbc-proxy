@@ -69,7 +69,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting thread info.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onThread = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onThread = (executionInfo, sb) -> {
         sb.append("Thread:");
         sb.append(executionInfo.getThreadName());
         sb.append("(");
@@ -80,7 +80,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting connection.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onConnection = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onConnection = (executionInfo, sb) -> {
         sb.append("Connection:");
         sb.append(executionInfo.getConnectionInfo().getConnectionId());
     };
@@ -88,7 +88,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting transaction releated info.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onTransactionInfo = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onTransactionInfo = (executionInfo, sb) -> {
         sb.append("Transaction:");
         ConnectionInfo connectionInfo = executionInfo.getConnectionInfo();
         sb.append("{Create:");
@@ -103,7 +103,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting success.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onSuccess = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onSuccess = (executionInfo, sb) -> {
         sb.append("Success:");
         sb.append(executionInfo.isSuccess() ? "True" : "False");
     };
@@ -111,7 +111,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting execution time.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onTime = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onTime = (executionInfo, sb) -> {
         sb.append("Time:");
         sb.append(executionInfo.getExecuteDuration().toMillis());
     };
@@ -119,7 +119,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting execution type.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onType = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onType = (executionInfo, sb) -> {
         sb.append("Type:");
         sb.append(executionInfo.getType() == ExecutionType.BATCH ? "Batch" : "Statement");
     };
@@ -127,7 +127,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting batch size.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onBatchSize = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onBatchSize = (executionInfo, sb) -> {
         sb.append("BatchSize:");
         sb.append(executionInfo.getBatchSize());
     };
@@ -135,7 +135,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting size of bindings.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onBindingsSize = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onBindingsSize = (executionInfo, sb) -> {
         sb.append("BindingsSize:");
         sb.append(executionInfo.getBindingsSize());
     };
@@ -143,7 +143,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     /**
      * Default implementation for formatting queries.
      */
-    private BiConsumer<QueryExecutionInfo, StringBuilder> onQuery = (executionInfo, sb) -> {
+    private final BiConsumer<QueryExecutionInfo, StringBuilder> onQuery = (executionInfo, sb) -> {
         sb.append("Query:[");
 
         List<QueryInfo> queries = executionInfo.getQueries();

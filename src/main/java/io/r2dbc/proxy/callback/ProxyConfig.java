@@ -29,7 +29,7 @@ import java.time.Clock;
  */
 public class ProxyConfig {
 
-    private CompositeProxyExecutionListener listeners = new CompositeProxyExecutionListener();
+    private final CompositeProxyExecutionListener listeners = new CompositeProxyExecutionListener();
 
     private ConnectionIdManager connectionIdManager = ConnectionIdManager.create();
 

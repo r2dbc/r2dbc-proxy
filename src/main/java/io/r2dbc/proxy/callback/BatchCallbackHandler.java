@@ -35,13 +35,13 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Tadaya Tsuyukubo
  */
-public class BatchCallbackHandler extends CallbackHandlerSupport {
+final class BatchCallbackHandler extends CallbackHandlerSupport {
 
-    private Batch<?> batch;
+    private final Batch<?> batch;
 
-    private ConnectionInfo connectionInfo;
+    private final ConnectionInfo connectionInfo;
 
-    private List<String> queries = new ArrayList<>();
+    private final List<String> queries = new ArrayList<>();
 
     public BatchCallbackHandler(Batch<?> batch, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);

@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class CompositeProxyExecutionListener implements ProxyExecutionListener {
 
-    private List<ProxyExecutionListener> listeners = new ArrayList<>();
+    private final List<ProxyExecutionListener> listeners = new ArrayList<>();
 
     public CompositeProxyExecutionListener(ProxyExecutionListener... listeners) {
         this.listeners.addAll(Arrays.asList(listeners));

@@ -43,7 +43,7 @@ import static java.util.stream.Collectors.toSet;
  *
  * @author Tadaya Tsuyukubo
  */
-public abstract class CallbackHandlerSupport implements CallbackHandler {
+abstract class CallbackHandlerSupport implements CallbackHandler {
 
     private static final Set<Method> PASS_THROUGH_METHODS;
 
@@ -83,7 +83,7 @@ public abstract class CallbackHandlerSupport implements CallbackHandler {
 
     }
 
-    protected ProxyConfig proxyConfig;
+    protected final ProxyConfig proxyConfig;
 
 
     public CallbackHandlerSupport(ProxyConfig proxyConfig) {

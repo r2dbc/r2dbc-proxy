@@ -28,9 +28,9 @@ import java.util.function.BiFunction;
  *
  * @author Tadaya Tsuyukubo
  */
-public class ConnectionFactoryCallbackHandler extends CallbackHandlerSupport {
+final class ConnectionFactoryCallbackHandler extends CallbackHandlerSupport {
 
-    private ConnectionFactory connectionFactory;
+    private final ConnectionFactory connectionFactory;
 
     public ConnectionFactoryCallbackHandler(ConnectionFactory connectionFactory, ProxyConfig proxyConfig) {
         super(proxyConfig);

@@ -38,15 +38,15 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Tadaya Tsuyukubo
  */
-public class StatementCallbackHandler extends CallbackHandlerSupport {
+final class StatementCallbackHandler extends CallbackHandlerSupport {
 
-    private Statement<?> statement;
+    private final Statement<?> statement;
 
-    private ConnectionInfo connectionInfo;
+    private final ConnectionInfo connectionInfo;
 
-    private String query;
+    private final String query;
 
-    private List<Bindings> bindings = new ArrayList<>();
+    private final List<Bindings> bindings = new ArrayList<>();
 
     private int currentBindingsIndex = 0;
 

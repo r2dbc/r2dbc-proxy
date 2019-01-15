@@ -32,11 +32,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Tadaya Tsuyukubo
  */
-public class ResultCallbackHandler extends CallbackHandlerSupport {
+final class ResultCallbackHandler extends CallbackHandlerSupport {
 
-    private Result result;
+    private final Result result;
 
-    private DefaultQueryExecutionInfo queryExecutionInfo;
+    private final DefaultQueryExecutionInfo queryExecutionInfo;
 
     /**
      * Callback handler logic for {@link Result}.

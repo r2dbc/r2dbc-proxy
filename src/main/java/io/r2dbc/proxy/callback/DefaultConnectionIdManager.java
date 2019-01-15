@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 final class DefaultConnectionIdManager implements ConnectionIdManager {
 
-    private AtomicLong idCounter = new AtomicLong(0);
+    private final AtomicLong idCounter = new AtomicLong(0);
 
     @Override
     public String getId(Connection connection) {

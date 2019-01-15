@@ -33,9 +33,9 @@ import static java.util.Comparator.naturalOrder;
  */
 public class Bindings {
 
-    private SortedSet<Binding> indexBindings = new TreeSet<>();
+    private final SortedSet<Binding> indexBindings = new TreeSet<>();
 
-    private SortedSet<Binding> identifierBindings = new TreeSet<>();
+    private final SortedSet<Binding> identifierBindings = new TreeSet<>();
 
     /**
      * Add an index binding.

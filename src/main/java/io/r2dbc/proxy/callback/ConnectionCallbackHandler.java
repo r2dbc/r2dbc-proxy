@@ -31,11 +31,11 @@ import java.util.function.Consumer;
  *
  * @author Tadaya Tsuyukubo
  */
-public class ConnectionCallbackHandler extends CallbackHandlerSupport {
+final class ConnectionCallbackHandler extends CallbackHandlerSupport {
 
-    private Connection connection;
+    private final Connection connection;
 
-    private ConnectionInfo connectionInfo;
+    private final ConnectionInfo connectionInfo;
 
     public ConnectionCallbackHandler(Connection connection, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);

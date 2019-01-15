@@ -47,9 +47,9 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
 
     private static final String DEFAULT_DELIMITER = " ";
 
-    private List<BiConsumer<MethodExecutionInfo, StringBuilder>> consumers = new ArrayList<>();
+    private final List<BiConsumer<MethodExecutionInfo, StringBuilder>> consumers = new ArrayList<>();
 
-    private AtomicLong sequenceNumber = new AtomicLong(1);
+    private final AtomicLong sequenceNumber = new AtomicLong(1);
 
     // Default consumer to format the MethodExecutionInfo
     private BiConsumer<MethodExecutionInfo, StringBuilder> defaultConsumer = (executionInfo, sb) -> {

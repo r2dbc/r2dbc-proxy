@@ -40,7 +40,7 @@ import java.util.function.Consumer;
  */
 public class ProxyConnectionFactoryBuilder {
 
-    private ConnectionFactory connectionFactory;  // actual ConnectionFactory
+    private final ConnectionFactory connectionFactory;  // actual ConnectionFactory
 
     private ProxyConfig proxyConfig = new ProxyConfig(); // default
 

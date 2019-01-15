@@ -36,9 +36,9 @@ import java.lang.reflect.Proxy;
  * @author Tadaya Tsuyukubo
  * @see JdkProxyFactoryFactory
  */
-public class JdkProxyFactory implements ProxyFactory {
+final class JdkProxyFactory implements ProxyFactory {
 
-    private ProxyConfig proxyConfig;
+    private final ProxyConfig proxyConfig;
 
     /**
      * Constructor

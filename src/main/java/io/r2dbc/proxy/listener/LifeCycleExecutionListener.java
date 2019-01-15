@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
  */
 public final class LifeCycleExecutionListener implements ProxyExecutionListener {
 
-    private LifeCycleListener delegate;
+    private final LifeCycleListener delegate;
 
     public static LifeCycleExecutionListener of(LifeCycleListener lifeCycleListener) {
         Assert.requireNonNull(lifeCycleListener, "lifeCycleListener must not be null");
