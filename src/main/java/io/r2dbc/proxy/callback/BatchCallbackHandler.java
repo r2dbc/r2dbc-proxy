@@ -37,13 +37,13 @@ import static java.util.stream.Collectors.toList;
  */
 final class BatchCallbackHandler extends CallbackHandlerSupport {
 
-    private final Batch<?> batch;
+    private final Batch batch;
 
     private final ConnectionInfo connectionInfo;
 
     private final List<String> queries = new ArrayList<>();
 
-    public BatchCallbackHandler(Batch<?> batch, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
+    public BatchCallbackHandler(Batch batch, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
         this.batch = Assert.requireNonNull(batch, "batch must not be null");
         this.connectionInfo = Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");

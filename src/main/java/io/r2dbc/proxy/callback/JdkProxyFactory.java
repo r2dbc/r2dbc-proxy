@@ -74,25 +74,25 @@ final class JdkProxyFactory implements ProxyFactory {
     }
 
     @Override
-    public Batch<?> wrapBatch(Batch<?> batch, ConnectionInfo connectionInfo) {
+    public Batch wrapBatch(Batch batch, ConnectionInfo connectionInfo) {
         Assert.requireNonNull(batch, "batch must not be null");
         Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
 
         CallbackHandler logic = new BatchCallbackHandler(batch, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-        return (Batch<?>) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+        return (Batch) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
             new Class<?>[]{Batch.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
     }
 
     @Override
-    public Statement<?> wrapStatement(Statement<?> statement, String query, ConnectionInfo connectionInfo) {
+    public Statement wrapStatement(Statement statement, String query, ConnectionInfo connectionInfo) {
         Assert.requireNonNull(statement, "statement must not be null");
         Assert.requireNonNull(query, "query must not be null");
         Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
 
         CallbackHandler logic = new StatementCallbackHandler(statement, query, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-        return (Statement<?>) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+        return (Statement) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
             new Class<?>[]{Statement.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
     }
 

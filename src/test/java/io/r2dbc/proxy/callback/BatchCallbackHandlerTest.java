@@ -55,7 +55,7 @@ public class BatchCallbackHandlerTest {
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
-        Batch<?> batch = mock(Batch.class);
+        Batch batch = mock(Batch.class);
         BatchCallbackHandler callback = new BatchCallbackHandler(batch, connectionInfo, proxyConfig);
 
         // mock batch execution
@@ -100,7 +100,7 @@ public class BatchCallbackHandlerTest {
 
     @Test
     void unwrap() throws Throwable {
-        Batch<?> batch = mock(Batch.class);
+        Batch batch = mock(Batch.class);
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
 

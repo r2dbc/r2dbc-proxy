@@ -60,7 +60,7 @@ public interface ProxyFactory {
      * @throws IllegalArgumentException if {@code batch} is {@code null}
      * @throws IllegalArgumentException if {@code connectionInfo} is {@code null}
      */
-    Batch<?> wrapBatch(Batch<?> batch, ConnectionInfo connectionInfo);
+    Batch wrapBatch(Batch batch, ConnectionInfo connectionInfo);
 
     /**
      * Create a proxy {@link Statement}.
@@ -73,7 +73,7 @@ public interface ProxyFactory {
      * @throws IllegalArgumentException if {@code query} is {@code null}
      * @throws IllegalArgumentException if {@code connectionInfo} is {@code null}
      */
-    Statement<?> wrapStatement(Statement<?> statement, String query, ConnectionInfo connectionInfo);
+    Statement wrapStatement(Statement statement, String query, ConnectionInfo connectionInfo);
 
     /**
      * Create a proxy {@link Result}.

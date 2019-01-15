@@ -40,7 +40,7 @@ import static java.util.stream.Collectors.toList;
  */
 final class StatementCallbackHandler extends CallbackHandlerSupport {
 
-    private final Statement<?> statement;
+    private final Statement statement;
 
     private final ConnectionInfo connectionInfo;
 
@@ -50,7 +50,7 @@ final class StatementCallbackHandler extends CallbackHandlerSupport {
 
     private int currentBindingsIndex = 0;
 
-    public StatementCallbackHandler(Statement<?> statement, String query, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
+    public StatementCallbackHandler(Statement statement, String query, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
         this.statement = Assert.requireNonNull(statement, "statement must not be null");
         this.query = Assert.requireNonNull(query, "query must not be null");

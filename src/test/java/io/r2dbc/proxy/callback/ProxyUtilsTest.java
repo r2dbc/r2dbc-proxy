@@ -35,8 +35,8 @@ public class ProxyUtilsTest {
     @Test
     void unwrapConnection() {
         Connection originalConnection = mock(Connection.class);
-        Batch<?> originalBatch = mock(Batch.class);
-        Statement<?> originalStatement = mock(Statement.class);
+        Batch originalBatch = mock(Batch.class);
+        Statement originalStatement = mock(Statement.class);
         Result originalResult = mock(Result.class);
 
         String query = "QUERY";
@@ -51,8 +51,8 @@ public class ProxyUtilsTest {
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         queryExecutionInfo.setConnectionInfo(connectionInfo);
 
-        Batch<?> proxyBatch = proxyConfig.getProxyFactory().wrapBatch(originalBatch, connectionInfo);
-        Statement<?> proxyStatement = proxyConfig.getProxyFactory().wrapStatement(originalStatement, query, connectionInfo);
+        Batch proxyBatch = proxyConfig.getProxyFactory().wrapBatch(originalBatch, connectionInfo);
+        Statement proxyStatement = proxyConfig.getProxyFactory().wrapStatement(originalStatement, query, connectionInfo);
         Result proxyResult = proxyConfig.getProxyFactory().wrapResult(originalResult, queryExecutionInfo);
 
         Optional<Connection> result;

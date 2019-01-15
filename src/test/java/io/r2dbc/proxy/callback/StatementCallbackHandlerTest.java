@@ -66,8 +66,8 @@ public class StatementCallbackHandlerTest {
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
-        Statement<?> statement = mock(Statement.class);
-        Statement<?> mockResult = mock(Statement.class);
+        Statement statement = mock(Statement.class);
+        Statement mockResult = mock(Statement.class);
 
         doReturn(mockResult).when(statement).add();
 
@@ -86,7 +86,7 @@ public class StatementCallbackHandlerTest {
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
-        Statement<?> statement = mock(Statement.class);
+        Statement statement = mock(Statement.class);
         StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
 
         when(statement.execute()).thenReturn(Flux.empty());
@@ -174,7 +174,7 @@ public class StatementCallbackHandlerTest {
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
-        Statement<?> statement = mock(Statement.class);
+        Statement statement = mock(Statement.class);
         StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
 
         when(statement.execute()).thenReturn(Flux.empty());
@@ -256,7 +256,7 @@ public class StatementCallbackHandlerTest {
 
     @Test
     void unwrap() throws Throwable {
-        Statement<?> statement = mock(Statement.class);
+        Statement statement = mock(Statement.class);
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         String query = "QUERY";

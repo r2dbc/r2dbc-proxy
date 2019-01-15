@@ -55,8 +55,8 @@ public class JdkProxyFactoryTest {
     void isProxy() {
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
         Connection connection = mock(Connection.class);
-        Batch<?> batch = mock(Batch.class);
-        Statement<?> statement = mock(Statement.class);
+        Batch batch = mock(Batch.class);
+        Statement statement = mock(Statement.class);
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         String query = "query";
 
@@ -87,8 +87,8 @@ public class JdkProxyFactoryTest {
     void testToString() {
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
         Connection connection = mock(Connection.class);
-        Batch<?> batch = mock(Batch.class);
-        Statement<?> statement = mock(Statement.class);
+        Batch batch = mock(Batch.class);
+        Statement statement = mock(Statement.class);
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         String query = "query";
 

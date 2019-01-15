@@ -334,7 +334,7 @@ public class CallbackHandlerSupportTest {
 
         // target method returns Producer
         Method executeMethod = ReflectionUtils.findMethod(Batch.class, "execute");
-        Batch<?> target = mock(Batch.class);
+        Batch target = mock(Batch.class);
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
@@ -398,7 +398,7 @@ public class CallbackHandlerSupportTest {
 
         // target method returns Producer
         Method executeMethod = ReflectionUtils.findMethod(Batch.class, "execute");
-        Batch<?> target = mock(Batch.class);
+        Batch target = mock(Batch.class);
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
@@ -453,13 +453,13 @@ public class CallbackHandlerSupportTest {
 
         // target method returns Batch (not Publisher)
         Method addMethod = ReflectionUtils.findMethod(Batch.class, "add", String.class);
-        Batch<?> target = mock(Batch.class);
+        Batch target = mock(Batch.class);
         Object[] args = new Object[]{"QUERY"};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
 
         // produce single result in order to trigger StepVerifier#consumeNextWith.
-        Batch<?> mockBatch = mock(Batch.class);
+        Batch mockBatch = mock(Batch.class);
 
         doReturn(mockBatch).when(target).add("QUERY");
 
@@ -501,7 +501,7 @@ public class CallbackHandlerSupportTest {
 
         // target method returns Batch (not Publisher)
         Method addMethod = ReflectionUtils.findMethod(Batch.class, "add", String.class);
-        Batch<?> target = mock(Batch.class);
+        Batch target = mock(Batch.class);
         Object[] args = new Object[]{"QUERY"};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);

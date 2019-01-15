@@ -70,8 +70,8 @@ public class ConnectionCallbackHandlerTest {
         proxyConfig.addListener(listener);
         proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
 
-        Batch<?> originalBatch = mock(Batch.class);
-        Batch<?> resultBatch = mock(Batch.class);
+        Batch originalBatch = mock(Batch.class);
+        Batch resultBatch = mock(Batch.class);
         doReturn(originalBatch).when(connection).createBatch();
 
         doReturn(resultBatch).when(proxyFactory).wrapBatch(originalBatch, connectionInfo);
@@ -102,8 +102,8 @@ public class ConnectionCallbackHandlerTest {
         proxyConfig.addListener(listener);
         proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
 
-        Statement<?> originalStatement = mock(Statement.class);
-        Statement<?> resultStatement = mock(Statement.class);
+        Statement originalStatement = mock(Statement.class);
+        Statement resultStatement = mock(Statement.class);
         doReturn(originalStatement).when(connection).createStatement(query);
 
         doReturn(resultStatement).when(proxyFactory).wrapStatement(originalStatement, query, connectionInfo);
