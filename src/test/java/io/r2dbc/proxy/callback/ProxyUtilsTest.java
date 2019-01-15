@@ -48,7 +48,7 @@ public class ProxyUtilsTest {
 
         Connection proxyConnection = proxyConfig.getProxyFactory().wrapConnection(originalConnection, connectionInfo);
 
-        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         queryExecutionInfo.setConnectionInfo(connectionInfo);
 
         Batch<?> proxyBatch = proxyConfig.getProxyFactory().wrapBatch(originalBatch, connectionInfo);

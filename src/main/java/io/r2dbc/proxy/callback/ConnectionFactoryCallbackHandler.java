@@ -48,7 +48,7 @@ final class ConnectionFactoryCallbackHandler extends CallbackHandlerSupport {
             return this.connectionFactory;
         }
 
-        BiFunction<Object, DefaultMethodExecutionInfo, Object> onMap = null;
+        BiFunction<Object, MutableMethodExecutionInfo, Object> onMap = null;
 
         if ("create".equals(methodName)) {
 

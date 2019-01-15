@@ -18,47 +18,58 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
-import io.r2dbc.proxy.core.MethodExecutionInfo;
+import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.ProxyEventType;
+import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.util.Assert;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Default implementation of the {@link MethodExecutionInfo}.
+ * Default implementation of the {@link QueryExecutionInfo}.
  *
  * @author Tadaya Tsuyukubo
  */
-final class DefaultMethodExecutionInfo implements MethodExecutionInfo {
+final class MutableQueryExecutionInfo implements QueryExecutionInfo {
 
-    private Object target;
+    private ConnectionInfo connectionInfo;
 
     private Method method;
 
     private Object[] methodArgs;
 
-    private Object result;
+    private Throwable throwable;
 
-    private Throwable thrown;
+    private boolean isSuccess;
 
-    private ConnectionInfo connectionInfo;
+    private int batchSize;  // num of Batch#add
+
+    private ExecutionType type;
+
+    private int bindingsSize;  // num of Statement#add
 
     private Duration executeDuration = Duration.ZERO;
 
-    private String threadName;
+    private String threadName = "";
 
     private long threadId;
 
     private ProxyEventType proxyEventType;
 
+    private int currentResultCount;
+
+    private Object currentMappedResult;
+
+    private List<QueryInfo> queries = new ArrayList<>();
+
     private Map<String, Object> customValues = new HashMap<>();
 
-    public void setTarget(Object target) {
-        this.target = target;
-    }
 
     public void setMethod(Method method) {
         this.method = method;
@@ -68,16 +79,40 @@ final class DefaultMethodExecutionInfo implements MethodExecutionInfo {
         this.methodArgs = methodArgs;
     }
 
-    public void setResult(Object result) {
-        this.result = result;
-    }
-
-    public void setThrown(Throwable thrown) {
-        this.thrown = thrown;
-    }
-
     public void setConnectionInfo(ConnectionInfo connectionInfo) {
         this.connectionInfo = connectionInfo;
+    }
+
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+    }
+
+    public void setSuccess(boolean isSuccess) {
+        this.isSuccess = isSuccess;
+    }
+
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    public void setQueries(List<QueryInfo> queries) {
+        this.queries = queries;
+    }
+
+    public ExecutionType getType() {
+        return type;
+    }
+
+    public void setType(ExecutionType type) {
+        this.type = type;
+    }
+
+    public int getBindingsSize() {
+        return bindingsSize;
+    }
+
+    public void setBindingsSize(int bindingsSize) {
+        this.bindingsSize = bindingsSize;
     }
 
     public void setExecuteDuration(Duration executeDuration) {
@@ -96,6 +131,14 @@ final class DefaultMethodExecutionInfo implements MethodExecutionInfo {
         this.proxyEventType = proxyEventType;
     }
 
+    public void setCurrentResultCount(int currentResultCount) {
+        this.currentResultCount = currentResultCount;
+    }
+
+    public void setCurrentMappedResult(Object currentResult) {
+        this.currentMappedResult = currentResult;
+    }
+
     @Override
     public void addCustomValue(String key, Object value) {
         Assert.requireNonNull(key, "key must not be null");
@@ -112,11 +155,6 @@ final class DefaultMethodExecutionInfo implements MethodExecutionInfo {
     }
 
     @Override
-    public Object getTarget() {
-        return target;
-    }
-
-    @Override
     public Method getMethod() {
         return method;
     }
@@ -127,18 +165,28 @@ final class DefaultMethodExecutionInfo implements MethodExecutionInfo {
     }
 
     @Override
-    public Object getResult() {
-        return result;
-    }
-
-    @Override
-    public Throwable getThrown() {
-        return thrown;
-    }
-
-    @Override
     public ConnectionInfo getConnectionInfo() {
         return this.connectionInfo;
+    }
+
+    @Override
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    @Override
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
+    @Override
+    public int getBatchSize() {
+        return batchSize;
+    }
+
+    @Override
+    public List<QueryInfo> getQueries() {
+        return this.queries;
     }
 
     @Override
@@ -159,6 +207,16 @@ final class DefaultMethodExecutionInfo implements MethodExecutionInfo {
     @Override
     public ProxyEventType getProxyEventType() {
         return proxyEventType;
+    }
+
+    @Override
+    public int getCurrentResultCount() {
+        return currentResultCount;
+    }
+
+    @Override
+    public Object getCurrentMappedResult() {
+        return currentMappedResult;
     }
 
 }

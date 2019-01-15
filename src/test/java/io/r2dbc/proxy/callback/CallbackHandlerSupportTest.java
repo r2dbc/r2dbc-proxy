@@ -85,7 +85,7 @@ public class CallbackHandlerSupportTest {
     void interceptQueryExecution() {
 
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        DefaultQueryExecutionInfo executionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo executionInfo = new MutableQueryExecutionInfo();
 
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
 
@@ -150,7 +150,7 @@ public class CallbackHandlerSupportTest {
     void interceptQueryExecutionWithFailure() {
 
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        DefaultQueryExecutionInfo executionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo executionInfo = new MutableQueryExecutionInfo();
 
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
         when(this.proxyConfig.getListeners()).thenReturn(compositeListener);
@@ -193,7 +193,7 @@ public class CallbackHandlerSupportTest {
     void interceptQueryExecutionWithMultipleResult() {
 
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        DefaultQueryExecutionInfo executionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo executionInfo = new MutableQueryExecutionInfo();
 
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
 
@@ -275,7 +275,7 @@ public class CallbackHandlerSupportTest {
     void interceptQueryExecutionWithEmptyResult() {
 
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        DefaultQueryExecutionInfo executionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo executionInfo = new MutableQueryExecutionInfo();
 
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
         when(this.proxyConfig.getListeners()).thenReturn(compositeListener);

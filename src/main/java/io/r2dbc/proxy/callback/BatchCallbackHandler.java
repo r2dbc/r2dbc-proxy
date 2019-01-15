@@ -73,7 +73,7 @@ final class BatchCallbackHandler extends CallbackHandlerSupport {
                 .map(QueryInfo::new)
                 .collect(toList());
 
-            DefaultQueryExecutionInfo execInfo = new DefaultQueryExecutionInfo();
+            MutableQueryExecutionInfo execInfo = new MutableQueryExecutionInfo();
             execInfo.setType(ExecutionType.BATCH);
             execInfo.setQueries(queryInfoList);
             execInfo.setBatchSize(this.queries.size());

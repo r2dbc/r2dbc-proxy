@@ -102,7 +102,7 @@ final class StatementCallbackHandler extends CallbackHandlerSupport {
             queryInfo.getBindingsList().addAll(this.bindings);
             List<QueryInfo> queries = Stream.of(queryInfo).collect(toList());
 
-            DefaultQueryExecutionInfo execInfo = new DefaultQueryExecutionInfo();
+            MutableQueryExecutionInfo execInfo = new MutableQueryExecutionInfo();
             execInfo.setType(ExecutionType.STATEMENT);
             execInfo.setQueries(queries);
             execInfo.setBindingsSize(this.bindings.size());

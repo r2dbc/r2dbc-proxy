@@ -108,7 +108,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      */
     protected Object proceedExecution(Method method, Object target, Object[] args,
                                       ProxyExecutionListener listener, ConnectionInfo connectionInfo,
-                                      BiFunction<Object, DefaultMethodExecutionInfo, Object> onMap,
+                                      BiFunction<Object, MutableMethodExecutionInfo, Object> onMap,
                                       Consumer<MethodExecutionInfo> onComplete) throws Throwable {
         Assert.requireNonNull(method, "method must not be null");
         Assert.requireNonNull(target, "target must not be null");
@@ -135,7 +135,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
 
         StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
 
-        DefaultMethodExecutionInfo executionInfo = new DefaultMethodExecutionInfo();
+        MutableMethodExecutionInfo executionInfo = new MutableMethodExecutionInfo();
         executionInfo.setMethod(method);
         executionInfo.setMethodArgs(args);
         executionInfo.setTarget(target);
@@ -237,7 +237,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      * @throws IllegalArgumentException if {@code flux} is {@code null}
      * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
-    protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> flux, DefaultQueryExecutionInfo executionInfo) {
+    protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> flux, MutableQueryExecutionInfo executionInfo) {
         Assert.requireNonNull(flux, "flux must not be null");
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 

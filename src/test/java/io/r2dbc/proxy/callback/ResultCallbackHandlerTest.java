@@ -17,7 +17,6 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ProxyEventType;
-import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.spi.Result;
@@ -52,7 +51,7 @@ public class ResultCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
-        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
@@ -120,7 +119,7 @@ public class ResultCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
-        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
@@ -166,7 +165,7 @@ public class ResultCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
-        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
@@ -202,7 +201,7 @@ public class ResultCallbackHandlerTest {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
-        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
@@ -255,7 +254,7 @@ public class ResultCallbackHandlerTest {
     @Test
     void unwrap() throws Throwable {
         Result mockResult = mock(Result.class);
-        DefaultQueryExecutionInfo queryExecutionInfo = new DefaultQueryExecutionInfo();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
 
         ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
