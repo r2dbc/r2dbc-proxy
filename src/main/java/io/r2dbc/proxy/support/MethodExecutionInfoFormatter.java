@@ -33,12 +33,12 @@ import java.util.function.Function;
  * <pre>{@code
  *   MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
  *
- *   ProxyConnectionFactoryBuilder.create(connectionFactory)
+ *   ProxyConnectionFactory.builder(connectionFactory)
  *     .onAfterMethod(execInfo ->
  *        execInfo.map(methodExecutionFormatter::format)  // convert
  *          .doOnNext(System.out::println)  // print out to sysout
  *          .subscribe())
- *     .build();
+ *     .create();
  * }</pre>
  *
  * @author Tadaya Tsuyukubo

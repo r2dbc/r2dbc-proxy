@@ -27,14 +27,14 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Tadaya Tsuyukubo
  */
-public class ProxyConnectionFactoryBuilderTest {
+public class ProxyConnectionFactoryTest {
 
     @Test
     void build() {
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
 
-        ProxyConnectionFactoryBuilder builder = ProxyConnectionFactoryBuilder.create(connectionFactory);
-        ConnectionFactory result = builder.build();
+        ProxyConnectionFactory.Builder builder = ProxyConnectionFactory.builder(connectionFactory);
+        ConnectionFactory result = builder.create();
 
         assertThat(result)
             .isNotSameAs(connectionFactory)
