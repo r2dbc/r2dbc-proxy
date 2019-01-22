@@ -32,14 +32,30 @@ public class QueryInfo {
 
     private final List<Bindings> bindingsList = new ArrayList<>();
 
+    /**
+     * Construct the {@code QueryInfo} with query.
+     *
+     * @param query query
+     * @throws IllegalArgumentException if {@code query} is {@code null}
+     */
     public QueryInfo(String query) {
         this.query = Assert.requireNonNull(query, "query must not be null");
     }
 
+    /**
+     * Get the query.
+     *
+     * @return query; never {@code null}
+     */
     public String getQuery() {
         return this.query;
     }
 
+    /**
+     * Get the list of {@link Bindings}.
+     *
+     * @return list of bindings; never {@code null}
+     */
     public List<Bindings> getBindingsList() {
         return this.bindingsList;
     }
