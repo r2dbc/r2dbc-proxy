@@ -339,6 +339,22 @@ public interface LifeCycleListener {
     default void afterExecuteOnStatement(MethodExecutionInfo methodExecutionInfo) {
     }
 
+    /**
+     * Callback that is invoked <em>before</em> {@link Statement#returnGeneratedValues(String...)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeReturnGeneratedValuesOnStatement(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Statement#returnGeneratedValues(String...)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterReturnGeneratedValuesOnStatement(MethodExecutionInfo methodExecutionInfo) {
+    }
+
     //
     // For Result
     //

@@ -183,6 +183,12 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                 } else {
                     this.delegate.afterExecuteOnStatement(executionInfo);
                 }
+            } else if ("returnGeneratedValues".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeReturnGeneratedValuesOnStatement(executionInfo);
+                } else {
+                    this.delegate.afterReturnGeneratedValuesOnStatement(executionInfo);
+                }
             }
         } else if (Result.class.equals(methodDeclaringClass)) {
             if ("getRowsUpdated".equals(methodName)) {
