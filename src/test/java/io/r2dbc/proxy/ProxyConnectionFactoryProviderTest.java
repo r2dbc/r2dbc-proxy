@@ -24,10 +24,16 @@ import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockConnectionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static io.r2dbc.proxy.ProxyConnectionFactoryProvider.PROXY_LISTENERS;
 import static io.r2dbc.spi.ConnectionFactoryOptions.DRIVER;
@@ -35,6 +41,7 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.HOST;
 import static io.r2dbc.spi.ConnectionFactoryOptions.PROTOCOL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
  * Test for {@link ProxyConnectionFactoryProvider}
@@ -148,6 +155,20 @@ public class ProxyConnectionFactoryProviderTest {
     }
 
     @Test
+    void noDelegatingFactory() {
+        MockConnectionFactoryProvider.setSupportsCallback(connectionFactoryOptions -> false);  // do not support
+
+        ConnectionFactoryOptions options = ConnectionFactoryOptions.builder()
+            .option(DRIVER, "proxy")
+            .option(PROTOCOL, "foo")
+            .build();
+
+        assertThatThrownBy(() -> this.provider.create(options))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Could not find delegating driver foo");
+    }
+
+    @Test
     void invalidProtocol() {
 
         ConnectionFactoryOptions emptyProtocolOptions = ConnectionFactoryOptions.builder()
@@ -178,8 +199,9 @@ public class ProxyConnectionFactoryProviderTest {
 
     }
 
-    @Test
-    void invalidListenerClassName() {
+    @ParameterizedTest
+    @ArgumentsSource(InvalidProxyListenerArgumentProvider.class)
+    void invalidListenerOptions(Object proxyListenerOption, String expectedErrorMessage) {
 
         MockConnectionFactoryProvider.setSupportsAlways();
         MockConnectionFactoryProvider.setCreateCallbackReturn(MockConnectionFactory.empty());
@@ -187,44 +209,81 @@ public class ProxyConnectionFactoryProviderTest {
         ConnectionFactoryOptions invalidListenerClassNameOptions = ConnectionFactoryOptions.builder()
             .option(DRIVER, "proxy")
             .option(PROTOCOL, "foo")
-            .option(PROXY_LISTENERS, Collections.singleton("invalid.class"))
+            .option(PROXY_LISTENERS, proxyListenerOption)
             .build();
 
         assertThatThrownBy(() -> this.provider.create(invalidListenerClassNameOptions))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("invalid.class is not a valid proxy listener class");
+            .hasMessageContaining(expectedErrorMessage);
 
     }
 
-    @Test
-    void invalidListenerClass() {
+    static class InvalidProxyListenerArgumentProvider implements ArgumentsProvider {
 
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
+            return Stream.of(
+                arguments("invalid.class", "invalid.class is not a valid proxy listener class"),            // invalid class name
+                arguments(InvalidTestProxyExecutionListener.class, "is not a proxy listener instance"),     // non-listener class
+                arguments(100, "100 is not a proxy listener instance"),                                     // invalid proxy instance
+
+                // collection contains invalid params
+                arguments(Collections.singleton("invalid.class"), "invalid.class is not a valid proxy listener class"),
+                arguments(Collections.singleton(InvalidTestProxyExecutionListener.class), "is not a proxy listener instance"),
+                arguments(Collections.singleton(100), "100 is not a proxy listener instance")
+            );
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(ValidProxyListenerArgumentProvider.class)
+    void validListenerOptions(Object proxyListenerOption) {
         MockConnectionFactoryProvider.setSupportsAlways();
         MockConnectionFactoryProvider.setCreateCallbackReturn(MockConnectionFactory.empty());
 
-        String invalidListenerClassName = InvalidTestProxyExecutionListener.class.getName();
         ConnectionFactoryOptions invalidListenerClassNameOptions = ConnectionFactoryOptions.builder()
             .option(DRIVER, "proxy")
             .option(PROTOCOL, "foo")
-            .option(PROXY_LISTENERS, Collections.singleton(invalidListenerClassName))
+            .option(PROXY_LISTENERS, proxyListenerOption)
             .build();
 
-        assertThatThrownBy(() -> this.provider.create(invalidListenerClassNameOptions))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(invalidListenerClassName + " is not a proxy listener class");
+        this.provider.create(invalidListenerClassNameOptions);
 
+        assertThat(TestProxyExecutionListener.lastInstantiatedInstance()).isNotNull();
+    }
+
+    static class ValidProxyListenerArgumentProvider implements ArgumentsProvider {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
+            return Stream.of(
+                TestProxyExecutionListener.class.getName(),
+                TestProxyExecutionListener.class,
+                new TestProxyExecutionListener(),
+                Collections.singleton(TestProxyExecutionListener.class.getName()),
+                Collections.singleton(TestProxyExecutionListener.class),
+                Collections.singleton(new TestProxyExecutionListener())
+            ).map(Arguments::of);
+        }
     }
 
     static class TestProxyExecutionListener implements ProxyExecutionListener {
 
         static boolean instantiated = false;
 
+        static TestProxyExecutionListener instantiatedObject;
+
         public TestProxyExecutionListener() {
             instantiated = true;
+            instantiatedObject = this;
         }
 
         static boolean isInstantiated() {
             return instantiated;
+        }
+
+        static TestProxyExecutionListener lastInstantiatedInstance() {
+            return instantiatedObject;
         }
 
         static void reset() {

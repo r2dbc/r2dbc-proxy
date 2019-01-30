@@ -26,12 +26,20 @@ import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.ConnectionFactoryProvider;
 import io.r2dbc.spi.Option;
 
-import java.util.Set;
+import java.util.Collection;
 
 import static java.lang.String.format;
 
 /**
  * An implementation of {@link ConnectionFactoryProvider} for creating proxy {@link ConnectionFactory}.
+ *
+ * <p>This provider takes {@link #PROXY_LISTENERS proxyListener} parameter and its value can be:
+ * <ul>
+ * <li> Fully qualified proxy listener class name
+ * <li> Proxy listener {@link Class}
+ * <li> Proxy listener instance
+ * <li> {@link Collection} of above
+ * </ul>
  *
  * @author Tadaya Tsuyukubo
  */
@@ -43,11 +51,9 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
     public static final String PROXY_DRIVER = "proxy";
 
     /**
-     * Fully qualified proxy listener class names.
-     *
-     * Specified class names need to be implementations of ({@link ProxyExecutionListener} or {@link LifeCycleListener}) interfaces.
+     * Proxy listener {@link Option}.
      */
-    public static final Option<Set<String>> PROXY_LISTENERS = Option.valueOf("proxyListener");
+    public static final Option<Object> PROXY_LISTENERS = Option.valueOf("proxyListener");
 
     private static final String COLON = ":";
 
@@ -59,8 +65,9 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
      * @throws IllegalArgumentException if {@code connectionFactoryOptions} is {@code null}
      * @throws IllegalStateException    if there is no value for {@link ConnectionFactoryOptions#PROTOCOL}
      * @throws IllegalArgumentException if {@link ConnectionFactoryOptions#PROTOCOL} has invalid format
+     * @throws IllegalArgumentException if delegating {@link ConnectionFactory} cannot be found
      * @throws IllegalArgumentException if specified proxyListener parameter class cannot be found or instantiated
-     * @throws IllegalArgumentException if specified proxyListener parameter value is not a proxy listener class
+     * @throws IllegalArgumentException if specified proxyListener parameter value is not a proxy listener class or instance
      */
     @Override
     public ConnectionFactory create(ConnectionFactoryOptions connectionFactoryOptions) {
@@ -97,37 +104,55 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
         // Run discovery again to find the actual connection factory
         ConnectionFactory connectionFactory = ConnectionFactories.find(newOptions);
         if (connectionFactory == null) {
-            return null;
+            throw new IllegalArgumentException(format("Could not find delegating driver %s", driverDelegate));
         }
 
         ProxyConnectionFactory.Builder builder = ProxyConnectionFactory.builder(connectionFactory);
 
         // add proxy listeners if specified
         if (connectionFactoryOptions.hasOption(PROXY_LISTENERS)) {
-            connectionFactoryOptions.getValue(PROXY_LISTENERS).forEach(proxyListener -> {
-
-                Object listener;
-                try {
-                    Class<?> proxyListenerClass = Class.forName(proxyListener);
-                    listener = proxyListenerClass.newInstance();
-                } catch (Exception e) {
-                    String message = proxyListener + " is not a valid proxy listener class";
-                    throw new IllegalArgumentException(message, e);
-                }
-
-                // currently two types of listeners exist
-                if (listener instanceof ProxyExecutionListener) {
-                    builder.listener((ProxyExecutionListener) listener);
-                } else if (listener instanceof LifeCycleListener) {
-                    builder.listener((LifeCycleListener) listener);
-                } else {
-                    throw new IllegalArgumentException(proxyListener + " is not a proxy listener class");
-                }
-
-            });
+            Object proxyListenerOption = connectionFactoryOptions.getValue(PROXY_LISTENERS);
+            registerProxyListeners(proxyListenerOption, builder);
         }
 
         return builder.create();
+    }
+
+    private void registerProxyListeners(Object optionValue, ProxyConnectionFactory.Builder builder) {
+        if (optionValue instanceof Collection) {
+            ((Collection<?>) optionValue).forEach(element -> registerProxyListeners(element, builder));
+        } else if (optionValue instanceof String) {
+            registerProxyListenerClassName((String) optionValue, builder);
+        } else if (optionValue instanceof Class<?>) {
+            registerProxyListenerClass((Class<?>) optionValue, builder);
+        } else if (optionValue instanceof ProxyExecutionListener) {
+            builder.listener((ProxyExecutionListener) optionValue);
+        } else if (optionValue instanceof LifeCycleListener) {
+            builder.listener((LifeCycleListener) optionValue);
+        } else {
+            throw new IllegalArgumentException(optionValue + " is not a proxy listener instance");
+        }
+    }
+
+    private void registerProxyListenerClassName(String proxyListenerClassName, ProxyConnectionFactory.Builder builder) {
+        Class<?> proxyListenerClass;
+        try {
+            proxyListenerClass = Class.forName(proxyListenerClassName);
+        } catch (Exception e) {
+            String message = proxyListenerClassName + " is not a valid proxy listener class";
+            throw new IllegalArgumentException(message, e);
+        }
+        registerProxyListeners(proxyListenerClass, builder);
+    }
+
+    private void registerProxyListenerClass(Class<?> proxyListenerClass, ProxyConnectionFactory.Builder builder) {
+        Object proxyListenerInstance;
+        try {
+            proxyListenerInstance = proxyListenerClass.newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(format("Could not instantiate %s", proxyListenerClass), e);
+        }
+        registerProxyListeners(proxyListenerInstance, builder);
     }
 
     @Override
