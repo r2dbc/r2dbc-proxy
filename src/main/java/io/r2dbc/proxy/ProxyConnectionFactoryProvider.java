@@ -115,7 +115,7 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
             registerProxyListeners(proxyListenerOption, builder);
         }
 
-        return builder.create();
+        return builder.build();
     }
 
     private void registerProxyListeners(Object optionValue, ProxyConnectionFactory.Builder builder) {

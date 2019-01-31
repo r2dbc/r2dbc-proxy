@@ -98,7 +98,7 @@ public final class ProxyConnectionFactory {
          *
          * @return a proxy {@link ConnectionFactory}
          */
-        public ConnectionFactory create() {
+        public ConnectionFactory build() {
             return this.proxyConfig.getProxyFactory().wrapConnectionFactory(this.connectionFactory);
         }
 

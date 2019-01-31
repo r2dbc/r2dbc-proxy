@@ -34,7 +34,7 @@ public class ProxyConnectionFactoryTest {
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
 
         ProxyConnectionFactory.Builder builder = ProxyConnectionFactory.builder(connectionFactory);
-        ConnectionFactory result = builder.create();
+        ConnectionFactory result = builder.build();
 
         assertThat(result)
             .isNotSameAs(connectionFactory)
