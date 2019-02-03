@@ -22,6 +22,8 @@ import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
+import io.r2dbc.proxy.test.MockConnectionInfo;
+import io.r2dbc.proxy.test.MockQueryExecutionInfo;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -31,8 +33,6 @@ import java.util.Collections;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -42,20 +42,20 @@ public class QueryExecutionInfoFormatterTest {
     @Test
     void batchExecution() {
 
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        when(connectionInfo.getConnectionId()).thenReturn("conn-id");
+        ConnectionInfo connectionInfo = MockConnectionInfo.builder().connectionId("conn-id").build();
 
         // Batch Query
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.getThreadName()).thenReturn("my-thread");
-        when(execInfo.getThreadId()).thenReturn(99L);
-        when(execInfo.getConnectionInfo()).thenReturn(connectionInfo);
-        when(execInfo.isSuccess()).thenReturn(true);
-        when(execInfo.getExecuteDuration()).thenReturn(Duration.of(35, ChronoUnit.MILLIS));
-        when(execInfo.getType()).thenReturn(ExecutionType.BATCH);
-        when(execInfo.getBatchSize()).thenReturn(20);
-        when(execInfo.getBindingsSize()).thenReturn(10);
-        when(execInfo.getQueries()).thenReturn(Arrays.asList(new QueryInfo("SELECT A"), new QueryInfo("SELECT B")));
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder()
+            .threadName("my-thread")
+            .threadId(99L)
+            .connectionInfo(connectionInfo)
+            .isSuccess(true)
+            .executeDuration(Duration.of(35, ChronoUnit.MILLIS))
+            .type(ExecutionType.BATCH)
+            .batchSize(20)
+            .bindingsSize(10)
+            .queries(Arrays.asList(new QueryInfo("SELECT A"), new QueryInfo("SELECT B")))
+            .build();
 
         QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
 
@@ -97,26 +97,28 @@ public class QueryExecutionInfoFormatterTest {
         queryWithIndexBindings.getBindingsList().addAll(Arrays.asList(indexBindings1, indexBindings2));
         queryWithIdBindings.getBindingsList().addAll(Arrays.asList(idBindings1, idBindings2));
 
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        when(connectionInfo.getConnectionId()).thenReturn("conn-id");
+        ConnectionInfo connectionInfo = MockConnectionInfo.builder().connectionId("conn-id").build();
 
         // Statement Query
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.getThreadName()).thenReturn("my-thread");
-        when(execInfo.getThreadId()).thenReturn(99L);
-        when(execInfo.getConnectionInfo()).thenReturn(connectionInfo);
-        when(execInfo.isSuccess()).thenReturn(true);
-        when(execInfo.getExecuteDuration()).thenReturn(Duration.of(35, ChronoUnit.MILLIS));
-        when(execInfo.getType()).thenReturn(ExecutionType.STATEMENT);
-        when(execInfo.getBatchSize()).thenReturn(20);
-        when(execInfo.getBindingsSize()).thenReturn(10);
-
+        MockQueryExecutionInfo baseExecInfo = MockQueryExecutionInfo.builder()
+            .threadName("my-thread")
+            .threadId(99L)
+            .connectionInfo(connectionInfo)
+            .isSuccess(true)
+            .executeDuration(Duration.of(35, ChronoUnit.MILLIS))
+            .type(ExecutionType.STATEMENT)
+            .batchSize(20)
+            .bindingsSize(10)
+            .build();
 
         QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
+        QueryExecutionInfo execInfo;
         String result;
 
         // with index bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(queryWithIndexBindings));
+        execInfo = MockQueryExecutionInfo.builder().from(baseExecInfo)
+            .queries(Collections.singletonList(queryWithIndexBindings))
+            .build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Thread:my-thread(99) Connection:conn-id" +
             " Transaction:{Create:0 Rollback:0 Commit:0} Success:True Time:35" +
@@ -124,7 +126,9 @@ public class QueryExecutionInfoFormatterTest {
             " Bindings:[(100,101,102),(200,null(String),202)]");
 
         // with identifier bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(queryWithIdBindings));
+        execInfo = MockQueryExecutionInfo.builder().from(baseExecInfo)
+            .queries(Collections.singletonList(queryWithIdBindings))
+            .build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Thread:my-thread(99) Connection:conn-id" +
             " Transaction:{Create:0 Rollback:0 Commit:0} Success:True Time:35" +
@@ -132,7 +136,9 @@ public class QueryExecutionInfoFormatterTest {
             " Bindings:[($0=100,$1=101,$2=102),($0=200,$1=null(Integer),$2=202)]");
 
         // with no bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(queryWithNoBindings));
+        execInfo = MockQueryExecutionInfo.builder().from(baseExecInfo)
+            .queries(Collections.singletonList(queryWithNoBindings))
+            .build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Thread:my-thread(99) Connection:conn-id" +
             " Transaction:{Create:0 Rollback:0 Commit:0} Success:True Time:35" +
@@ -147,9 +153,11 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showThread();
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.getThreadName()).thenReturn("my-thread");
-        when(execInfo.getThreadId()).thenReturn(99L);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder()
+            .threadName("my-thread")
+            .threadId(99L)
+            .build();
+
 
         String str = formatter.format(execInfo);
         assertThat(str).isEqualTo("Thread:my-thread(99)");
@@ -160,11 +168,11 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showConnection();
 
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        when(connectionInfo.getConnectionId()).thenReturn("99");
+        ConnectionInfo connectionInfo = MockConnectionInfo.builder().connectionId("99").build();
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.getConnectionInfo()).thenReturn(connectionInfo);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder()
+            .connectionInfo(connectionInfo)
+            .build();
 
         String str = formatter.format(execInfo);
         assertThat(str).isEqualTo("Connection:99");
@@ -176,13 +184,13 @@ public class QueryExecutionInfoFormatterTest {
         formatter.showTransaction();
 
         // 1 transaction, 2 rollback, 3 commit
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        when(connectionInfo.getTransactionCount()).thenReturn(1);
-        when(connectionInfo.getRollbackCount()).thenReturn(2);
-        when(connectionInfo.getCommitCount()).thenReturn(3);
-
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.getConnectionInfo()).thenReturn(connectionInfo);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder()
+            .connectionInfo(MockConnectionInfo.builder()
+                .transactionCount(1)
+                .rollbackCount(2)
+                .commitCount(3)
+                .build())
+            .build();
 
         String str = formatter.format(execInfo);
         assertThat(str).isEqualTo("Transaction:{Create:1 Rollback:2 Commit:3}");
@@ -193,13 +201,12 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showSuccess();
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.isSuccess()).thenReturn(true);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder().isSuccess(true).build();
 
         String str = formatter.format(execInfo);
         assertThat(str).isEqualTo("Success:True");
 
-        when(execInfo.isSuccess()).thenReturn(false);
+        execInfo = MockQueryExecutionInfo.builder().isSuccess(false).build();
 
         str = formatter.format(execInfo);
         assertThat(str).isEqualTo("Success:False");
@@ -210,8 +217,7 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showTime();
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.getExecuteDuration()).thenReturn(Duration.of(55, ChronoUnit.MILLIS));
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder().executeDuration(Duration.of(55, ChronoUnit.MILLIS)).build();
 
         String str = formatter.format(execInfo);
         assertThat(str).isEqualTo("Time:55");
@@ -222,14 +228,14 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showType();
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
+        QueryExecutionInfo execInfo;
         String str;
 
-        when(execInfo.getType()).thenReturn(ExecutionType.BATCH);
+        execInfo = MockQueryExecutionInfo.builder().type(ExecutionType.BATCH).build();
         str = formatter.format(execInfo);
         assertThat(str).isEqualTo("Type:Batch");
 
-        when(execInfo.getType()).thenReturn(ExecutionType.STATEMENT);
+        execInfo = MockQueryExecutionInfo.builder().type(ExecutionType.STATEMENT).build();
         str = formatter.format(execInfo);
         assertThat(str).isEqualTo("Type:Statement");
     }
@@ -239,8 +245,7 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showBatchSize();
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.getBatchSize()).thenReturn(99);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder().batchSize(99).build();
 
         String str = formatter.format(execInfo);
         assertThat(str).isEqualTo("BatchSize:99");
@@ -251,8 +256,7 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showBindingsSize();
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
-        when(execInfo.getBindingsSize()).thenReturn(99);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder().bindingsSize(99).build();
 
         String str = formatter.format(execInfo);
         assertThat(str).isEqualTo("BindingsSize:99");
@@ -267,22 +271,22 @@ public class QueryExecutionInfoFormatterTest {
         QueryInfo query2 = new QueryInfo("QUERY-2");
         QueryInfo query3 = new QueryInfo("QUERY-3");
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
+        QueryExecutionInfo execInfo;
         String result;
 
 
         // with multiple bindings
-        when(execInfo.getQueries()).thenReturn(Arrays.asList(query1, query2, query3));
+        execInfo = MockQueryExecutionInfo.builder().queries(Arrays.asList(query1, query2, query3)).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Query:[\"QUERY-1\",\"QUERY-2\",\"QUERY-3\"]");
 
         // with single bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(query2));
+        execInfo = MockQueryExecutionInfo.builder().queries(Collections.singletonList(query2)).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Query:[\"QUERY-2\"]");
 
         // with no bindings
-        when(execInfo.getQueries()).thenReturn(Collections.emptyList());
+        execInfo = MockQueryExecutionInfo.builder().queries(Collections.emptyList()).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Query:[]");
 
@@ -316,22 +320,22 @@ public class QueryExecutionInfoFormatterTest {
         query2.getBindingsList().addAll(Arrays.asList(bindings2));
 
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
+        QueryExecutionInfo execInfo;
         String result;
 
 
         // with multiple bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(query1));
+        execInfo = MockQueryExecutionInfo.builder().queries(Collections.singletonList(query1)).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Bindings:[(100,101,102),(200,null(String),202),(null(Integer),300,302)]");
 
         // with single bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(query2));
+        execInfo = MockQueryExecutionInfo.builder().queries(Collections.singletonList(query2)).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Bindings:[(200,null(String),202)]");
 
         // with no bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(query3));
+        execInfo = MockQueryExecutionInfo.builder().queries(Collections.singletonList(query3)).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Bindings:[]");
 
@@ -365,22 +369,22 @@ public class QueryExecutionInfoFormatterTest {
         query2.getBindingsList().addAll(Arrays.asList(bindings2));
 
 
-        QueryExecutionInfo execInfo = mock(QueryExecutionInfo.class);
+        QueryExecutionInfo execInfo;
         String result;
 
 
         // with multiple bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(query1));
+        execInfo = MockQueryExecutionInfo.builder().queries(Collections.singletonList(query1)).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Bindings:[($0=100,$1=101,$2=102),($0=200,$1=null(Long),$2=202),($0=null(String),$1=300,$2=302)]");
 
         // with single bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(query2));
+        execInfo = MockQueryExecutionInfo.builder().queries(Collections.singletonList(query2)).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Bindings:[($0=200,$1=null(Long),$2=202)]");
 
         // with no bindings
-        when(execInfo.getQueries()).thenReturn(Collections.singletonList(query3));
+        execInfo = MockQueryExecutionInfo.builder().queries(Collections.singletonList(query3)).build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Bindings:[]");
 
@@ -390,20 +394,19 @@ public class QueryExecutionInfoFormatterTest {
     void showAll() {
         QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
 
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        QueryExecutionInfo queryExecutionInfo = mock(QueryExecutionInfo.class);
-        when(queryExecutionInfo.getThreadName()).thenReturn("");
-        when(queryExecutionInfo.getThreadId()).thenReturn(0L);
-        when(queryExecutionInfo.getConnectionInfo()).thenReturn(connectionInfo);
-        when(queryExecutionInfo.isSuccess()).thenReturn(true);
-        when(queryExecutionInfo.getExecuteDuration()).thenReturn(Duration.ZERO);
-        when(queryExecutionInfo.getType()).thenReturn(ExecutionType.BATCH);
-        when(queryExecutionInfo.getBatchSize()).thenReturn(0);
-        when(queryExecutionInfo.getBindingsSize()).thenReturn(0);
-        when(queryExecutionInfo.getQueries()).thenReturn(Collections.emptyList());
-        when(queryExecutionInfo.getBindingsSize()).thenReturn(0);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder()
+            .threadName("")
+            .threadId(0L)
+            .connectionInfo(MockConnectionInfo.empty())
+            .isSuccess(true)
+            .executeDuration(Duration.ZERO)
+            .type(ExecutionType.BATCH)
+            .batchSize(0)
+            .bindingsSize(0)
+            .queries(Collections.emptyList())
+            .build();
 
-        String result = formatter.format(queryExecutionInfo);
+        String result = formatter.format(execInfo);
         assertThat(result)
             .containsSubsequence("Thread", "Connection", "Transaction", "Success", "Time", "Type",
                 "BatchSize", "BindingsSize", "Query", "Bindings");
@@ -411,35 +414,38 @@ public class QueryExecutionInfoFormatterTest {
 
     @Test
     void defaultInstance() {
-        QueryExecutionInfo queryExecutionInfo = mock(QueryExecutionInfo.class);
+        QueryExecutionInfo queryExecutionInfo = MockQueryExecutionInfo.empty();
 
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         String result = formatter.format(queryExecutionInfo);
-        assertThat(result).isEqualTo("").as("Does not generate anything.");
+        assertThat(result).as("Does not generate anything.").isEqualTo("");
     }
 
 
     @Test
     void delimiter() {
-        QueryExecutionInfo queryExecutionInfo = mock(QueryExecutionInfo.class);
-        when(queryExecutionInfo.getExecuteDuration()).thenReturn(Duration.ZERO);
-        when(queryExecutionInfo.isSuccess()).thenReturn(false);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder()
+            .executeDuration(Duration.ZERO)
+            .isSuccess(false)
+            .build();
 
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter()
             .showTime()
             .showSuccess()
             .delimiter("ZZZ");
 
-        String result = formatter.format(queryExecutionInfo);
+        String result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Time:0ZZZSuccess:False");
     }
 
     @Test
     void newLine() {
-        QueryExecutionInfo queryExecutionInfo = mock(QueryExecutionInfo.class);
-        when(queryExecutionInfo.getExecuteDuration()).thenReturn(Duration.ZERO);
-        when(queryExecutionInfo.isSuccess()).thenReturn(false);
-        when(queryExecutionInfo.getBatchSize()).thenReturn(0);
+        QueryExecutionInfo execInfo = MockQueryExecutionInfo.builder()
+            .executeDuration(Duration.ZERO)
+            .isSuccess(false)
+            .batchSize(0)
+            .build();
+
 
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter()
             .showTime()
@@ -451,7 +457,7 @@ public class QueryExecutionInfoFormatterTest {
         String lineSeparator = System.lineSeparator();
         String expected = format("Time:0 %sSuccess:False %sBatchSize:0", lineSeparator, lineSeparator);
 
-        String result = formatter.format(queryExecutionInfo);
+        String result = formatter.format(execInfo);
         assertThat(result).isEqualTo(expected);
     }
 
@@ -478,10 +484,12 @@ public class QueryExecutionInfoFormatterTest {
         queryWithIndexBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIndex));
         queryWithIdentifierBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIdentifier));
 
-        QueryExecutionInfo execInfoWithIndexBindings = mock(QueryExecutionInfo.class);
-        QueryExecutionInfo execInfoWithIdentifierBindings = mock(QueryExecutionInfo.class);
-        when(execInfoWithIndexBindings.getQueries()).thenReturn(Collections.singletonList(queryWithIndexBindings));
-        when(execInfoWithIdentifierBindings.getQueries()).thenReturn(Collections.singletonList(queryWithIdentifierBindings));
+        QueryExecutionInfo execInfoWithIndexBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithIndexBindings))
+            .build();
+        QueryExecutionInfo execInfoWithIdentifierBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithIdentifierBindings))
+            .build();
 
         String result;
 
@@ -508,8 +516,9 @@ public class QueryExecutionInfoFormatterTest {
 
         queryWithIndexBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIndex));
 
-        QueryExecutionInfo execInfoWithIndexBindings = mock(QueryExecutionInfo.class);
-        when(execInfoWithIndexBindings.getQueries()).thenReturn(Collections.singletonList(queryWithIndexBindings));
+        QueryExecutionInfo execInfoWithIndexBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithIndexBindings))
+            .build();
 
         String result;
 
@@ -534,8 +543,9 @@ public class QueryExecutionInfoFormatterTest {
 
         queryWithIdentifierBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIdentifier));
 
-        QueryExecutionInfo execInfoWithIdentifierBindings = mock(QueryExecutionInfo.class);
-        when(execInfoWithIdentifierBindings.getQueries()).thenReturn(Collections.singletonList(queryWithIdentifierBindings));
+        QueryExecutionInfo execInfoWithIdentifierBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithIdentifierBindings))
+            .build();
 
         String result;
 

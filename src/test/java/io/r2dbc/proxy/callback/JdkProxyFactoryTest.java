@@ -17,11 +17,16 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
+import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
+import io.r2dbc.spi.test.MockBatch;
+import io.r2dbc.spi.test.MockConnection;
+import io.r2dbc.spi.test.MockConnectionFactory;
+import io.r2dbc.spi.test.MockStatement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,11 +58,11 @@ public class JdkProxyFactoryTest {
 
     @Test
     void isProxy() {
-        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        Batch batch = mock(Batch.class);
-        Statement statement = mock(Statement.class);
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ConnectionFactory connectionFactory = MockConnectionFactory.empty();
+        Connection connection = MockConnection.empty();
+        Batch batch = MockBatch.empty();
+        Statement statement = MockStatement.empty();
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         String query = "query";
 
         Object result;
@@ -85,11 +90,11 @@ public class JdkProxyFactoryTest {
 
     @Test
     void testToString() {
-        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        Batch batch = mock(Batch.class);
-        Statement statement = mock(Statement.class);
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ConnectionFactory connectionFactory = MockConnectionFactory.empty();
+        Connection connection = MockConnection.empty();
+        Batch batch = MockBatch.empty();
+        Statement statement = MockStatement.empty();
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         String query = "query";
 
         String expected;

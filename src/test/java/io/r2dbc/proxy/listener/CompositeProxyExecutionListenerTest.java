@@ -19,12 +19,12 @@ package io.r2dbc.proxy.listener;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.test.MockMethodExecutionInfo;
+import io.r2dbc.proxy.test.MockQueryExecutionInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -48,8 +48,9 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void beforeMethod() {
 
-        MethodExecutionInfo executionInfo = mock(MethodExecutionInfo.class);
-        when(executionInfo.getProxyEventType()).thenReturn(ProxyEventType.BEFORE_METHOD);
+        MethodExecutionInfo executionInfo = MockMethodExecutionInfo.builder()
+            .proxyEventType(ProxyEventType.BEFORE_METHOD)
+            .build();
 
         this.compositeListener.beforeMethod(executionInfo);
 
@@ -61,8 +62,9 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void afterMethod() {
 
-        MethodExecutionInfo executionInfo = mock(MethodExecutionInfo.class);
-        when(executionInfo.getProxyEventType()).thenReturn(ProxyEventType.AFTER_METHOD);
+        MethodExecutionInfo executionInfo = MockMethodExecutionInfo.builder()
+            .proxyEventType(ProxyEventType.AFTER_METHOD)
+            .build();
 
         this.compositeListener.afterMethod(executionInfo);
 
@@ -74,7 +76,7 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void beforeQuery() {
 
-        QueryExecutionInfo executionInfo = mock(QueryExecutionInfo.class);
+        QueryExecutionInfo executionInfo = MockQueryExecutionInfo.empty();
 
         this.compositeListener.beforeQuery(executionInfo);
 
@@ -85,7 +87,7 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void afterQuery() {
 
-        QueryExecutionInfo executionInfo = mock(QueryExecutionInfo.class);
+        QueryExecutionInfo executionInfo = MockQueryExecutionInfo.empty();
 
         this.compositeListener.afterQuery(executionInfo);
 
@@ -97,7 +99,7 @@ public class CompositeProxyExecutionListenerTest {
     @Test
     void eachQueryResult() {
 
-        QueryExecutionInfo executionInfo = mock(QueryExecutionInfo.class);
+        QueryExecutionInfo executionInfo = MockQueryExecutionInfo.empty();
 
         this.compositeListener.eachQueryResult(executionInfo);
 

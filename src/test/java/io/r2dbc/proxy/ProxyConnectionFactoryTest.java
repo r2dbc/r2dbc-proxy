@@ -19,10 +19,10 @@ package io.r2dbc.proxy;
 
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Wrapped;
+import io.r2dbc.spi.test.MockConnectionFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -31,7 +31,7 @@ public class ProxyConnectionFactoryTest {
 
     @Test
     void build() {
-        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+        ConnectionFactory connectionFactory = MockConnectionFactory.builder().build();
 
         ProxyConnectionFactory.Builder builder = ProxyConnectionFactory.builder(connectionFactory);
         ConnectionFactory result = builder.build();

@@ -20,7 +20,12 @@ import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Row;
+import io.r2dbc.spi.RowMetadata;
 import io.r2dbc.spi.Wrapped;
+import io.r2dbc.spi.test.MockResult;
+import io.r2dbc.spi.test.MockRow;
+import io.r2dbc.spi.test.MockRowMetadata;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.util.ReflectionUtils;
@@ -29,6 +34,7 @@ import reactor.test.StepVerifier;
 import reactor.test.publisher.TestPublisher;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,19 +61,21 @@ public class ResultCallbackHandlerTest {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
-        Publisher<Object> source = Flux.just("foo", "bar", "baz");
-        Result mockResult = mock(Result.class);
-        when(mockResult.map(any())).thenReturn(source);
+        Row row1 = MockRow.builder().identified(0, String.class, "foo").build();
+        Row row2 = MockRow.builder().identified(0, String.class, "bar").build();
+        Row row3 = MockRow.builder().identified(0, String.class, "baz").build();
+        Result mockResult = MockResult.builder().row(row1, row2, row3).rowMetadata(MockRowMetadata.empty()).build();
 
         ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
-        // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
-        Object[] args = new Object[]{null};
+        // map function to return the String value
+        BiFunction<Row, RowMetadata, String> mapBiFunction = (row, rowMetadata) -> row.get(0, String.class);
+
+        Object[] args = new Object[]{mapBiFunction};
         Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
         assertThat(result)
-            .isInstanceOf(Publisher.class)
-            .isNotSameAs(source);
+            .isInstanceOf(Publisher.class);
 
         long threadId = Thread.currentThread().getId();
         String threadName = Thread.currentThread().getName();
@@ -169,20 +177,24 @@ public class ResultCallbackHandlerTest {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(compositeListener);
 
-        // return empty publisher
-        Publisher<Object> publisher = Flux.empty();
-        Result mockResult = mock(Result.class);
-        when(mockResult.map(any())).thenReturn(publisher);
+        // return empty result
+        Result mockResult = MockResult.builder().build();
+
+        AtomicBoolean isCalled = new AtomicBoolean();
+        BiFunction<Row, RowMetadata, String> mapBiFunction = (row, rowMetadata) -> {
+            isCalled.set(true);
+            return null;
+        };
+
 
         ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
-        Object[] args = new Object[]{null};
+        Object[] args = new Object[]{mapBiFunction};
         Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
-        assertThat(result)
-            .isInstanceOf(Publisher.class)
-            .isNotSameAs(publisher);
+        assertThat(result).isInstanceOf(Publisher.class);
+        assertThat(isCalled).as("map function should not be called").isFalse();
 
         StepVerifier.create((Publisher<?>) result)
             .expectSubscription()
@@ -208,24 +220,26 @@ public class ResultCallbackHandlerTest {
 
         RuntimeException exception = new RuntimeException("failure");
 
-        // publisher that fails at execution
-        Publisher<Object> source = Flux.just("foo", "bar", "baz")
-            .map(str -> {
-                throw exception;
-            });
+        // return mock results
+        Row row1 = MockRow.builder().identified(0, String.class, "foo").build();
+        Row row2 = MockRow.builder().identified(0, String.class, "bar").build();
+        Row row3 = MockRow.builder().identified(0, String.class, "baz").build();
+        Result mockResult = MockResult.builder().row(row1, row2, row3).rowMetadata(MockRowMetadata.empty()).build();
 
-        Result mockResult = mock(Result.class);
-        when(mockResult.map(any())).thenReturn(source);
+        // map function to throw exception
+        BiFunction<Row, RowMetadata, String> mapBiFunction = (row, rowMetadata) -> {
+            throw exception;
+        };
+
 
         ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
-        Object[] args = new Object[]{null};
+        Object[] args = new Object[]{mapBiFunction};
         Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
         assertThat(result)
-            .isInstanceOf(Publisher.class)
-            .isNotSameAs(source);
+            .isInstanceOf(Publisher.class);
 
         Flux<String> resultConsumer = Flux.from((Publisher<String>) result);
 
@@ -253,7 +267,7 @@ public class ResultCallbackHandlerTest {
 
     @Test
     void unwrap() throws Throwable {
-        Result mockResult = mock(Result.class);
+        Result mockResult = MockResult.empty();
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
 

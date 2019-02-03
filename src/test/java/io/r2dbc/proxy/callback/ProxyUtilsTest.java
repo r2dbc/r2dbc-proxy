@@ -20,12 +20,15 @@ import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
+import io.r2dbc.spi.test.MockBatch;
+import io.r2dbc.spi.test.MockConnection;
+import io.r2dbc.spi.test.MockResult;
+import io.r2dbc.spi.test.MockStatement;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -34,10 +37,10 @@ public class ProxyUtilsTest {
 
     @Test
     void unwrapConnection() {
-        Connection originalConnection = mock(Connection.class);
-        Batch originalBatch = mock(Batch.class);
-        Statement originalStatement = mock(Statement.class);
-        Result originalResult = mock(Result.class);
+        Connection originalConnection = MockConnection.empty();
+        Batch originalBatch = MockBatch.empty();
+        Statement originalStatement = MockStatement.empty();
+        Result originalResult = MockResult.empty();
 
         String query = "QUERY";
 

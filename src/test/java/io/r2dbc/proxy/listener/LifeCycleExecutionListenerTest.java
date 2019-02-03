@@ -19,6 +19,8 @@ package io.r2dbc.proxy.listener;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.test.MockMethodExecutionInfo;
+import io.r2dbc.proxy.test.MockQueryExecutionInfo;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,9 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -55,8 +54,6 @@ public class LifeCycleExecutionListenerTest {
         LifeCycleListener lifeCycleListener = createLifeCycleListener(invokedMethods);
         LifeCycleExecutionListener listener = LifeCycleExecutionListener.of(lifeCycleListener);
 
-        MethodExecutionInfo methodExecutionInfo = mock(MethodExecutionInfo.class);
-
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method methodToInvoke : declaredMethods) {
             String methodName = methodToInvoke.getName();
@@ -66,7 +63,9 @@ public class LifeCycleExecutionListenerTest {
             String expectedAfterMethodName = "after" + StringUtils.capitalize(methodName) + "On" + StringUtils.capitalize(className);
 
             // mock executing method
-            when(methodExecutionInfo.getMethod()).thenReturn(methodToInvoke);
+            MethodExecutionInfo methodExecutionInfo = MockMethodExecutionInfo.builder()
+                .method(methodToInvoke)
+                .build();
 
             // invoke beforeMethod()
             listener.beforeMethod(methodExecutionInfo);
@@ -102,7 +101,6 @@ public class LifeCycleExecutionListenerTest {
 
             // reset
             invokedMethods.clear();
-            reset(methodExecutionInfo);
         }
 
     }
@@ -117,8 +115,9 @@ public class LifeCycleExecutionListenerTest {
         QueryExecutionInfo queryExecutionInfo;
 
         // for Statement#execute
-        queryExecutionInfo = mock(QueryExecutionInfo.class);
-        when(queryExecutionInfo.getType()).thenReturn(ExecutionType.STATEMENT);
+        queryExecutionInfo = MockQueryExecutionInfo.builder()
+            .type(ExecutionType.STATEMENT)
+            .build();
 
         // test beforeQuery
         listener.beforeQuery(queryExecutionInfo);
@@ -137,8 +136,9 @@ public class LifeCycleExecutionListenerTest {
 
 
         // for Batch#execute
-        queryExecutionInfo = mock(QueryExecutionInfo.class);
-        when(queryExecutionInfo.getType()).thenReturn(ExecutionType.BATCH);
+        queryExecutionInfo = MockQueryExecutionInfo.builder()
+            .type(ExecutionType.BATCH)
+            .build();
 
         // test beforeQuery
         listener.beforeQuery(queryExecutionInfo);

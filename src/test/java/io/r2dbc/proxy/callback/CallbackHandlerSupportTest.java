@@ -21,8 +21,11 @@ import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
+import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.test.MockBatch;
+import io.r2dbc.spi.test.MockResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,11 +97,11 @@ public class CallbackHandlerSupportTest {
         when(this.proxyConfig.getProxyFactory()).thenReturn(proxyFactory);
 
         // when it creates a proxy for Result
-        Result mockResultProxy = mock(Result.class);
+        Result mockResultProxy = MockResult.empty();
         when(proxyFactory.wrapResult(any(), any())).thenReturn(mockResultProxy);
 
         // produce single result
-        Result mockResult = mock(Result.class);
+        Result mockResult = MockResult.empty();
         Mono<Result> resultPublisher = Mono.just(mockResult);
 
         Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(resultPublisher, executionInfo);
@@ -337,10 +340,10 @@ public class CallbackHandlerSupportTest {
         Batch target = mock(Batch.class);
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
 
         // produce single result in order to trigger StepVerifier#consumeNextWith.
-        Result mockResult = mock(Result.class);
+        Result mockResult = MockResult.empty();
         Mono<Result> publisher = Mono.just(mockResult);
 
         doReturn(publisher).when(target).execute();
@@ -401,7 +404,7 @@ public class CallbackHandlerSupportTest {
         Batch target = mock(Batch.class);
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
 
         // publisher that throws exception
         RuntimeException exception = new RuntimeException();
@@ -456,7 +459,7 @@ public class CallbackHandlerSupportTest {
         Batch target = mock(Batch.class);
         Object[] args = new Object[]{"QUERY"};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
 
         // produce single result in order to trigger StepVerifier#consumeNextWith.
         Batch mockBatch = mock(Batch.class);
@@ -504,7 +507,7 @@ public class CallbackHandlerSupportTest {
         Batch target = mock(Batch.class);
         Object[] args = new Object[]{"QUERY"};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
 
         // method invocation throws exception
         RuntimeException exception = new RuntimeException();

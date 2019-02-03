@@ -18,6 +18,8 @@ package io.r2dbc.proxy.support;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
+import io.r2dbc.proxy.test.MockConnectionInfo;
+import io.r2dbc.proxy.test.MockMethodExecutionInfo;
 import io.r2dbc.spi.ConnectionFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ReflectionUtils;
@@ -27,8 +29,6 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -43,15 +43,13 @@ public class MethodExecutionInfoFormatterTest {
 
         Long target = 100L;
 
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        when(connectionInfo.getConnectionId()).thenReturn("ABC");
-
-        MethodExecutionInfo executionInfo = mock(MethodExecutionInfo.class);
-        when(executionInfo.getThreadId()).thenReturn(5L);
-        when(executionInfo.getConnectionInfo()).thenReturn(connectionInfo);
-        when(executionInfo.getExecuteDuration()).thenReturn(Duration.of(23, ChronoUnit.MILLIS));
-        when(executionInfo.getMethod()).thenReturn(method);
-        when(executionInfo.getTarget()).thenReturn(target);
+        MethodExecutionInfo executionInfo = MockMethodExecutionInfo.builder()
+            .threadId(5L)
+            .connectionInfo(MockConnectionInfo.builder().connectionId("ABC").build())
+            .executeDuration(Duration.of(23, ChronoUnit.MILLIS))
+            .method(method)
+            .target(target)
+            .build();
 
         MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
         String result = formatter.format(executionInfo);
@@ -73,12 +71,13 @@ public class MethodExecutionInfoFormatterTest {
         Long target = 100L;
 
         // null ConnectionInfo
-        MethodExecutionInfo executionInfo = mock(MethodExecutionInfo.class);
-        when(executionInfo.getThreadId()).thenReturn(5L);
-        when(executionInfo.getConnectionInfo()).thenReturn(null);
-        when(executionInfo.getExecuteDuration()).thenReturn(Duration.of(23, ChronoUnit.MILLIS));
-        when(executionInfo.getMethod()).thenReturn(method);
-        when(executionInfo.getTarget()).thenReturn(target);
+        MethodExecutionInfo executionInfo = MockMethodExecutionInfo.builder()
+            .threadId(5L)
+            .connectionInfo(null)
+            .executeDuration(Duration.of(23, ChronoUnit.MILLIS))
+            .method(method)
+            .target(target)
+            .build();
 
         MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
         String result = formatter.format(executionInfo);
@@ -86,9 +85,15 @@ public class MethodExecutionInfoFormatterTest {
         assertThat(result).isEqualTo("  1: Thread:5 Connection:n/a Time:23  Long#create()");
 
         // null ConnectionId
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        when(connectionInfo.getConnectionId()).thenReturn(null);
-        when(executionInfo.getConnectionInfo()).thenReturn(connectionInfo);
+        ConnectionInfo connectionInfo = MockConnectionInfo.builder().connectionId(null).build();
+
+        executionInfo = MockMethodExecutionInfo.builder()
+            .threadId(5L)
+            .connectionInfo(connectionInfo)
+            .executeDuration(Duration.of(23, ChronoUnit.MILLIS))
+            .method(method)
+            .target(target)
+            .build();
 
         result = formatter.format(executionInfo);
 
@@ -98,7 +103,7 @@ public class MethodExecutionInfoFormatterTest {
     @Test
     void customConsumer() {
 
-        MethodExecutionInfo methodExecutionInfo = mock(MethodExecutionInfo.class);
+        MethodExecutionInfo methodExecutionInfo = MockMethodExecutionInfo.empty();
 
         MethodExecutionInfoFormatter formatter = new MethodExecutionInfoFormatter();
         formatter.addConsumer((executionInfo, sb) -> {

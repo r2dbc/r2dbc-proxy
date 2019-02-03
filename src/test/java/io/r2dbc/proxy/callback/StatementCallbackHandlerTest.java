@@ -23,12 +23,13 @@ import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
+import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
+import io.r2dbc.spi.test.MockStatement;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.util.ReflectionUtils;
-import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import java.lang.reflect.Method;
@@ -38,7 +39,6 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -63,7 +63,7 @@ public class StatementCallbackHandlerTest {
     void add() throws Throwable {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
         Statement statement = mock(Statement.class);
@@ -83,13 +83,11 @@ public class StatementCallbackHandlerTest {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
         String query = "QUERY";
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
-        Statement statement = mock(Statement.class);
+        Statement statement = MockStatement.empty(); // make it return empty result
         StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
-
-        when(statement.execute()).thenReturn(Flux.empty());
 
         callback.invoke(statement, BIND_BY_INDEX_METHOD, new Object[]{1, 100});
         callback.invoke(statement, BIND_NULL_BY_INDEX_METHOD, new Object[]{2, String.class});
@@ -174,10 +172,8 @@ public class StatementCallbackHandlerTest {
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.addListener(testListener);
-        Statement statement = mock(Statement.class);
+        Statement statement = MockStatement.empty(); // make it return empty result
         StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
-
-        when(statement.execute()).thenReturn(Flux.empty());
 
         callback.invoke(statement, BIND_BY_ID_METHOD, new Object[]{"$1", 100});
         callback.invoke(statement, BIND_NULL_BY_ID_METHOD, new Object[]{"$2", String.class});
@@ -256,8 +252,8 @@ public class StatementCallbackHandlerTest {
 
     @Test
     void unwrap() throws Throwable {
-        Statement statement = mock(Statement.class);
-        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        Statement statement = MockStatement.empty();
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         ProxyConfig proxyConfig = new ProxyConfig();
         String query = "QUERY";
 
