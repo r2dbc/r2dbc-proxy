@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
  *
  * @author Tadaya Tsuyukubo
  */
-interface CallbackHandler {
+public interface CallbackHandler {
 
     /**
      * When proxy is invoked, actual implementation of the proxy handler delegates the

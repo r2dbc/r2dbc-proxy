@@ -38,7 +38,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Tadaya Tsuyukubo
  */
-final class StatementCallbackHandler extends CallbackHandlerSupport {
+public final class StatementCallbackHandler extends CallbackHandlerSupport {
 
     private final Statement statement;
 

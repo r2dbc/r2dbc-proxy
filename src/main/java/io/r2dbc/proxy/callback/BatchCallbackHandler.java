@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Tadaya Tsuyukubo
  */
-final class BatchCallbackHandler extends CallbackHandlerSupport {
+public final class BatchCallbackHandler extends CallbackHandlerSupport {
 
     private final Batch batch;
 

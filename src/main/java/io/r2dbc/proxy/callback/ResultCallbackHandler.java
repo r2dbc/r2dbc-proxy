@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Tadaya Tsuyukubo
  */
-final class ResultCallbackHandler extends CallbackHandlerSupport {
+public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
     private final Result result;
 

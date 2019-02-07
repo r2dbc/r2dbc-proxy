@@ -31,7 +31,7 @@ import java.util.function.Consumer;
  *
  * @author Tadaya Tsuyukubo
  */
-final class ConnectionCallbackHandler extends CallbackHandlerSupport {
+public final class ConnectionCallbackHandler extends CallbackHandlerSupport {
 
     private final Connection connection;
 
