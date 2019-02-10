@@ -112,6 +112,11 @@ public final class MockConnectionInfo implements ConnectionInfo {
         return this.isClosed;
     }
 
+    @Override
+    public void setClosed(boolean closed) {
+        this.isClosed = closed;
+    }
+
     public static final class Builder {
 
         private Connection originalConnection;

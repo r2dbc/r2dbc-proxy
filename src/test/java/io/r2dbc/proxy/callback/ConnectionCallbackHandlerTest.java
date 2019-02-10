@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.callback;
 
+import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.spi.Batch;
@@ -34,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -225,6 +227,28 @@ public class ConnectionCallbackHandlerTest {
 
         assertThat(connectionInfo.isClosed()).isTrue();
     }
+
+    @Test // relates to issue-14
+    @SuppressWarnings("unchecked")
+    void closeWithCustomConnectionInfo() throws Throwable {
+        Connection connection = mock(Connection.class);
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);  // non DefaultConnectionInfo implementation
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        when(connection.close()).thenReturn(Mono.empty());
+
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(connection, CLOSE_METHOD, null);
+        StepVerifier.create((Publisher<Void>) result)
+            .expectSubscription()
+            // since it is a Publisher<Void>, no steps for assertNext
+            .verifyComplete();
+
+        //  "setClosed" should be called on non DefaultConnectionInfo implementation
+        verify(connectionInfo).setClosed(true);
+    }
+
 
     @Test
     void unwrap() throws Throwable {

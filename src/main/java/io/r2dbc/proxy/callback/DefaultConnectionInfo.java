@@ -69,11 +69,7 @@ final class DefaultConnectionInfo implements ConnectionInfo {
         this.connectionId = connectionId;
     }
 
-    /**
-     * Set {@code boolean} to indicate whether the connection is closed or not.
-     *
-     * @param closed set {@code true} if {@link Connection} is closed
-     */
+    @Override
     public void setClosed(boolean closed) {
         this.isClosed.set(closed);
     }

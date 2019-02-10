@@ -84,4 +84,11 @@ public interface ConnectionInfo {
      */
     boolean isClosed();
 
+    /**
+     * Set {@code boolean} to indicate whether the connection is closed or not.
+     *
+     * @param closed set {@code true} if {@link Connection} is closed
+     */
+    void setClosed(boolean closed);
+
 }
