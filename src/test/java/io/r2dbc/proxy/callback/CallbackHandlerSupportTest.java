@@ -24,7 +24,6 @@ import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Result;
-import io.r2dbc.spi.test.MockBatch;
 import io.r2dbc.spi.test.MockResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +37,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.TestPublisher;
+import reactor.util.function.Tuple3;
+import reactor.util.function.Tuples;
 
 import java.lang.reflect.Method;
 import java.time.Clock;
@@ -45,6 +46,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,6 +56,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -583,5 +586,63 @@ public class CallbackHandlerSupportTest {
         result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{target}, listener, null, null, null);
         assertThat(result).isEqualTo(true);
     }
+
+    @Test
+    void methodInvocationStrategy() throws Throwable {
+        // target method returns Batch (not Publisher)
+        Method addMethod = ReflectionUtils.findMethod(Batch.class, "add", String.class);
+        Batch target = mock(Batch.class);
+        Object[] args = new Object[]{"QUERY"};
+        LastExecutionAwareListener listener = new LastExecutionAwareListener();
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+
+        Object resultMock = new Object();
+
+        AtomicReference<Tuple3<Method, Object, Object[]>> invokedArgumentsHolder = new AtomicReference<>();
+
+        this.callbackHandlerSupport.setMethodInvocationStrategy((invokingMethod, invokingTarget, invokingArgs) -> {
+            invokedArgumentsHolder.set(Tuples.of(invokingMethod, invokingTarget, invokingArgs));  // capture args
+            return resultMock;
+        });
+
+        Object result = this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null, null);
+
+        assertThat(result).isSameAs(resultMock);
+
+        Tuple3<Method, Object, Object[]> invokedArguments = invokedArgumentsHolder.get();
+        assertThat(invokedArguments.getT1()).isSameAs(addMethod);
+        assertThat(invokedArguments.getT2()).isSameAs(target);
+        assertThat(invokedArguments.getT3()).isSameAs(args);
+
+        // target should not be invoked since invocation strategy returns resultMock
+        verifyZeroInteractions(target);
+
+        MethodExecutionInfo beforeMethodExecution = listener.getBeforeMethodExecutionInfo();
+        MethodExecutionInfo afterMethodExecution = listener.getAfterMethodExecutionInfo();
+        assertThat(afterMethodExecution).isSameAs(beforeMethodExecution);
+
+        assertThat(listener.getBeforeQueryExecutionInfo()).isNull();
+        assertThat(listener.getAfterQueryExecutionInfo()).isNull();
+
+        assertThat(afterMethodExecution.getTarget()).isEqualTo(target);
+        assertThat(afterMethodExecution.getResult()).isEqualTo(resultMock);
+        assertThat(afterMethodExecution.getMethod()).isEqualTo(addMethod);
+        assertThat(afterMethodExecution.getMethodArgs()).isEqualTo(args);
+        assertThat(afterMethodExecution.getConnectionInfo()).isSameAs(connectionInfo);
+
+        String threadName = Thread.currentThread().getName();
+        long threadId = Thread.currentThread().getId();
+        assertThat(afterMethodExecution.getThreadName()).isEqualTo(threadName);
+        assertThat(afterMethodExecution.getThreadId()).isEqualTo(threadId);
+
+        // since it uses fixed clock that returns same time, duration is 0
+        assertThat(afterMethodExecution.getExecuteDuration()).isEqualTo(Duration.ZERO);
+
+        assertThat(afterMethodExecution.getProxyEventType()).isEqualTo(ProxyEventType.AFTER_METHOD);
+
+        assertThat(afterMethodExecution.getThrown()).isNull();
+
+    }
+
 
 }

@@ -45,6 +45,38 @@ import static java.util.stream.Collectors.toSet;
  */
 abstract class CallbackHandlerSupport implements CallbackHandler {
 
+    /**
+     * Strategy to invoke the original instance(non-proxy) and retrieve result.
+     */
+    @FunctionalInterface
+    public interface MethodInvocationStrategy {
+
+        /**
+         * Retrieve the actual result from original object.
+         *
+         * @param method invocation method
+         * @param target invocation target instance
+         * @param args   invocation arguments
+         * @return actual invocation result (not a proxy object)
+         * @throws Throwable actual thrown exception
+         */
+        Object invoke(Method method, Object target, Object[] args) throws Throwable;
+    }
+
+    protected static final MethodInvocationStrategy DEFAULT_INVOCATION_STRATEGY = (method, target, args) -> {
+        // Perform reflective invocation on target instance.
+        // When underlying method throws exception, "Method#invoke()" throws InvocationTargetException.
+        // Since this strategy requires throwing originally thrown exception, catch-and-throw the original
+        // exception.
+        Object result;
+        try {
+            result = method.invoke(target, args);
+        } catch (InvocationTargetException ex) {
+            throw ex.getTargetException();  // throw actual exception
+        }
+        return result;
+    };
+
     private static final Set<Method> PASS_THROUGH_METHODS;
 
     static {
@@ -85,6 +117,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
 
     protected final ProxyConfig proxyConfig;
 
+    protected MethodInvocationStrategy methodInvocationStrategy = DEFAULT_INVOCATION_STRATEGY;
 
     public CallbackHandlerSupport(ProxyConfig proxyConfig) {
         this.proxyConfig = Assert.requireNonNull(proxyConfig, "proxyConfig must not be null");
@@ -145,12 +178,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
 
         if (Publisher.class.isAssignableFrom(returnType)) {
 
-            Publisher<?> result;
-            try {
-                result = (Publisher<?>) method.invoke(target, args);
-            } catch (InvocationTargetException ex) {
-                throw ex.getTargetException();
-            }
+            Publisher<?> result = (Publisher<?>) this.methodInvocationStrategy.invoke(method, target, args);
 
             return Flux.empty()
                 .doOnSubscribe(s -> {
@@ -210,9 +238,9 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
             Object result = null;
             Throwable thrown = null;
             try {
-                result = method.invoke(target, args);
-            } catch (InvocationTargetException ex) {
-                thrown = ex.getTargetException();
+                result = this.methodInvocationStrategy.invoke(method, target, args);
+            } catch (Throwable ex) {
+                thrown = ex;  // capture the exception
                 throw thrown;
             } finally {
                 executionInfo.setResult(result);
@@ -284,6 +312,17 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         return Flux.from(queryExecutionFlux)
             .flatMap(queryResult -> Mono.just(proxyFactory.wrapResult(queryResult, executionInfo)));
 
+    }
+
+    /**
+     * Set {@link MethodInvocationStrategy} to invoke the original instance(non-proxy) and retrieve result.
+     *
+     * @param methodInvocationStrategy strategy for method invocation
+     * @throws IllegalArgumentException if {@code methodInvocationStrategy} is {@code null}
+     * @see MethodInvocationStrategy
+     */
+    public void setMethodInvocationStrategy(MethodInvocationStrategy methodInvocationStrategy) {
+        this.methodInvocationStrategy = Assert.requireNonNull(methodInvocationStrategy, "methodInvocationStrategy must not be null");
     }
 
 }
