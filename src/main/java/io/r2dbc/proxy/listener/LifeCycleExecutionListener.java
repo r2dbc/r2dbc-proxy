@@ -64,7 +64,7 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
         String methodName = method.getName();
         Class<?> methodDeclaringClass = method.getDeclaringClass();
 
-        if (ConnectionFactory.class.equals(methodDeclaringClass)) {
+        if (ConnectionFactory.class.isAssignableFrom(methodDeclaringClass)) {
             // ConnectionFactory methods
             if ("create".equals(methodName)) {
                 if (isBefore) {
@@ -79,7 +79,7 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                     this.delegate.afterGetMetadataOnConnectionFactory(executionInfo);
                 }
             }
-        } else if (Connection.class.equals(methodDeclaringClass)) {
+        } else if (Connection.class.isAssignableFrom(methodDeclaringClass)) {
             // Connection methods
             if ("beginTransaction".equals(methodName)) {
                 if (isBefore) {
@@ -142,7 +142,7 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                     this.delegate.afterSetTransactionIsolationLevelOnConnection(executionInfo);
                 }
             }
-        } else if (Batch.class.equals(methodDeclaringClass)) {
+        } else if (Batch.class.isAssignableFrom(methodDeclaringClass)) {
             // Batch methods
             if ("add".equals(methodName)) {
                 if (isBefore) {
@@ -157,7 +157,7 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                     this.delegate.afterExecuteOnBatch(executionInfo);
                 }
             }
-        } else if (Statement.class.equals(methodDeclaringClass)) {
+        } else if (Statement.class.isAssignableFrom(methodDeclaringClass)) {
             // Statement methods
             if ("add".equals(methodName)) {
                 if (isBefore) {
@@ -190,7 +190,7 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                     this.delegate.afterReturnGeneratedValuesOnStatement(executionInfo);
                 }
             }
-        } else if (Result.class.equals(methodDeclaringClass)) {
+        } else if (Result.class.isAssignableFrom(methodDeclaringClass)) {
             if ("getRowsUpdated".equals(methodName)) {
                 if (isBefore) {
                     this.delegate.beforeGetRowsUpdatedOnResult(executionInfo);

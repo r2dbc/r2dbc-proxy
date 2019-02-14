@@ -21,16 +21,21 @@ import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.test.MockMethodExecutionInfo;
 import io.r2dbc.proxy.test.MockQueryExecutionInfo;
+import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.ConnectionFactoryMetadata;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -175,6 +180,41 @@ public class LifeCycleExecutionListenerTest {
         proxyFactory.addAdvice(interceptor);
         proxyFactory.addInterface(LifeCycleListener.class);
         return (LifeCycleListener) proxyFactory.getProxy();
+    }
+
+    @Test
+    void methodInvocationWithConcreteClass() {
+
+        // just declare an abstract class to get Method object
+        abstract class MyConnectionFactory implements ConnectionFactory {
+
+            @Override
+            public ConnectionFactoryMetadata getMetadata() {
+                return null;
+            }
+        }
+
+        List<Method> invokedMethods = new ArrayList<>();
+        LifeCycleListener lifeCycleListener = createLifeCycleListener(invokedMethods);
+        LifeCycleExecutionListener listener = LifeCycleExecutionListener.of(lifeCycleListener);
+
+        Method getMetadataMethod = ReflectionUtils.findMethod(MyConnectionFactory.class, "getMetadata");
+
+        // just make sure that retrieved method is not the one defined on interface
+        Method getMetadataMethodFromInterface = ReflectionUtils.findMethod(ConnectionFactory.class, "getMetadata");
+        assertThat(getMetadataMethod).isNotEqualTo(getMetadataMethodFromInterface);
+
+        MethodExecutionInfo methodExecutionInfo = MockMethodExecutionInfo.builder()
+            .method(getMetadataMethod)
+            .build();
+
+        // test beforeQuery
+        listener.beforeMethod(methodExecutionInfo);
+
+        Set<String> invokedMethodNames = invokedMethods.stream().map(Method::getName).collect(toSet());
+
+        assertThat(invokedMethodNames).contains("beforeGetMetadataOnConnectionFactory");
+
     }
 
 
