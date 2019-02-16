@@ -173,16 +173,20 @@ In [datasource-proxy](datasource-proxy), [`SlowQueryListener` is implemented in 
 
 Using before and after callbacks with contextual information, it can easily construct tracing spans.
 
-Sample implementation: [TracingExecutionListener](https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/src/main/java/io/r2dbc/examples/TracingExecutionListener.java):
+Sample implementation: [TracingExecutionListener][TracingExecutionListener]
 
 *Tracing*
-![Tracing](https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/images/zipkin-tracing-rollback.png)
+![Tracing][zipkin-tracing-rollback]
 
 *Connection Span*
-![Connection Span](https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/images/zipkin-span-connection.png)
+![Connection Span][zipkin-span-connection]
 
 *Query Span*
-![Query Span](https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/images/zipkin-span-batch-query.png)
+![Query Span][zipkin-span-batch-query]
+
+[zipkin-tracing-rollback]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/zipkin-tracing-rollback.png
+[zipkin-span-connection]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/zipkin-span-connection.png
+[zipkin-span-batch-query]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/zipkin-span-batch-query.png
 
 
 ### Metrics
@@ -198,7 +202,7 @@ For example:
 - Query execution time
 - etc.
 
-Sample implementation: [MetricsExecutionListener](https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java)
+Sample implementation: [MetricsExecutionListener][MetricsExecutionListener]
 
 This listener populates following metrics:
 - Time took to create a connection
@@ -210,14 +214,17 @@ In addition, this listener logs slow queries.
 
 
 *Connection metrics on JMX*
-![Connection JMX](https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/images/metrics-jmx-connection.png)
+![Connection JMX][metrics-jmx-connection]
 
 *Query metrics on JMX:*
-![Query JMX](https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/images/metrics-jmx-query.png)
+![Query JMX][metrics-jmx-query]
 
 *Transaction metrics on actuator (`/actuator/metrics/r2dbc.transaction`):*
-![Transaction Actuator](https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/images/metrics-actuator-connection.png)
+![Transaction Actuator][metrics-actuator-connection]
 
+[metrics-jmx-connection]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/metrics-jmx-connection.png
+[metrics-jmx-query]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/metrics-jmx-query.png
+[metrics-actuator-connection]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/metrics-actuator-connection.png
 
 ### Assertion/Verification
 
@@ -430,5 +437,5 @@ ConnectionFactory proxyConnectionFactory =
 
 
 [r2dbc-proxy-samples]: https://github.com/ttddyy/r2dbc-proxy-examples
-[TracingExecutionListener]: https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/src/main/java/io/r2dbc/examples/TracingExecutionListener.java
-[MetricsExecutionListener]: https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java
+[TracingExecutionListener]: https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/TracingExecutionListener.java
+[MetricsExecutionListener]: https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java
