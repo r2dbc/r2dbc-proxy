@@ -59,10 +59,10 @@ Supported Connection Factory Discovery options:
 | ------ | -----------
 | `driver` | Must be `proxy`
 | `protocol` | Delegating connection factory driver
-| `proxyListener` | Fully qualified proxy listener class name  _(Optional)_
+| `proxyListener` | Comma separated list of fully qualified proxy listener class names  _(Optional)_
 
 When programmatically `ConnectionFactoryOptions` are constructed, `proxyListener` option allows following values:
-- Fully qualified proxy listener class name
+- Comma separated list of fully qualified proxy listener class names
 - Proxy listener class
 - Proxy listener instance
 - Collection of above

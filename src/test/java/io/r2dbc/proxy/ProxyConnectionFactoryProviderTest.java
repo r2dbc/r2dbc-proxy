@@ -30,6 +30,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -221,9 +222,13 @@ public class ProxyConnectionFactoryProviderTest {
     static class InvalidProxyListenerArgumentProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
+        public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
             return Stream.of(
+                arguments("", " is not a valid proxy listener class"),                                      // empty class name
                 arguments("invalid.class", "invalid.class is not a valid proxy listener class"),            // invalid class name
+                arguments(",", " is not a valid proxy listener class"),
+                arguments(String.join(",", TestProxyExecutionListener.class.getName(), "invalid.class"),
+                        "invalid.class is not a valid proxy listener class"),                               // invalid class name in comma-separated proxy-listeners string
                 arguments(InvalidTestProxyExecutionListener.class, "is not a proxy listener instance"),     // non-listener class
                 arguments(100, "100 is not a proxy listener instance"),                                     // invalid proxy instance
 
@@ -255,9 +260,10 @@ public class ProxyConnectionFactoryProviderTest {
     static class ValidProxyListenerArgumentProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
+        public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
             return Stream.of(
                 TestProxyExecutionListener.class.getName(),
+                Arrays.asList(TestProxyExecutionListener.class.getName(), TestProxyExecutionListener.class.getName()),
                 TestProxyExecutionListener.class,
                 new TestProxyExecutionListener(),
                 Collections.singleton(TestProxyExecutionListener.class.getName()),
