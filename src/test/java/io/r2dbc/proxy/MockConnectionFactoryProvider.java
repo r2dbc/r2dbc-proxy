@@ -101,4 +101,8 @@ public class MockConnectionFactoryProvider implements ConnectionFactoryProvider 
         return supportsCallback.apply(connectionFactoryOptions);
     }
 
+    @Override
+    public String getDriver() {
+        return ProxyConnectionFactoryProvider.PROXY_DRIVER;
+    }
 }

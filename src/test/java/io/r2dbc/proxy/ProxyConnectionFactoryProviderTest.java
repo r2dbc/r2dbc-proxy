@@ -200,6 +200,11 @@ public class ProxyConnectionFactoryProviderTest {
 
     }
 
+    @Test
+    void getProvider() {
+        assertThat(this.provider.getDriver()).isEqualTo(ProxyConnectionFactoryProvider.PROXY_DRIVER);
+    }
+
     @ParameterizedTest
     @ArgumentsSource(InvalidProxyListenerArgumentProvider.class)
     void invalidListenerOptions(Object proxyListenerOption, String expectedErrorMessage) {

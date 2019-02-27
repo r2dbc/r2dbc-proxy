@@ -165,4 +165,9 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
         return PROXY_DRIVER.equals(driver);
     }
 
+    @Override
+    public String getDriver() {
+        return PROXY_DRIVER;
+    }
+
 }
