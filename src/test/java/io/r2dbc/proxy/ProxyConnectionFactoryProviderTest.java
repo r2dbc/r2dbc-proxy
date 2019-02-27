@@ -251,13 +251,13 @@ public class ProxyConnectionFactoryProviderTest {
         MockConnectionFactoryProvider.setSupportsAlways();
         MockConnectionFactoryProvider.setCreateCallbackReturn(MockConnectionFactory.empty());
 
-        ConnectionFactoryOptions invalidListenerClassNameOptions = ConnectionFactoryOptions.builder()
+        ConnectionFactoryOptions validListenerClassNameOptions = ConnectionFactoryOptions.builder()
             .option(DRIVER, "proxy")
             .option(PROTOCOL, "foo")
             .option(PROXY_LISTENERS, proxyListenerOption)
             .build();
 
-        this.provider.create(invalidListenerClassNameOptions);
+        this.provider.create(validListenerClassNameOptions);
 
         assertThat(TestProxyExecutionListener.lastInstantiatedInstance()).isNotNull();
     }
