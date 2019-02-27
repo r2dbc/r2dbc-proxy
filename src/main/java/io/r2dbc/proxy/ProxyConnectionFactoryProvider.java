@@ -26,6 +26,7 @@ import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.ConnectionFactoryProvider;
 import io.r2dbc.spi.Option;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import static java.lang.String.format;
@@ -122,7 +123,8 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
         if (optionValue instanceof Collection) {
             ((Collection<?>) optionValue).forEach(element -> registerProxyListeners(element, builder));
         } else if (optionValue instanceof String) {
-            registerProxyListenerClassName((String) optionValue, builder);
+            Arrays.asList(((String) optionValue).split(",", -1))
+                    .forEach(className -> registerProxyListenerClassName(className, builder));
         } else if (optionValue instanceof Class<?>) {
             registerProxyListenerClass((Class<?>) optionValue, builder);
         } else if (optionValue instanceof ProxyExecutionListener) {
