@@ -17,7 +17,11 @@
 
 package io.r2dbc.proxy.callback;
 
+import io.r2dbc.proxy.listener.LifeCycleListener;
+import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import org.junit.jupiter.api.Test;
+
+import java.time.Clock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -44,6 +48,43 @@ public class ProxyConfigTest {
         assertThat(proxyConfig.getProxyFactory())
             .as("Second time calling getProxyFactory() should return same instance")
             .isSameAs(proxyFactory);
+    }
+
+    @Test
+    void builder() {
+
+        ConnectionIdManager connectionIdManager = mock(ConnectionIdManager.class);
+        Clock clock = mock(Clock.class);
+        ProxyExecutionListener listener = mock(ProxyExecutionListener.class);
+        LifeCycleListener lifeCycleListener = mock(LifeCycleListener.class);
+        ProxyFactory proxyFactory = mock(ProxyFactory.class);
+        ProxyFactoryFactory proxyFactoryFactory = config -> proxyFactory;
+
+        ProxyConfig.Builder builder = ProxyConfig.builder();
+        builder.connectionIdManager(connectionIdManager)
+            .clock(clock)
+            .listener(listener)
+            .listener(lifeCycleListener)
+            .proxyFactoryFactory(proxyFactoryFactory);
+
+        ProxyConfig proxyConfig = builder.build();
+
+        assertThat(proxyConfig.getConnectionIdManager()).isSameAs(connectionIdManager);
+        assertThat(proxyConfig.getClock()).isSameAs(clock);
+        assertThat(proxyConfig.getListeners().getListeners())
+            .hasSize(2)
+            .contains(listener);
+        assertThat(proxyConfig.getProxyFactory()).isSameAs(proxyFactory);
+    }
+
+    @Test
+    void builderWithDefaultValues() {
+        ProxyConfig proxyConfig = ProxyConfig.builder().build();
+
+        assertThat(proxyConfig.getConnectionIdManager()).isNotNull();
+        assertThat(proxyConfig.getClock()).isNotNull();
+        assertThat(proxyConfig.getListeners()).isNotNull();
+        assertThat(proxyConfig.getProxyFactory()).isNotNull();
     }
 
 }

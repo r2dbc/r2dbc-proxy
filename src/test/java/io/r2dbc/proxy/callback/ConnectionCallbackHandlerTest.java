@@ -68,9 +68,7 @@ public class ConnectionCallbackHandlerTest {
         ProxyFactoryFactory proxyFactoryFactory = mock(ProxyFactoryFactory.class);
         when(proxyFactoryFactory.create(any())).thenReturn(proxyFactory);
 
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(listener);
-        proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).proxyFactoryFactory(proxyFactoryFactory).build();
 
         Batch originalBatch = mock(Batch.class);
         Batch resultBatch = mock(Batch.class);
@@ -100,9 +98,7 @@ public class ConnectionCallbackHandlerTest {
 
         String query = "MY-QUERY";
 
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(listener);
-        proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).proxyFactoryFactory(proxyFactoryFactory).build();
 
         Statement originalStatement = mock(Statement.class);
         Statement resultStatement = mock(Statement.class);
@@ -127,8 +123,7 @@ public class ConnectionCallbackHandlerTest {
 
         Connection connection = mock(Connection.class);
         DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(listener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
         when(connection.beginTransaction()).thenReturn(Mono.empty());
 
@@ -154,8 +149,7 @@ public class ConnectionCallbackHandlerTest {
 
         Connection connection = mock(Connection.class);
         DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(listener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
         when(connection.commitTransaction()).thenReturn(Mono.empty());
 
@@ -181,8 +175,7 @@ public class ConnectionCallbackHandlerTest {
 
         Connection connection = mock(Connection.class);
         DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(listener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
         when(connection.rollbackTransaction()).thenReturn(Mono.empty());
 
@@ -208,8 +201,7 @@ public class ConnectionCallbackHandlerTest {
 
         Connection connection = mock(Connection.class);
         DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(listener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
         when(connection.close()).thenReturn(Mono.empty());
 

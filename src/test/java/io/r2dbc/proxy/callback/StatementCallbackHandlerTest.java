@@ -64,8 +64,7 @@ public class StatementCallbackHandlerTest {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(testListener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
         Statement statement = mock(Statement.class);
         Statement mockResult = mock(Statement.class);
 
@@ -84,8 +83,7 @@ public class StatementCallbackHandlerTest {
 
         String query = "QUERY";
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(testListener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
         Statement statement = MockStatement.empty(); // make it return empty result
         StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
 
@@ -170,8 +168,7 @@ public class StatementCallbackHandlerTest {
 
         String query = "QUERY";
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(testListener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
         Statement statement = MockStatement.empty(); // make it return empty result
         StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
 

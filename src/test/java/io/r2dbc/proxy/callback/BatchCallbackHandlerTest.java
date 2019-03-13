@@ -53,8 +53,7 @@ public class BatchCallbackHandlerTest {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(testListener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
         Batch batch = mock(Batch.class);
         BatchCallbackHandler callback = new BatchCallbackHandler(batch, connectionInfo, proxyConfig);
 

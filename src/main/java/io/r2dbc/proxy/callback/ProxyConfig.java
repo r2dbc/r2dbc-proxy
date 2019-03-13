@@ -17,10 +17,14 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
+import io.r2dbc.proxy.listener.LifeCycleExecutionListener;
+import io.r2dbc.proxy.listener.LifeCycleListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.util.Assert;
 
 import java.time.Clock;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Central configuration object for proxy.
@@ -29,13 +33,38 @@ import java.time.Clock;
  */
 public class ProxyConfig {
 
+    private static final ConnectionIdManager DEFAULT_CONNECTION_ID_MANAGER = ConnectionIdManager.create();
+
+    private static final ProxyFactoryFactory DEFAULT_PROXY_FACTORY_FACTORY = new JdkProxyFactoryFactory();
+
+    private static final Clock DEFAULT_CLOCK = Clock.systemUTC();
+
     private final CompositeProxyExecutionListener listeners = new CompositeProxyExecutionListener();
 
-    private ConnectionIdManager connectionIdManager = ConnectionIdManager.create();
+    private ConnectionIdManager connectionIdManager = DEFAULT_CONNECTION_ID_MANAGER;
 
-    private ProxyFactory proxyFactory = new JdkProxyFactoryFactory().create(this);
+    private ProxyFactory proxyFactory = DEFAULT_PROXY_FACTORY_FACTORY.create(this);
 
-    private Clock clock = Clock.systemUTC();
+    private Clock clock = DEFAULT_CLOCK;
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @return builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public ProxyConfig() {
+    }
+
+    private ProxyConfig(Builder builder) {
+        this.connectionIdManager = builder.connectionIdManager;
+        this.clock = builder.clock;
+        this.listeners.addAll(builder.listeners);
+        this.proxyFactory = builder.proxyFactoryFactory.create(this);
+    }
 
     /**
      * Set {@link ProxyFactoryFactory}.
@@ -111,7 +140,7 @@ public class ProxyConfig {
      * @return clock to use
      */
     public Clock getClock() {
-        return clock;
+        return this.clock;
     }
 
     /**
@@ -124,4 +153,93 @@ public class ProxyConfig {
     public void setClock(Clock clock) {
         this.clock = Assert.requireNonNull(clock, "clock must not be null");
     }
+
+
+    /**
+     * Builder to create a {@link ProxyConfig}.
+     *
+     * For attributes that are not specified, default values will be used.
+     */
+    public static final class Builder {
+
+        private List<ProxyExecutionListener> listeners = new ArrayList<>();
+
+        private ConnectionIdManager connectionIdManager = DEFAULT_CONNECTION_ID_MANAGER;
+
+        private ProxyFactoryFactory proxyFactoryFactory = DEFAULT_PROXY_FACTORY_FACTORY;
+
+        private Clock clock = DEFAULT_CLOCK;
+
+        /**
+         * Add a {@link ProxyExecutionListener}.
+         *
+         * @param listener a listener to add
+         * @return builder
+         * @throws IllegalArgumentException if {@code listener} is {@code null}
+         */
+        public Builder listener(ProxyExecutionListener listener) {
+            this.listeners.add(Assert.requireNonNull(listener, "listener must not be null"));
+            return this;
+        }
+
+        /**
+         * Add a {@link LifeCycleListener}.
+         *
+         * @param lifeCycleListener a listener to add
+         * @return builder
+         * @throws IllegalArgumentException if {@code listener} is {@code null}
+         */
+        public Builder listener(LifeCycleListener lifeCycleListener) {
+            Assert.requireNonNull(lifeCycleListener, "lifeCycleListener must not be null");
+
+            return listener(LifeCycleExecutionListener.of(lifeCycleListener));
+        }
+
+        /**
+         * Set {@link ConnectionIdManager}.
+         *
+         * @param connectionIdManager connectionIdManager to be used
+         * @return builder
+         * @throws IllegalArgumentException if {@code connectionIdManager} is {@code null}
+         */
+        public Builder connectionIdManager(ConnectionIdManager connectionIdManager) {
+            this.connectionIdManager = Assert.requireNonNull(connectionIdManager, "connectionIdManager must not be null");
+            return this;
+        }
+
+        /**
+         * Set {@link ProxyFactoryFactory}.
+         *
+         * @param proxyFactoryFactory proxyFactoryFactory to be used
+         * @return builder
+         * @throws IllegalArgumentException if {@code proxyFactoryFactory} is {@code null}
+         */
+        public Builder proxyFactoryFactory(ProxyFactoryFactory proxyFactoryFactory) {
+            this.proxyFactoryFactory = Assert.requireNonNull(proxyFactoryFactory, "proxyFactoryFactory must not be null");
+            return this;
+        }
+
+        /**
+         * Set {@link Clock}.
+         *
+         * @param clock clock to be used
+         * @return builder
+         * @throws IllegalArgumentException if {@code clock} is {@code null}
+         */
+        public Builder clock(Clock clock) {
+            this.clock = Assert.requireNonNull(clock, "clock must not be null");
+            return this;
+        }
+
+        /**
+         * Build a {@link ProxyConfig}.
+         *
+         * @return a {@link ProxyConfig}
+         */
+        public ProxyConfig build() {
+            return new ProxyConfig(this);
+        }
+
+    }
+
 }

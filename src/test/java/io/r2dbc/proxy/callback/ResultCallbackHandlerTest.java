@@ -17,7 +17,6 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ProxyEventType;
-import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Row;
@@ -55,11 +54,9 @@ public class ResultCallbackHandlerTest {
     @Test
     void map() throws Throwable {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(compositeListener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
         Row row1 = MockRow.builder().identified(0, String.class, "foo").build();
         Row row2 = MockRow.builder().identified(0, String.class, "bar").build();
@@ -125,11 +122,9 @@ public class ResultCallbackHandlerTest {
     @Test
     void mapWithPublisherException() throws Throwable {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(compositeListener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
 
         // return a publisher that throws exception at execution
@@ -171,11 +166,9 @@ public class ResultCallbackHandlerTest {
     @Test
     void mapWithEmptyPublisher() throws Throwable {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(compositeListener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
         // return empty result
         Result mockResult = MockResult.builder().build();
@@ -211,11 +204,9 @@ public class ResultCallbackHandlerTest {
         // call to the "map()" method returns a publisher that fails(errors) at execution time
 
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
-        CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
 
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.addListener(compositeListener);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
 
         RuntimeException exception = new RuntimeException("failure");

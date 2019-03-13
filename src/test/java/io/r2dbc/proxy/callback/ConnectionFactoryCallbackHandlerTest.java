@@ -71,10 +71,11 @@ public class ConnectionFactoryCallbackHandlerTest {
         when(proxyFactory.wrapConnection(any(Connection.class), any(ConnectionInfo.class))).thenReturn(mockedConnection);
 
 
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.setConnectionIdManager(idManager);
-        proxyConfig.setProxyFactoryFactory(proxyFactoryFactory);
-        proxyConfig.addListener(listener);
+        ProxyConfig proxyConfig = ProxyConfig.builder()
+            .proxyFactoryFactory(proxyFactoryFactory)
+            .connectionIdManager(idManager)
+            .listener(listener)
+            .build();
 
         ConnectionFactoryCallbackHandler callback = new ConnectionFactoryCallbackHandler(connectionFactory, proxyConfig);
 
