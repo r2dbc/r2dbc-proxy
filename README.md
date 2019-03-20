@@ -166,7 +166,7 @@ is to create a watcher that checks running queries and notify ones exceeded the 
 In [datasource-proxy](datasource-proxy), [`SlowQueryListener` is implemented in this way][slow-query-doc].
 
 [datasource-proxy]: https://github.com/ttddyy/datasource-proxy
-[slow-query-doc]: http://ttddyy.github.io/datasource-proxy/docs/current/user-guide/#_slow_query_logging_listener
+[slow-query-doc]: https://ttddyy.github.io/datasource-proxy/docs/current/user-guide/#_slow_query_logging_listener
 
 
 ### Distributed Tracing
