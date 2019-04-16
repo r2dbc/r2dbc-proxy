@@ -24,6 +24,8 @@ import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
+import io.r2dbc.spi.Blob;
+import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.Statement;
 
 import java.util.ArrayList;
@@ -167,7 +169,14 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
             sb.append(type.getSimpleName());
             sb.append(")");
         } else {
-            sb.append(boundValue.getValue());
+            Object value = boundValue.getValue();
+            if (value instanceof Clob) {
+                sb.append("<clob>");
+            } else if (value instanceof Blob) {
+                sb.append("<blob>");
+            } else {
+                sb.append(value);
+            }
         }
     };
 

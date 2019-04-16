@@ -24,8 +24,12 @@ import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.proxy.test.MockQueryExecutionInfo;
+import io.r2dbc.spi.Blob;
+import io.r2dbc.spi.Clob;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
 
+import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -498,6 +502,44 @@ public class QueryExecutionInfoFormatterTest {
 
         result = formatter.format(execInfoWithIdentifierBindings);
         assertThat(result).isEqualTo("Bindings:[($0=FOO,$1=FOO)]");
+    }
+
+    @Test
+    void boundValuePlaceholderForLargeObject() {
+        QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
+        formatter.showBindings();
+
+        Blob blob = Blob.from(Mono.just(ByteBuffer.wrap("FOO".getBytes())));
+        Clob clob = Clob.from(Mono.just("BAR"));
+
+        Bindings bindingsByIndex = new Bindings();
+        bindingsByIndex.addIndexBinding(0, BoundValue.value(blob));
+        bindingsByIndex.addIndexBinding(1, BoundValue.value(clob));
+
+        Bindings bindingsByIdentifier = new Bindings();
+        bindingsByIdentifier.addIdentifierBinding("$0", BoundValue.value(blob));
+        bindingsByIdentifier.addIdentifierBinding("$1", BoundValue.value(clob));
+
+        QueryInfo queryWithIndexBindings = new QueryInfo("SELECT 1");
+        QueryInfo queryWithIdentifierBindings = new QueryInfo("SELECT 1");
+
+        queryWithIndexBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIndex));
+        queryWithIdentifierBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIdentifier));
+
+        QueryExecutionInfo execInfoWithIndexBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithIndexBindings))
+            .build();
+        QueryExecutionInfo execInfoWithIdentifierBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithIdentifierBindings))
+            .build();
+
+        String result;
+
+        result = formatter.format(execInfoWithIndexBindings);
+        assertThat(result).isEqualTo("Bindings:[(<blob>,<clob>)]");
+
+        result = formatter.format(execInfoWithIdentifierBindings);
+        assertThat(result).isEqualTo("Bindings:[($0=<blob>,$1=<clob>)]");
     }
 
     @Test
