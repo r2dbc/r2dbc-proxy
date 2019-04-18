@@ -26,10 +26,10 @@ import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.proxy.test.MockQueryExecutionInfo;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
+import io.r2dbc.spi.test.MockBlob;
+import io.r2dbc.spi.test.MockClob;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
 
-import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -509,8 +509,8 @@ public class QueryExecutionInfoFormatterTest {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showBindings();
 
-        Blob blob = Blob.from(Mono.just(ByteBuffer.wrap("FOO".getBytes())));
-        Clob clob = Clob.from(Mono.just("BAR"));
+        Blob blob = MockBlob.empty();
+        Clob clob = MockClob.empty();
 
         Bindings bindingsByIndex = new Bindings();
         bindingsByIndex.addIndexBinding(0, BoundValue.value(blob));
