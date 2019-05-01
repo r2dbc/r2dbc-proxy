@@ -76,6 +76,7 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
         // add, bind, bindNull, execute
         if ("add".equals(methodName)) {
             this.currentBindingsIndex++;
+            return proxy;
         } else if ("bind".equals(methodName) || "bindNull".equals(methodName)) {
 
             if (this.bindings.size() <= this.currentBindingsIndex) {
@@ -95,6 +96,7 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
             } else {
                 bindings.addIdentifierBinding(args[0], boundValue);
             }
+            return proxy;
         } else if ("execute".equals(methodName)) {
 
             // build QueryExecutionInfo
@@ -114,6 +116,8 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
             Publisher<? extends Result> publisher = (Publisher<? extends Result>) result;
 
             return interceptQueryExecution(publisher, execInfo);
+        } else if ("returnGeneratedValues".equals(methodName)) {
+            return proxy;
         }
 
         return result;

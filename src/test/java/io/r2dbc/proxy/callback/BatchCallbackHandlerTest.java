@@ -109,4 +109,24 @@ public class BatchCallbackHandlerTest {
         assertThat(result).isSameAs(batch);
     }
 
+    @Test
+    void add() throws Throwable {
+        LastExecutionAwareListener testListener = new LastExecutionAwareListener();
+
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
+        Batch originalBatch = mock(Batch.class);
+        Batch proxyBatch = mock(Batch.class);
+        Batch resultBatch = mock(Batch.class);
+        BatchCallbackHandler callback = new BatchCallbackHandler(originalBatch, connectionInfo, proxyConfig);
+
+        // mock batch execution
+        String query1 = "QUERY-1";
+        when(originalBatch.add(query1)).thenReturn(resultBatch);
+
+        Object result = callback.invoke(proxyBatch, ADD_METHOD, new String[]{query1});
+
+        assertThat(result).isSameAs(proxyBatch);
+    }
+
 }

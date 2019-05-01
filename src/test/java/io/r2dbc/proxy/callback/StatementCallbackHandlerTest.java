@@ -37,8 +37,8 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -65,16 +65,36 @@ public class StatementCallbackHandlerTest {
 
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
-        Statement statement = mock(Statement.class);
-        Statement mockResult = mock(Statement.class);
+        Statement originalStatement = mock(Statement.class);
+        Statement resultStatement = mock(Statement.class);
+        Statement proxyStatement = mock(Statement.class);
 
-        doReturn(mockResult).when(statement).add();
+        when(originalStatement.add()).thenReturn(resultStatement);
 
-        StatementCallbackHandler callback = new StatementCallbackHandler(statement, "", connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(originalStatement, "", connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(statement, ADD_METHOD, null);
+        Object result = callback.invoke(proxyStatement, ADD_METHOD, null);
 
-        assertThat(result).isSameAs(mockResult);
+        assertThat(result).isSameAs(proxyStatement);
+    }
+
+    @Test
+    void bind() throws Throwable {
+        LastExecutionAwareListener testListener = new LastExecutionAwareListener();
+
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
+        Statement originalStatement = mock(Statement.class);
+        Statement resultStatement = mock(Statement.class);
+        Statement proxyStatement = mock(Statement.class);
+
+        when(originalStatement.bind(10, "foo")).thenReturn(resultStatement);
+
+        StatementCallbackHandler callback = new StatementCallbackHandler(originalStatement, "", connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(proxyStatement, BIND_BY_INDEX_METHOD, new Object[]{10, "foo"});
+
+        assertThat(result).isSameAs(proxyStatement);
     }
 
     @Test

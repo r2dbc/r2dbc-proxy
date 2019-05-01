@@ -67,6 +67,7 @@ public final class BatchCallbackHandler extends CallbackHandlerSupport {
 
         if ("add".equals(methodName)) {
             this.queries.add((String) args[0]);
+            return proxy;
         } else if ("execute".equals(methodName)) {
 
             List<QueryInfo> queryInfoList = this.queries.stream()
