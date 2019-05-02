@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -104,7 +105,7 @@ public class ConnectionCallbackHandlerTest {
         Statement resultStatement = mock(Statement.class);
         doReturn(originalStatement).when(connection).createStatement(query);
 
-        doReturn(resultStatement).when(proxyFactory).wrapStatement(originalStatement, query, connectionInfo);
+        doReturn(resultStatement).when(proxyFactory).wrapStatement(eq(originalStatement), any(), eq(connectionInfo));
 
         ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 

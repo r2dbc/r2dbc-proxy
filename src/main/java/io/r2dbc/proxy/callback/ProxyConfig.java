@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.callback;
 
+import io.r2dbc.proxy.listener.BindParameterConverter;
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.LifeCycleExecutionListener;
 import io.r2dbc.proxy.listener.LifeCycleListener;
@@ -37,6 +38,8 @@ public class ProxyConfig {
 
     private static final ProxyFactoryFactory DEFAULT_PROXY_FACTORY_FACTORY = new JdkProxyFactoryFactory();
 
+    private static final BindParameterConverter DEFAULT_BIND_PARAMETER_CONVERTER = BindParameterConverter.create();
+
     private static final Clock DEFAULT_CLOCK = Clock.systemUTC();
 
     private final CompositeProxyExecutionListener listeners = new CompositeProxyExecutionListener();
@@ -46,6 +49,8 @@ public class ProxyConfig {
     private ProxyFactory proxyFactory = DEFAULT_PROXY_FACTORY_FACTORY.create(this);
 
     private Clock clock = DEFAULT_CLOCK;
+
+    private BindParameterConverter bindParameterConverter = DEFAULT_BIND_PARAMETER_CONVERTER;
 
     /**
      * Create a new {@link Builder}.
@@ -63,6 +68,7 @@ public class ProxyConfig {
         this.connectionIdManager = builder.connectionIdManager;
         this.clock = builder.clock;
         this.listeners.addAll(builder.listeners);
+        this.bindParameterConverter = builder.bindParameterConverter;
         this.proxyFactory = builder.proxyFactoryFactory.create(this);
     }
 
@@ -154,6 +160,24 @@ public class ProxyConfig {
         this.clock = Assert.requireNonNull(clock, "clock must not be null");
     }
 
+    /**
+     * Get {@link BindParameterConverter}.
+     *
+     * @return bindParameterConverter to use
+     */
+    public BindParameterConverter getBindParameterConverter() {
+        return this.bindParameterConverter;
+    }
+
+    /**
+     * Set {@link BindParameterConverter}.
+     *
+     * @param bindParameterConverter bind parameter converter
+     * @throws IllegalArgumentException if {@code bindParameterConverter} is {@code null}
+     */
+    public void setBindParameterConverter(BindParameterConverter bindParameterConverter) {
+        this.bindParameterConverter = Assert.requireNonNull(bindParameterConverter, "bindParameterConverter must not be null");
+    }
 
     /**
      * Builder to create a {@link ProxyConfig}.
@@ -167,6 +191,8 @@ public class ProxyConfig {
         private ConnectionIdManager connectionIdManager = DEFAULT_CONNECTION_ID_MANAGER;
 
         private ProxyFactoryFactory proxyFactoryFactory = DEFAULT_PROXY_FACTORY_FACTORY;
+
+        private BindParameterConverter bindParameterConverter = DEFAULT_BIND_PARAMETER_CONVERTER;
 
         private Clock clock = DEFAULT_CLOCK;
 
@@ -228,6 +254,18 @@ public class ProxyConfig {
          */
         public Builder clock(Clock clock) {
             this.clock = Assert.requireNonNull(clock, "clock must not be null");
+            return this;
+        }
+
+        /**
+         * Set {@link BindParameterConverter}.
+         *
+         * @param bindParameterConverter bindParameterConverter to be used
+         * @return builder
+         * @throws IllegalArgumentException if {@code bindParameterConverter} is {@code null}
+         */
+        public Builder bindParameterConverter(BindParameterConverter bindParameterConverter) {
+            this.bindParameterConverter = Assert.requireNonNull(bindParameterConverter, "bindParameterConverter must not be null");
             return this;
         }
 

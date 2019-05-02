@@ -17,7 +17,9 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
+import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.test.MockConnectionInfo;
+import io.r2dbc.proxy.test.MockStatementInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
@@ -63,7 +65,7 @@ public class JdkProxyFactoryTest {
         Batch batch = MockBatch.empty();
         Statement statement = MockStatement.empty();
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
-        String query = "query";
+        StatementInfo statementInfo = MockStatementInfo.empty();
 
         Object result;
 
@@ -82,7 +84,7 @@ public class JdkProxyFactoryTest {
         assertThat(result).isInstanceOf(Wrapped.class);
         assertThat(result).isInstanceOf(ConnectionHolder.class);
 
-        result = this.proxyFactory.wrapStatement(statement, query, connectionInfo);
+        result = this.proxyFactory.wrapStatement(statement, statementInfo, connectionInfo);
         assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
         assertThat(result).isInstanceOf(Wrapped.class);
         assertThat(result).isInstanceOf(ConnectionHolder.class);
@@ -95,7 +97,7 @@ public class JdkProxyFactoryTest {
         Batch batch = MockBatch.empty();
         Statement statement = MockStatement.empty();
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
-        String query = "query";
+        StatementInfo statementInfo = MockStatementInfo.empty();
 
         String expected;
         Object result;
@@ -112,7 +114,7 @@ public class JdkProxyFactoryTest {
         expected = getExpectedToString(batch);
         assertThat(result.toString()).isEqualTo(expected);
 
-        result = this.proxyFactory.wrapStatement(statement, query, connectionInfo);
+        result = this.proxyFactory.wrapStatement(statement, statementInfo, connectionInfo);
         expected = getExpectedToString(statement);
         assertThat(result.toString()).isEqualTo(expected);
 

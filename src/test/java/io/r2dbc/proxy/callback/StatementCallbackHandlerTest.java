@@ -22,8 +22,10 @@ import io.r2dbc.proxy.core.BoundValue;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
+import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.proxy.test.MockConnectionInfo;
+import io.r2dbc.proxy.test.MockStatementInfo;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockStatement;
@@ -64,6 +66,7 @@ public class StatementCallbackHandlerTest {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+        StatementInfo statementInfo = MockStatementInfo.empty();
         ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
         Statement originalStatement = mock(Statement.class);
         Statement resultStatement = mock(Statement.class);
@@ -71,7 +74,7 @@ public class StatementCallbackHandlerTest {
 
         when(originalStatement.add()).thenReturn(resultStatement);
 
-        StatementCallbackHandler callback = new StatementCallbackHandler(originalStatement, "", connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(originalStatement, statementInfo, connectionInfo, proxyConfig);
 
         Object result = callback.invoke(proxyStatement, ADD_METHOD, null);
 
@@ -83,6 +86,7 @@ public class StatementCallbackHandlerTest {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+        StatementInfo statementInfo = MockStatementInfo.empty();
         ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
         Statement originalStatement = mock(Statement.class);
         Statement resultStatement = mock(Statement.class);
@@ -90,7 +94,7 @@ public class StatementCallbackHandlerTest {
 
         when(originalStatement.bind(10, "foo")).thenReturn(resultStatement);
 
-        StatementCallbackHandler callback = new StatementCallbackHandler(originalStatement, "", connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(originalStatement, statementInfo, connectionInfo, proxyConfig);
 
         Object result = callback.invoke(proxyStatement, BIND_BY_INDEX_METHOD, new Object[]{10, "foo"});
 
@@ -103,9 +107,10 @@ public class StatementCallbackHandlerTest {
 
         String query = "QUERY";
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+        StatementInfo statementInfo = MockStatementInfo.builder().updatedQuery(query).build();
         ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
         Statement statement = MockStatement.empty(); // make it return empty result
-        StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
 
         callback.invoke(statement, BIND_BY_INDEX_METHOD, new Object[]{1, 100});
         callback.invoke(statement, BIND_NULL_BY_INDEX_METHOD, new Object[]{2, String.class});
@@ -188,9 +193,10 @@ public class StatementCallbackHandlerTest {
 
         String query = "QUERY";
         ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        StatementInfo statementInfo = MockStatementInfo.builder().updatedQuery(query).build();
         ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
         Statement statement = MockStatement.empty(); // make it return empty result
-        StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
 
         callback.invoke(statement, BIND_BY_ID_METHOD, new Object[]{"$1", 100});
         callback.invoke(statement, BIND_NULL_BY_ID_METHOD, new Object[]{"$2", String.class});
@@ -272,9 +278,9 @@ public class StatementCallbackHandlerTest {
         Statement statement = MockStatement.empty();
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         ProxyConfig proxyConfig = new ProxyConfig();
-        String query = "QUERY";
+        StatementInfo statementInfo = MockStatementInfo.empty();
 
-        StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
 
         Object result = callback.invoke(statement, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(statement);
