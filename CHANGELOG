@@ -1,6 +1,15 @@
 R2DBC Proxy Changelog
 =============================
 
+0.8.0.M8
+------------------
+* Support ConnectionFactoryProvider.getDriver() #19
+* BLOB/CLOB support in query formatter
+* Add ProxyConfig.Builder
+* Support comma separated proxyListener parameter #17
+* Update LifeCycleExecutionListener dispatching logic #16
+* Use strategy pattern to invoke original method #15
+
 1.0.0.M7
 ------------------
 * Inception
