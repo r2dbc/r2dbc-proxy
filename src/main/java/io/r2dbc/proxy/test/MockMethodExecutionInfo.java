@@ -20,11 +20,10 @@ package io.r2dbc.proxy.test;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
-import io.r2dbc.proxy.util.Assert;
+import io.r2dbc.proxy.core.ValueStore;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -72,7 +71,7 @@ public final class MockMethodExecutionInfo implements MethodExecutionInfo {
 
     private final ProxyEventType proxyEventType;
 
-    private final Map<String, Object> customValues;
+    private final ValueStore valueStore;
 
     private MockMethodExecutionInfo(Builder builder) {
         this.target = builder.target;
@@ -85,7 +84,7 @@ public final class MockMethodExecutionInfo implements MethodExecutionInfo {
         this.threadName = builder.threadName;
         this.threadId = builder.threadId;
         this.proxyEventType = builder.proxyEventType;
-        this.customValues = builder.customValues;
+        this.valueStore = builder.valueStore;
     }
 
     @Override
@@ -139,18 +138,8 @@ public final class MockMethodExecutionInfo implements MethodExecutionInfo {
     }
 
     @Override
-    public void addCustomValue(String key, Object value) {
-        Assert.requireNonNull(key, "key must not be null");
-
-        this.customValues.put(key, value);
-    }
-
-    @Override
-    public <T> T getCustomValue(String key, Class<T> type) {
-        Assert.requireNonNull(key, "key must not be null");
-        Assert.requireNonNull(type, "type must not be null");
-
-        return type.cast(this.customValues.get(key));
+    public ValueStore getValueStore() {
+        return this.valueStore;
     }
 
     public static final class Builder {
@@ -175,7 +164,7 @@ public final class MockMethodExecutionInfo implements MethodExecutionInfo {
 
         private ProxyEventType proxyEventType;
 
-        private Map<String, Object> customValues = new HashMap<>();
+        private ValueStore valueStore = ValueStore.create();
 
         private Builder() {
         }
@@ -230,13 +219,18 @@ public final class MockMethodExecutionInfo implements MethodExecutionInfo {
             return this;
         }
 
-        public Builder customValue(String key, Object value) {
-            this.customValues.put(key, value);
+        public Builder valueStore(ValueStore valueStore) {
+            this.valueStore = valueStore;
             return this;
         }
 
-        public Builder customValues(Map<String, Object> values) {
-            this.customValues = values;
+        public Builder customValue(Object key, Object value) {
+            this.valueStore.put(key, value);
+            return this;
+        }
+
+        public Builder customValues(Map<Object, Object> values) {
+            this.valueStore.putAll(values);
             return this;
         }
 

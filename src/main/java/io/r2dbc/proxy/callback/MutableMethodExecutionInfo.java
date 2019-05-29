@@ -20,12 +20,10 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
-import io.r2dbc.proxy.util.Assert;
+import io.r2dbc.proxy.core.ValueStore;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Default implementation of the {@link MethodExecutionInfo}.
@@ -54,7 +52,7 @@ final class MutableMethodExecutionInfo implements MethodExecutionInfo {
 
     private ProxyEventType proxyEventType;
 
-    private Map<String, Object> customValues = new HashMap<>();
+    private ValueStore valueStore = ValueStore.create();
 
     public void setTarget(Object target) {
         this.target = target;
@@ -94,21 +92,6 @@ final class MutableMethodExecutionInfo implements MethodExecutionInfo {
 
     public void setProxyEventType(ProxyEventType proxyEventType) {
         this.proxyEventType = proxyEventType;
-    }
-
-    @Override
-    public void addCustomValue(String key, Object value) {
-        Assert.requireNonNull(key, "key must not be null");
-
-        this.customValues.put(key, value);
-    }
-
-    @Override
-    public <T> T getCustomValue(String key, Class<T> type) {
-        Assert.requireNonNull(key, "key must not be null");
-        Assert.requireNonNull(type, "type must not be null");
-
-        return type.cast(this.customValues.get(key));
     }
 
     @Override
@@ -159,6 +142,11 @@ final class MutableMethodExecutionInfo implements MethodExecutionInfo {
     @Override
     public ProxyEventType getProxyEventType() {
         return proxyEventType;
+    }
+
+    @Override
+    public ValueStore getValueStore() {
+        return this.valueStore;
     }
 
 }
