@@ -18,6 +18,7 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
+import io.r2dbc.proxy.core.ValueStore;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
 
@@ -42,6 +43,8 @@ final class DefaultConnectionInfo implements ConnectionInfo {
     private AtomicInteger commitCount = new AtomicInteger();
 
     private AtomicInteger rollbackCount = new AtomicInteger();
+
+    private ValueStore valueStore = ValueStore.create();
 
     // TODO: may keep transaction isolation level
 
@@ -119,5 +122,8 @@ final class DefaultConnectionInfo implements ConnectionInfo {
         return this.isClosed.get();
     }
 
-
+    @Override
+    public ValueStore getValueStore() {
+        return this.valueStore;
+    }
 }

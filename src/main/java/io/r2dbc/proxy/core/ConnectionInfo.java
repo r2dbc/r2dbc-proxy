@@ -91,4 +91,13 @@ public interface ConnectionInfo {
      */
     void setClosed(boolean closed);
 
+    /**
+     * Retrieve {@link ValueStore} which is associated to the scope of logical connection.
+     *
+     * <p>Values can be stored or retrieved from this store while connection is available.
+     *
+     * @return value store
+     */
+    ValueStore getValueStore();
+
 }

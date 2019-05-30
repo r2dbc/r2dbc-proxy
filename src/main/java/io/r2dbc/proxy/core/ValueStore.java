@@ -21,9 +21,10 @@ import reactor.util.annotation.Nullable;
 import java.util.Map;
 
 /**
- * Custom value store used in scope of before/after method and query executions.
+ * Custom value store.
  *
  * @author Tadaya Tsuyukubo
+ * @see ConnectionInfo
  * @see MethodExecutionInfo
  * @see QueryExecutionInfo
  */

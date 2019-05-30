@@ -162,7 +162,7 @@ public interface QueryExecutionInfo {
     Object getCurrentMappedResult();
 
     /**
-     * Retrieve {@link ValueStore} which is associated to the scoped of before/after method execution.
+     * Retrieve {@link ValueStore} which is associated to the scope of before/after method execution.
      *
      * Mainly used for passing values between {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)} and
      * {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}.

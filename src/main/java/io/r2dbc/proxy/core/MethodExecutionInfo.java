@@ -107,7 +107,7 @@ public interface MethodExecutionInfo {
     ProxyEventType getProxyEventType();
 
     /**
-     * Retrieve {@link ValueStore} which is associated to the scoped of before/after method execution.
+     * Retrieve {@link ValueStore} which is associated to the scope of before/after method execution.
      *
      * Mainly used for passing values between {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} and
      * {@link ProxyExecutionListener#afterMethod(MethodExecutionInfo)}.

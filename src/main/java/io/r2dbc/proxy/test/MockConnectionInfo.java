@@ -18,6 +18,7 @@
 package io.r2dbc.proxy.test;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
+import io.r2dbc.proxy.core.ValueStore;
 import io.r2dbc.spi.Connection;
 
 /**
@@ -57,6 +58,7 @@ public final class MockConnectionInfo implements ConnectionInfo {
 
     private int rollbackCount;
 
+    private ValueStore valueStore;
 
     private MockConnectionInfo(Builder builder) {
         this.originalConnection = builder.originalConnection;
@@ -65,6 +67,7 @@ public final class MockConnectionInfo implements ConnectionInfo {
         this.transactionCount = builder.transactionCount;
         this.commitCount = builder.commitCount;
         this.rollbackCount = builder.rollbackCount;
+        this.valueStore = builder.valueStore;
     }
 
     @Override
@@ -117,6 +120,11 @@ public final class MockConnectionInfo implements ConnectionInfo {
         this.isClosed = closed;
     }
 
+    @Override
+    public ValueStore getValueStore() {
+        return this.valueStore;
+    }
+
     public static final class Builder {
 
         private Connection originalConnection;
@@ -130,6 +138,8 @@ public final class MockConnectionInfo implements ConnectionInfo {
         private int commitCount;
 
         private int rollbackCount;
+
+        private ValueStore valueStore = ValueStore.create();
 
         private Builder() {
         }
@@ -161,6 +171,11 @@ public final class MockConnectionInfo implements ConnectionInfo {
 
         public Builder rollbackCount(int rollbackCount) {
             this.rollbackCount = rollbackCount;
+            return this;
+        }
+
+        public Builder valueStore(ValueStore valueStore) {
+            this.valueStore = valueStore;
             return this;
         }
 
