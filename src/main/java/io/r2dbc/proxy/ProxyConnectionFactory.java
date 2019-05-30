@@ -25,7 +25,6 @@ import io.r2dbc.proxy.listener.LifeCycleListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.ConnectionFactory;
-import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
@@ -122,14 +121,14 @@ public final class ProxyConnectionFactory {
          * @return builder
          * @throws IllegalArgumentException if {@code consumer} is {@code null}
          */
-        public Builder onBeforeMethod(Consumer<Mono<MethodExecutionInfo>> consumer) {
+        public Builder onBeforeMethod(Consumer<MethodExecutionInfo> consumer) {
             Assert.requireNonNull(consumer, "consumer must not be null");
 
             this.proxyConfig.addListener(new ProxyExecutionListener() {
 
                 @Override
                 public void beforeMethod(MethodExecutionInfo executionInfo) {
-                    consumer.accept(Mono.just(executionInfo));
+                    consumer.accept(executionInfo);
                 }
             });
             return this;
@@ -142,14 +141,14 @@ public final class ProxyConnectionFactory {
          * @return builder
          * @throws IllegalArgumentException if {@code consumer} is {@code null}
          */
-        public Builder onAfterMethod(Consumer<Mono<MethodExecutionInfo>> consumer) {
+        public Builder onAfterMethod(Consumer<MethodExecutionInfo> consumer) {
             Assert.requireNonNull(consumer, "consumer must not be null");
 
             this.proxyConfig.addListener(new ProxyExecutionListener() {
 
                 @Override
                 public void afterMethod(MethodExecutionInfo executionInfo) {
-                    consumer.accept(Mono.just(executionInfo));
+                    consumer.accept(executionInfo);
                 }
             });
             return this;
@@ -162,14 +161,14 @@ public final class ProxyConnectionFactory {
          * @return builder
          * @throws IllegalArgumentException if {@code consumer} is {@code null}
          */
-        public Builder onBeforeQuery(Consumer<Mono<QueryExecutionInfo>> consumer) {
+        public Builder onBeforeQuery(Consumer<QueryExecutionInfo> consumer) {
             Assert.requireNonNull(consumer, "consumer must not be null");
 
             this.proxyConfig.addListener(new ProxyExecutionListener() {
 
                 @Override
                 public void beforeQuery(QueryExecutionInfo executionInfo) {
-                    consumer.accept(Mono.just(executionInfo));
+                    consumer.accept(executionInfo);
                 }
             });
             return this;
@@ -182,14 +181,14 @@ public final class ProxyConnectionFactory {
          * @return builder
          * @throws IllegalArgumentException if {@code consumer} is {@code null}
          */
-        public Builder onAfterQuery(Consumer<Mono<QueryExecutionInfo>> consumer) {
+        public Builder onAfterQuery(Consumer<QueryExecutionInfo> consumer) {
             Assert.requireNonNull(consumer, "consumer must not be null");
 
             this.proxyConfig.addListener(new ProxyExecutionListener() {
 
                 @Override
                 public void afterQuery(QueryExecutionInfo executionInfo) {
-                    consumer.accept(Mono.just(executionInfo));
+                    consumer.accept(executionInfo);
                 }
             });
             return this;
@@ -202,14 +201,14 @@ public final class ProxyConnectionFactory {
          * @return builder
          * @throws IllegalArgumentException if {@code consumer} is {@code null}
          */
-        public Builder onEachQueryResult(Consumer<Mono<QueryExecutionInfo>> consumer) {
+        public Builder onEachQueryResult(Consumer<QueryExecutionInfo> consumer) {
             Assert.requireNonNull(consumer, "consumer must not be null");
 
             this.proxyConfig.addListener(new ProxyExecutionListener() {
 
                 @Override
                 public void eachQueryResult(QueryExecutionInfo executionInfo) {
-                    consumer.accept(Mono.just(executionInfo));
+                    consumer.accept(executionInfo);
                 }
             });
             return this;
