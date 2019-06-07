@@ -107,27 +107,13 @@ public interface MethodExecutionInfo {
     ProxyEventType getProxyEventType();
 
     /**
-     * Store key/value pair.
+     * Retrieve {@link ValueStore} which is associated to the scope of before/after method execution.
      *
      * Mainly used for passing values between {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} and
      * {@link ProxyExecutionListener#afterMethod(MethodExecutionInfo)}.
      *
-     * @param key   key
-     * @param value value
-     * @throws IllegalArgumentException if {@code key} is {@code null}
+     * @return value store
      */
-    void addCustomValue(String key, Object value);
-
-    /**
-     * Retrieve value from key/value store.
-     *
-     * @param key  key
-     * @param type value class
-     * @param <T>  return type
-     * @return value
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     * @throws IllegalArgumentException if {@code type} is {@code null}
-     */
-    <T> T getCustomValue(String key, Class<T> type);
+    ValueStore getValueStore();
 
 }

@@ -22,7 +22,7 @@ import io.r2dbc.proxy.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -47,13 +47,18 @@ public class MethodExecutionInfoFormatter implements Function<MethodExecutionInf
 
     private static final String DEFAULT_DELIMITER = " ";
 
+    private static final AtomicLongFieldUpdater<MethodExecutionInfoFormatter> SEQUENCE_NUMBER_INCREMENTER =
+        AtomicLongFieldUpdater.newUpdater(MethodExecutionInfoFormatter.class, "sequenceNumber");
+
     private final List<BiConsumer<MethodExecutionInfo, StringBuilder>> consumers = new ArrayList<>();
 
-    private final AtomicLong sequenceNumber = new AtomicLong(1);
+    // access via SEQUENCE_NUMBER_INCREMENTER
+    private volatile long sequenceNumber = 0;
+
 
     // Default consumer to format the MethodExecutionInfo
     private BiConsumer<MethodExecutionInfo, StringBuilder> defaultConsumer = (executionInfo, sb) -> {
-        long seq = this.sequenceNumber.getAndIncrement();
+        long seq = SEQUENCE_NUMBER_INCREMENTER.incrementAndGet(this);
         long executionTime = executionInfo.getExecuteDuration().toMillis();
         String targetClass = executionInfo.getTarget().getClass().getSimpleName();
         String methodName = executionInfo.getMethod().getName();

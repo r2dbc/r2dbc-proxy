@@ -22,12 +22,11 @@ import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
-import io.r2dbc.proxy.util.Assert;
+import io.r2dbc.proxy.core.ValueStore;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +85,7 @@ public final class MockQueryExecutionInfo implements QueryExecutionInfo {
 
     private List<QueryInfo> queries;
 
-    private Map<String, Object> customValues;
+    private ValueStore valueStore;
 
     private MockQueryExecutionInfo(Builder builder) {
         this.connectionInfo = builder.connectionInfo;
@@ -104,7 +103,7 @@ public final class MockQueryExecutionInfo implements QueryExecutionInfo {
         this.currentResultCount = builder.currentResultCount;
         this.currentMappedResult = builder.currentMappedResult;
         this.queries = builder.queries;
-        this.customValues = builder.customValues;
+        this.valueStore = builder.valueStore;
     }
 
     @Override
@@ -183,18 +182,8 @@ public final class MockQueryExecutionInfo implements QueryExecutionInfo {
     }
 
     @Override
-    public void addCustomValue(String key, Object value) {
-        Assert.requireNonNull(key, "key must not be null");
-
-        this.customValues.put(key, value);
-    }
-
-    @Override
-    public <T> T getCustomValue(String key, Class<T> type) {
-        Assert.requireNonNull(key, "key must not be null");
-        Assert.requireNonNull(type, "type must not be null");
-
-        return type.cast(this.customValues.get(key));
+    public ValueStore getValueStore() {
+        return this.valueStore;
     }
 
     public static final class Builder {
@@ -229,7 +218,7 @@ public final class MockQueryExecutionInfo implements QueryExecutionInfo {
 
         private List<QueryInfo> queries = new ArrayList<>();
 
-        private Map<String, Object> customValues = new HashMap<>();
+        private ValueStore valueStore = ValueStore.create();
 
 
         public Builder from(MockQueryExecutionInfo mock) {
@@ -248,7 +237,7 @@ public final class MockQueryExecutionInfo implements QueryExecutionInfo {
             this.currentResultCount = mock.currentResultCount;
             this.currentMappedResult = mock.currentMappedResult;
             this.queries = mock.queries;
-            this.customValues = mock.customValues;
+            this.valueStore = mock.valueStore;
             return this;
         }
 
@@ -332,13 +321,18 @@ public final class MockQueryExecutionInfo implements QueryExecutionInfo {
             return this;
         }
 
-        public Builder customValue(String key, Object value) {
-            this.customValues.put(key, value);
+        public Builder valueStore(ValueStore valueStore) {
+            this.valueStore = valueStore;
             return this;
         }
 
-        public Builder customValues(Map<String, Object> customValues) {
-            this.customValues = customValues;
+        public Builder customValue(Object key, Object value) {
+            this.valueStore.put(key, value);
+            return this;
+        }
+
+        public Builder customValues(Map<Object, Object> customValues) {
+            this.valueStore.putAll(customValues);
             return this;
         }
 

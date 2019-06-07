@@ -22,14 +22,12 @@ import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
-import io.r2dbc.proxy.util.Assert;
+import io.r2dbc.proxy.core.ValueStore;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Default implementation of the {@link QueryExecutionInfo}.
@@ -68,8 +66,7 @@ final class MutableQueryExecutionInfo implements QueryExecutionInfo {
 
     private List<QueryInfo> queries = new ArrayList<>();
 
-    private Map<String, Object> customValues = new HashMap<>();
-
+    private ValueStore valueStore = ValueStore.create();
 
     public void setMethod(Method method) {
         this.method = method;
@@ -140,18 +137,8 @@ final class MutableQueryExecutionInfo implements QueryExecutionInfo {
     }
 
     @Override
-    public void addCustomValue(String key, Object value) {
-        Assert.requireNonNull(key, "key must not be null");
-
-        this.customValues.put(key, value);
-    }
-
-    @Override
-    public <T> T getCustomValue(String key, Class<T> type) {
-        Assert.requireNonNull(key, "key must not be null");
-        Assert.requireNonNull(type, "type must not be null");
-
-        return type.cast(this.customValues.get(key));
+    public ValueStore getValueStore() {
+        return this.valueStore;
     }
 
     @Override

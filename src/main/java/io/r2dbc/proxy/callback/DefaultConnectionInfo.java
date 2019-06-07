@@ -18,11 +18,12 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
+import io.r2dbc.proxy.core.ValueStore;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
  * Default implementation for {@link ConnectionInfo}.
@@ -31,17 +32,32 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 final class DefaultConnectionInfo implements ConnectionInfo {
 
+    private static final AtomicIntegerFieldUpdater<DefaultConnectionInfo> TRANSACTION_COUNT_INCREMENTER =
+        AtomicIntegerFieldUpdater.newUpdater(DefaultConnectionInfo.class, "transactionCount");
+
+    private static final AtomicIntegerFieldUpdater<DefaultConnectionInfo> COMMIT_COUNT_INCREMENTER =
+        AtomicIntegerFieldUpdater.newUpdater(DefaultConnectionInfo.class, "commitCount");
+
+    private static final AtomicIntegerFieldUpdater<DefaultConnectionInfo> ROLLBACK_COUNT_INCREMENTER =
+        AtomicIntegerFieldUpdater.newUpdater(DefaultConnectionInfo.class, "rollbackCount");
+
+
     private Connection originalConnection;
 
     private String connectionId;
 
     private AtomicBoolean isClosed = new AtomicBoolean();
 
-    private AtomicInteger transactionCount = new AtomicInteger();
+    // access via TRANSACTION_COUNT_INCREMENTER
+    private volatile int transactionCount = 0;
 
-    private AtomicInteger commitCount = new AtomicInteger();
+    // access via COMMIT_COUNT_INCREMENTER
+    private volatile int commitCount = 0;
 
-    private AtomicInteger rollbackCount = new AtomicInteger();
+    // access via ROLLBACK_COUNT_INCREMENTER
+    private volatile int rollbackCount = 0;
+
+    private ValueStore valueStore = ValueStore.create();
 
     // TODO: may keep transaction isolation level
 
@@ -86,32 +102,32 @@ final class DefaultConnectionInfo implements ConnectionInfo {
 
     @Override
     public void incrementTransactionCount() {
-        this.transactionCount.incrementAndGet();
+        TRANSACTION_COUNT_INCREMENTER.incrementAndGet(this);
     }
 
     @Override
     public void incrementCommitCount() {
-        this.commitCount.incrementAndGet();
+        COMMIT_COUNT_INCREMENTER.incrementAndGet(this);
     }
 
     @Override
     public void incrementRollbackCount() {
-        this.rollbackCount.incrementAndGet();
+        ROLLBACK_COUNT_INCREMENTER.incrementAndGet(this);
     }
 
     @Override
     public int getTransactionCount() {
-        return this.transactionCount.get();
+        return this.transactionCount;
     }
 
     @Override
     public int getCommitCount() {
-        return this.commitCount.get();
+        return this.commitCount;
     }
 
     @Override
     public int getRollbackCount() {
-        return this.rollbackCount.get();
+        return this.rollbackCount;
     }
 
     @Override
@@ -119,5 +135,8 @@ final class DefaultConnectionInfo implements ConnectionInfo {
         return this.isClosed.get();
     }
 
-
+    @Override
+    public ValueStore getValueStore() {
+        return this.valueStore;
+    }
 }
