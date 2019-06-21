@@ -47,7 +47,19 @@ public class Bindings {
     public void addIndexBinding(int index, BoundValue boundValue) {
         Assert.requireNonNull(boundValue, "boundValue must not be null");
 
-        this.indexBindings.add(new IndexBinding(index, boundValue));
+        addIndexBinding(new IndexBinding(index, boundValue));
+    }
+
+    /**
+     * Add an index binding.
+     *
+     * @param indexBinding indexBinding
+     * @throws IllegalArgumentException if {@code indexBinding} is {@code null}
+     */
+    public void addIndexBinding(IndexBinding indexBinding) {
+        Assert.requireNonNull(indexBinding, "indexBinding must not be null");
+
+        this.indexBindings.add(indexBinding);
     }
 
     /**
@@ -63,6 +75,18 @@ public class Bindings {
         Assert.requireNonNull(boundValue, "boundValue must not be null");
 
         this.identifierBindings.add(new IdentifierBinding(identifier, boundValue));
+    }
+
+    /**
+     * Add an identifier binding.
+     *
+     * @param identifierBinding identifierBinding
+     * @throws IllegalArgumentException if {@code identifierBinding} is {@code null}
+     */
+    public void addIdentifierBinding(IdentifierBinding identifierBinding) {
+        Assert.requireNonNull(identifierBinding, "identifierBinding must not be null");
+
+        this.identifierBindings.add(identifierBinding);
     }
 
     /**

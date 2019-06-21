@@ -21,9 +21,9 @@ import io.r2dbc.proxy.core.BindInfo;
 import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.spi.Statement;
 
-import java.util.function.Supplier;
-
 /**
+ * Callback for {@link io.r2dbc.spi.Connection#createStatement(String)} and bind operations({@code bind} and {@code bindNull}).
+ *
  * @author Tadaya Tsuyukubo
  */
 public interface BindParameterConverter {
@@ -45,11 +45,11 @@ public interface BindParameterConverter {
      * <p>This method will be called when {@link io.r2dbc.spi.Connection#createStatement(String)} is called(before actually
      * performing), and the returned query will be used as its input.
      * Additionally, in this method, any information can be stored in {@link StatementInfo#addCustomValue(String, Object)}
-     * and they will be available at {@link #onBind(BindInfo, Statement, Supplier)}.
+     * and they will be available at {@link #onBind(BindInfo, Statement, BindOperation)}.
      *
      * <p>Typical usage would be parsing the parameters in query and convert it to the parameter placeholder that target
      * database supports. In addition, construct a map that contains parameter indexes by the place holder to avoid parsing
-     * query again at {@link #onBind(BindInfo, Statement, Supplier)}.
+     * query again at {@link #onBind(BindInfo, Statement, BindOperation)}.
      *
      * <p>For example, convert a query that uses colon prefix for named parameters:
      *
@@ -69,15 +69,29 @@ public interface BindParameterConverter {
      * Callback method for bind operations({@code bind} and {@code bindNull}) on {@link Statement} before actually performing those methods.
      *
      * Implementation of this method can modify the actual behavior.
-     * When calling the {@code defaultBinding.get()} performs the actual invocation of original bind operation, and returns proxy {@link Statement}.
-     * To skip actual invocation of bind operation, simply returns {@code proxyStatement}.
+     * When calling the {@code defaultBinding.proceed()} performs the actual invocation of original bind operation, and returns proxy {@link Statement}.
+     * To skip actual invocation of the original bind operation, simply returns {@code proxyStatement}.
      *
      * @param info           contextual information for {@code bind} and {@code bindNull}.
      * @param proxyStatement proxy {@link Statement}.
      * @param defaultBinding perform default bind operations and returns a result of proxy {@link Statement}
      */
-    default void onBind(BindInfo info, Statement proxyStatement, Supplier<Statement> defaultBinding) {
-        defaultBinding.get();  // just perform default behavior
+    default void onBind(BindInfo info, Statement proxyStatement, BindOperation defaultBinding) {
+        defaultBinding.proceed();  // just perform default behavior
+    }
+
+    /**
+     * Represent bind operation({@code bind} and {@code bindNull}).
+     */
+    @FunctionalInterface
+    interface BindOperation {
+
+        /**
+         * Perform the bind operation.
+         *
+         * @return result of bind operation which is a {@link Statement}.
+         */
+        Statement proceed();
     }
 
 }

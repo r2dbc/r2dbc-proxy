@@ -22,9 +22,10 @@ import io.r2dbc.proxy.core.BoundValue;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryInfo;
+import io.r2dbc.proxy.core.R2dbcProxyException;
 import io.r2dbc.proxy.core.StatementInfo;
+import io.r2dbc.proxy.listener.BindParameterConverter;
 import io.r2dbc.proxy.util.Assert;
-import io.r2dbc.spi.R2dbcException;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
 import org.reactivestreams.Publisher;
@@ -32,7 +33,6 @@ import org.reactivestreams.Publisher;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -84,46 +84,45 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
                 boundValue = BoundValue.nullValue((Class<?>) args[1]);
             }
 
+            boolean isIndexBinding = args[0] instanceof Integer;
+
+            Binding binding;
+            if (isIndexBinding) {
+                binding = new Bindings.IndexBinding((int) args[0], boundValue);
+            } else {
+                binding = new Bindings.IdentifierBinding(args[0], boundValue);
+            }
+
             // when converter decides to perform original binding behavior, this lambda will be called.
-            Supplier<Statement> onBindResult = () -> {
+            BindParameterConverter.BindOperation onBind = () -> {
 
                 try {
                     proceedExecution(method, this.statement, args, this.proxyConfig.getListeners(), this.connectionInfo, null, null);
                 } catch (Throwable throwable) {
-                    // TODO: error handling
-                    throw new R2dbcException("Failed to perform " + methodName, throwable) {
-
-                    };
+                    throw new R2dbcProxyException("Failed to perform " + methodName, throwable);
                 }
 
                 if (this.bindings.size() <= this.currentBindingsIndex) {
                     this.bindings.add(new Bindings());
                 }
-                Bindings bindings = this.bindings.get(this.currentBindingsIndex);
 
-                if (args[0] instanceof Integer) {
-                    bindings.addIndexBinding((int) args[0], boundValue);
+                Bindings bindings = this.bindings.get(this.currentBindingsIndex);
+                if (isIndexBinding) {
+                    bindings.addIndexBinding((Bindings.IndexBinding) binding);
                 } else {
-                    bindings.addIdentifierBinding(args[0], boundValue);
+                    bindings.addIdentifierBinding((Bindings.IdentifierBinding) binding);
                 }
 
                 return (Statement) proxy;
             };
 
-            // TODO: consolidate the binding creation in above supplier
-            Binding binding;
-            if (args[0] instanceof Integer) {
-                binding = new Bindings.IndexBinding((int) args[0], boundValue);
-            } else {
-                binding = new Bindings.IdentifierBinding(args[0], boundValue);
-            }
 
             MutableBindInfo bindInfo = new MutableBindInfo();
             bindInfo.setStatementInfo(this.statementInfo);
             bindInfo.setBinding(binding);
 
             // callback for binding operation
-            this.proxyConfig.getBindParameterConverter().onBind(bindInfo, (Statement) proxy, onBindResult);
+            this.proxyConfig.getBindParameterConverter().onBind(bindInfo, (Statement) proxy, onBind);
 
             return proxy;
         }
