@@ -17,13 +17,29 @@
 
 package io.r2dbc.proxy.core;
 
+import io.r2dbc.proxy.listener.BindParameterConverter;
+import io.r2dbc.spi.Statement;
+
 /**
+ * Hold contextual information for bind operations({@code bind} and {@code bindNull}).
+ *
  * @author Tadaya Tsuyukubo
+ * @see BindParameterConverter
  */
 public interface BindInfo {
 
+    /**
+     * Get {@link StatementInfo} where bind operation has happened.
+     *
+     * @return contextual info for {@link Statement}
+     */
     StatementInfo getStatementInfo();
 
+    /**
+     * Get invoked bind operation details.
+     *
+     * @return binding details
+     */
     Binding getBinding();
 
 }
