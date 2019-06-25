@@ -71,7 +71,6 @@ public interface ValueStore {
      * @return value
      * @throws IllegalArgumentException if {@code key} is {@code null}
      */
-    @Nullable
     <T> T getOrDefault(Object key, T defaultValue);
 
     /**
