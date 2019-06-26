@@ -44,7 +44,7 @@ public interface BindParameterConverter {
      *
      * <p>This method will be called when {@link io.r2dbc.spi.Connection#createStatement(String)} is called(before actually
      * performing), and the returned query will be used as its input.
-     * Additionally, in this method, any information can be stored in {@link StatementInfo#addCustomValue(String, Object)}
+     * Additionally, in this method, any information can be stored in {@link StatementInfo#getValueStore()}
      * and they will be available at {@link #onBind(BindInfo, Statement, BindOperation)}.
      *
      * <p>Typical usage would be parsing the parameters in query and convert it to the parameter placeholder that target

@@ -19,10 +19,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.StatementInfo;
-import io.r2dbc.proxy.util.Assert;
-
-import java.util.HashMap;
-import java.util.Map;
+import io.r2dbc.proxy.core.ValueStore;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -35,7 +32,7 @@ final class MutableStatementInfo implements StatementInfo {
 
     private String updatedQuery;
 
-    private Map<String, Object> customValues = new HashMap<>();
+    private ValueStore valueStore = ValueStore.create();
 
     @Override
     public ConnectionInfo getConnectionInfo() {
@@ -65,18 +62,7 @@ final class MutableStatementInfo implements StatementInfo {
     }
 
     @Override
-    public void addCustomValue(String key, Object value) {
-        Assert.requireNonNull(key, "key must not be null");
-
-        this.customValues.put(key, value);
+    public ValueStore getValueStore() {
+        return this.valueStore;
     }
-
-    @Override
-    public <T> T getCustomValue(String key, Class<T> type) {
-        Assert.requireNonNull(key, "key must not be null");
-        Assert.requireNonNull(type, "type must not be null");
-
-        return type.cast(this.customValues.get(key));
-    }
-
 }

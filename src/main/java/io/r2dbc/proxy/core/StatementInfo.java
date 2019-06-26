@@ -17,42 +17,45 @@
 
 package io.r2dbc.proxy.core;
 
-import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.proxy.listener.BindParameterConverter;
+import io.r2dbc.spi.Connection;
+import io.r2dbc.spi.Statement;
 
 /**
+ * Hold {@link Statement} related information.
+ *
  * @author Tadaya Tsuyukubo
  */
 public interface StatementInfo {
 
+    /**
+     * Get {@link ConnectionInfo} associated to this {@link Statement}.
+     *
+     * @return connection info
+     */
     ConnectionInfo getConnectionInfo();
 
+    /**
+     * Get the sql statement that has originally specified on {@link Connection#createStatement(String)}.
+     *
+     * @return original sql statement
+     */
     String getOriginalQuery();
 
+    /**
+     * Get the updated sql statement by {@link BindParameterConverter#onCreateStatement(String, StatementInfo)}.
+     *
+     * @return updated sql statement
+     */
     String getUpdatedQuery();
 
     /**
-     * Store key/value pair.
+     * Retrieve {@link ValueStore} which is associated to the scope of logical statement.
      *
-     * Mainly used for passing values between {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)} and
-     * {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}.
+     * <p>Values can be stored or retrieved from this store while statement is available.
      *
-     * @param key   key
-     * @param value value
-     * @throws IllegalArgumentException if {@code key} is {@code null}
+     * @return value store
      */
-    void addCustomValue(String key, Object value);
-
-    /**
-     * Retrieve value from key/value store.
-     *
-     * @param key  key
-     * @param type value class
-     * @param <T>  return type
-     * @return value
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     * @throws IllegalArgumentException if {@code type} is {@code null}
-     */
-    <T> T getCustomValue(String key, Class<T> type);
-
+    ValueStore getValueStore();
 
 }

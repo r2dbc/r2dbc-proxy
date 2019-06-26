@@ -19,10 +19,7 @@ package io.r2dbc.proxy.test;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.StatementInfo;
-import io.r2dbc.proxy.util.Assert;
-
-import java.util.HashMap;
-import java.util.Map;
+import io.r2dbc.proxy.core.ValueStore;
 
 /**
  * Mock implementation of {@link StatementInfo}.
@@ -55,14 +52,14 @@ public final class MockStatementInfo implements StatementInfo {
 
     private String updatedQuery;
 
-    private Map<String, Object> customValues;
+    private ValueStore valueStore;
 
 
     private MockStatementInfo(Builder builder) {
         this.connectionInfo = builder.connectionInfo;
         this.originalQuery = builder.originalQuery;
         this.updatedQuery = builder.updatedQuery;
-        this.customValues = builder.customValues;
+        this.valueStore = builder.valueStore;
     }
 
     @Override
@@ -81,18 +78,8 @@ public final class MockStatementInfo implements StatementInfo {
     }
 
     @Override
-    public void addCustomValue(String key, Object value) {
-        Assert.requireNonNull(key, "key must not be null");
-
-        this.customValues.put(key, value);
-    }
-
-    @Override
-    public <T> T getCustomValue(String key, Class<T> type) {
-        Assert.requireNonNull(key, "key must not be null");
-        Assert.requireNonNull(type, "type must not be null");
-
-        return type.cast(this.customValues.get(key));
+    public ValueStore getValueStore() {
+        return this.valueStore;
     }
 
     public static final class Builder {
@@ -103,7 +90,7 @@ public final class MockStatementInfo implements StatementInfo {
 
         private String updatedQuery;
 
-        private Map<String, Object> customValues = new HashMap<>();
+        private ValueStore valueStore = ValueStore.create();
 
         public ConnectionInfo getConnectionInfo() {
             return this.connectionInfo;
@@ -124,13 +111,8 @@ public final class MockStatementInfo implements StatementInfo {
             return this;
         }
 
-        public Builder customValue(String key, Object value) {
-            this.customValues.put(key, value);
-            return this;
-        }
-
-        public Builder customValues(Map<String, Object> customValues) {
-            this.customValues = customValues;
+        public Builder valueStore(ValueStore valueStore) {
+            this.valueStore = valueStore;
             return this;
         }
 
