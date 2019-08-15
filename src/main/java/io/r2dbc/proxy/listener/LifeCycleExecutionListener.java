@@ -16,6 +16,8 @@
 
 package io.r2dbc.proxy.listener;
 
+import java.lang.reflect.Method;
+
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
@@ -25,8 +27,6 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
-
-import java.lang.reflect.Method;
 
 /**
  * Provides explicit callbacks on all SPI invocations and query executions on given {@link LifeCycleListener}.
@@ -141,6 +141,12 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                 } else {
                     this.delegate.afterSetTransactionIsolationLevelOnConnection(executionInfo);
                 }
+            } else if ("validate".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeValidateOnConnection(executionInfo);
+                } else {
+                    this.delegate.afterValidateOnConnection(executionInfo);
+                }
             }
         } else if (Batch.class.isAssignableFrom(methodDeclaringClass)) {
             // Batch methods
@@ -182,6 +188,12 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                     this.delegate.beforeExecuteOnStatement(executionInfo);
                 } else {
                     this.delegate.afterExecuteOnStatement(executionInfo);
+                }
+            } else if ("fetchSize".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeFetchSizeOnStatement(executionInfo);
+                } else {
+                    this.delegate.afterFetchSizeOnStatement(executionInfo);
                 }
             } else if ("returnGeneratedValues".equals(methodName)) {
                 if (isBefore) {
