@@ -16,6 +16,8 @@
 
 package io.r2dbc.proxy.listener;
 
+import java.util.function.BiFunction;
+
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.spi.Batch;
@@ -24,8 +26,6 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.IsolationLevel;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
-
-import java.util.function.BiFunction;
 
 /**
  * Provides callback methods for each SPI call.
@@ -339,6 +339,12 @@ public interface LifeCycleListener {
     default void afterExecuteOnStatement(MethodExecutionInfo methodExecutionInfo) {
     }
 
+    default void beforeFetchSizeOnStatement(MethodExecutionInfo executionInfo) {
+    }
+
+    default void afterFetchSizeOnStatement(MethodExecutionInfo executionInfo) {
+    }
+
     /**
      * Callback that is invoked <em>before</em> {@link Statement#returnGeneratedValues(String...)} is called.
      *
@@ -498,6 +504,12 @@ public interface LifeCycleListener {
      * @param queryExecutionInfo query execution info
      */
     default void afterQuery(QueryExecutionInfo queryExecutionInfo) {
+    }
+
+    default void beforeValidateOnConnection(MethodExecutionInfo executionInfo) {
+    }
+
+    default void afterValidateOnConnection(MethodExecutionInfo executionInfo) {
     }
 
 }
