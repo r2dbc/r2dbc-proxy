@@ -147,6 +147,24 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                 } else {
                     this.delegate.afterValidateOnConnection(executionInfo);
                 }
+            } else if ("isAutoCommit".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeIsAutoCommitOnConnection(executionInfo);
+                } else {
+                    this.delegate.afterIsAutoCommitOnConnection(executionInfo);
+                }
+            } else if ("getTransactionIsolationLevel".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeGetTransactionIsolationLevelOnConnection(executionInfo);
+                } else {
+                    this.delegate.afterGetTransactionIsolationLevelOnConnection(executionInfo);
+                }
+            } else if ("setAutoCommit".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeSetAutoCommitOnConnection(executionInfo);
+                } else {
+                    this.delegate.afterSetAutoCommitOnConnection(executionInfo);
+                }
             }
         } else if (Batch.class.isAssignableFrom(methodDeclaringClass)) {
             // Batch methods

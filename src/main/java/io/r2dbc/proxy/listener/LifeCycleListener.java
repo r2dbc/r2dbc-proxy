@@ -26,6 +26,7 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.IsolationLevel;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
+import io.r2dbc.spi.ValidationDepth;
 
 /**
  * Provides callback methods for each SPI call.
@@ -235,6 +236,70 @@ public interface LifeCycleListener {
     default void afterSetTransactionIsolationLevelOnConnection(MethodExecutionInfo methodExecutionInfo) {
     }
 
+    /**
+     * Callback that is invoked <em>before</em> {@link Connection#validate(ValidationDepth)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeValidateOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Connection#validate(ValidationDepth)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterValidateOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>before</em> {@link Connection#isAutoCommit()} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeIsAutoCommitOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Connection#isAutoCommit()} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterIsAutoCommitOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>before</em> {@link Connection#getTransactionIsolationLevel()} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeGetTransactionIsolationLevelOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Connection#getTransactionIsolationLevel()} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterGetTransactionIsolationLevelOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>before</em> {@link Connection#setAutoCommit(boolean)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeSetAutoCommitOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Connection#setAutoCommit(boolean)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterSetAutoCommitOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
     //
     // for Batch
     //
@@ -339,10 +404,20 @@ public interface LifeCycleListener {
     default void afterExecuteOnStatement(MethodExecutionInfo methodExecutionInfo) {
     }
 
-    default void beforeFetchSizeOnStatement(MethodExecutionInfo executionInfo) {
+    /**
+     * Callback that is invoked <em>before</em> {@link Statement#fetchSize(int)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeFetchSizeOnStatement(MethodExecutionInfo methodExecutionInfo) {
     }
 
-    default void afterFetchSizeOnStatement(MethodExecutionInfo executionInfo) {
+    /**
+     * Callback that is invoked <em>after</em> {@link Statement#fetchSize(int)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterFetchSizeOnStatement(MethodExecutionInfo methodExecutionInfo) {
     }
 
     /**
@@ -504,12 +579,6 @@ public interface LifeCycleListener {
      * @param queryExecutionInfo query execution info
      */
     default void afterQuery(QueryExecutionInfo queryExecutionInfo) {
-    }
-
-    default void beforeValidateOnConnection(MethodExecutionInfo executionInfo) {
-    }
-
-    default void afterValidateOnConnection(MethodExecutionInfo executionInfo) {
     }
 
 }
