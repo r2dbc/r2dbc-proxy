@@ -300,6 +300,22 @@ public interface LifeCycleListener {
     default void afterSetAutoCommitOnConnection(MethodExecutionInfo methodExecutionInfo) {
     }
 
+    /**
+     * Callback that is invoked <em>before</em> {@link Connection#getMetadata()} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeGetMetadataOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Connection#getMetadata()} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterGetMetadataOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
     //
     // for Batch
     //

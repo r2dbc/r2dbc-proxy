@@ -165,6 +165,12 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                 } else {
                     this.delegate.afterSetAutoCommitOnConnection(executionInfo);
                 }
+            } else if ("getMetadata".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeGetMetadataOnConnection(executionInfo);
+                } else {
+                    this.delegate.afterGetMetadataOnConnection(executionInfo);
+                }
             }
         } else if (Batch.class.isAssignableFrom(methodDeclaringClass)) {
             // Batch methods
