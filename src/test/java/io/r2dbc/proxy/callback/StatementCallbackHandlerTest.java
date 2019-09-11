@@ -51,11 +51,11 @@ public class StatementCallbackHandlerTest {
 
     private static Method BIND_BY_INDEX_METHOD = ReflectionUtils.findMethod(Statement.class, "bind", int.class, Object.class);
 
-    private static Method BIND_BY_ID_METHOD = ReflectionUtils.findMethod(Statement.class, "bind", Object.class, Object.class);
+    private static Method BIND_BY_NAME_METHOD = ReflectionUtils.findMethod(Statement.class, "bind", String.class, Object.class);
 
     private static Method BIND_NULL_BY_INDEX_METHOD = ReflectionUtils.findMethod(Statement.class, "bindNull", int.class, Class.class);
 
-    private static Method BIND_NULL_BY_ID_METHOD = ReflectionUtils.findMethod(Statement.class, "bindNull", Object.class, Class.class);
+    private static Method BIND_NULL_BY_NAME_METHOD = ReflectionUtils.findMethod(Statement.class, "bindNull", String.class, Class.class);
 
     private static Method UNWRAP_METHOD = ReflectionUtils.findMethod(Wrapped.class, "unwrap");
 
@@ -139,7 +139,7 @@ public class StatementCallbackHandlerTest {
             .hasSize(2)
             .extracting(Binding::getKey)
             .containsExactly(1, 2);
-        assertThat(firstBindings.getIdentifierBindings()).isEmpty();
+        assertThat(firstBindings.getNamedBindings()).isEmpty();
 
         List<BoundValue> boundValues = firstBindings.getIndexBindings().stream()
             .map(Binding::getBoundValue)
@@ -162,7 +162,7 @@ public class StatementCallbackHandlerTest {
             .hasSize(2)
             .extracting(Binding::getKey)
             .containsExactly(1, 2);
-        assertThat(secondBindings.getIdentifierBindings()).isEmpty();
+        assertThat(secondBindings.getNamedBindings()).isEmpty();
 
         boundValues = secondBindings.getIndexBindings().stream()
             .map(Binding::getBoundValue)
@@ -183,7 +183,7 @@ public class StatementCallbackHandlerTest {
     }
 
     @Test
-    void executeOperationWithBindByIdentifier() throws Throwable {
+    void executeOperationWithBindByName() throws Throwable {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
 
         String query = "QUERY";
@@ -192,11 +192,11 @@ public class StatementCallbackHandlerTest {
         Statement statement = MockStatement.empty(); // make it return empty result
         StatementCallbackHandler callback = new StatementCallbackHandler(statement, query, connectionInfo, proxyConfig);
 
-        callback.invoke(statement, BIND_BY_ID_METHOD, new Object[]{"$1", 100});
-        callback.invoke(statement, BIND_NULL_BY_ID_METHOD, new Object[]{"$2", String.class});
+        callback.invoke(statement, BIND_BY_NAME_METHOD, new Object[]{"$1", 100});
+        callback.invoke(statement, BIND_NULL_BY_NAME_METHOD, new Object[]{"$2", String.class});
         callback.invoke(statement, ADD_METHOD, null);
-        callback.invoke(statement, BIND_NULL_BY_ID_METHOD, new Object[]{"$1", int.class});
-        callback.invoke(statement, BIND_BY_ID_METHOD, new Object[]{"$2", 200});
+        callback.invoke(statement, BIND_NULL_BY_NAME_METHOD, new Object[]{"$1", int.class});
+        callback.invoke(statement, BIND_BY_NAME_METHOD, new Object[]{"$2", 200});
         Object result = callback.invoke(statement, EXECUTE_METHOD, null);
 
 
@@ -221,12 +221,12 @@ public class StatementCallbackHandlerTest {
 
 
         assertThat(firstBindings.getIndexBindings()).isEmpty();
-        assertThat(firstBindings.getIdentifierBindings())
+        assertThat(firstBindings.getNamedBindings())
             .hasSize(2)
             .extracting(Binding::getKey)
             .containsExactly("$1", "$2");
 
-        List<BoundValue> boundValues = firstBindings.getIdentifierBindings().stream()
+        List<BoundValue> boundValues = firstBindings.getNamedBindings().stream()
             .map(Binding::getBoundValue)
             .collect(toList());
 
@@ -244,12 +244,12 @@ public class StatementCallbackHandlerTest {
 
 
         assertThat(secondBindings.getIndexBindings()).isEmpty();
-        assertThat(secondBindings.getIdentifierBindings())
+        assertThat(secondBindings.getNamedBindings())
             .hasSize(2)
             .extracting(Binding::getKey)
             .containsExactly("$1", "$2");
 
-        boundValues = secondBindings.getIdentifierBindings().stream()
+        boundValues = secondBindings.getNamedBindings().stream()
             .map(Binding::getBoundValue)
             .collect(toList());
 

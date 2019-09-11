@@ -85,21 +85,21 @@ public class QueryExecutionInfoFormatterTest {
 
 
         Bindings idBindings1 = new Bindings();
-        idBindings1.addIdentifierBinding("$0", BoundValue.value("100"));
-        idBindings1.addIdentifierBinding("$1", BoundValue.value("101"));
-        idBindings1.addIdentifierBinding("$2", BoundValue.value("102"));
+        idBindings1.addNamedBinding("$0", BoundValue.value("100"));
+        idBindings1.addNamedBinding("$1", BoundValue.value("101"));
+        idBindings1.addNamedBinding("$2", BoundValue.value("102"));
 
         Bindings idBindings2 = new Bindings();
-        idBindings2.addIdentifierBinding("$2", BoundValue.value("202"));
-        idBindings2.addIdentifierBinding("$1", BoundValue.nullValue(Integer.class));
-        idBindings2.addIdentifierBinding("$0", BoundValue.value("200"));
+        idBindings2.addNamedBinding("$2", BoundValue.value("202"));
+        idBindings2.addNamedBinding("$1", BoundValue.nullValue(Integer.class));
+        idBindings2.addNamedBinding("$0", BoundValue.value("200"));
 
         QueryInfo queryWithIndexBindings = new QueryInfo("SELECT WITH-INDEX");
-        QueryInfo queryWithIdBindings = new QueryInfo("SELECT WITH-IDENTIFIER");
+        QueryInfo queryWithNamedBindings = new QueryInfo("SELECT WITH-NAME");
         QueryInfo queryWithNoBindings = new QueryInfo("SELECT NO-BINDINGS");
 
         queryWithIndexBindings.getBindingsList().addAll(Arrays.asList(indexBindings1, indexBindings2));
-        queryWithIdBindings.getBindingsList().addAll(Arrays.asList(idBindings1, idBindings2));
+        queryWithNamedBindings.getBindingsList().addAll(Arrays.asList(idBindings1, idBindings2));
 
         ConnectionInfo connectionInfo = MockConnectionInfo.builder().connectionId("conn-id").build();
 
@@ -129,14 +129,14 @@ public class QueryExecutionInfoFormatterTest {
             " Type:Statement BatchSize:20 BindingsSize:10 Query:[\"SELECT WITH-INDEX\"]" +
             " Bindings:[(100,101,102),(200,null(String),202)]");
 
-        // with identifier bindings
+        // with named bindings
         execInfo = MockQueryExecutionInfo.builder().from(baseExecInfo)
-            .queries(Collections.singletonList(queryWithIdBindings))
+            .queries(Collections.singletonList(queryWithNamedBindings))
             .build();
         result = formatter.format(execInfo);
         assertThat(result).isEqualTo("Thread:my-thread(99) Connection:conn-id" +
             " Transaction:{Create:0 Rollback:0 Commit:0} Success:True Time:35" +
-            " Type:Statement BatchSize:20 BindingsSize:10 Query:[\"SELECT WITH-IDENTIFIER\"]" +
+            " Type:Statement BatchSize:20 BindingsSize:10 Query:[\"SELECT WITH-NAME\"]" +
             " Bindings:[($0=100,$1=101,$2=102),($0=200,$1=null(Integer),$2=202)]");
 
         // with no bindings
@@ -346,24 +346,24 @@ public class QueryExecutionInfoFormatterTest {
     }
 
     @Test
-    void showBindingsWithIdentifierBinding() {
+    void showBindingsWithNamedBinding() {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
         formatter.showBindings();
 
         Bindings bindings1 = new Bindings();
-        bindings1.addIdentifierBinding("$0", BoundValue.value("100"));
-        bindings1.addIdentifierBinding("$1", BoundValue.value("101"));
-        bindings1.addIdentifierBinding("$2", BoundValue.value("102"));
+        bindings1.addNamedBinding("$0", BoundValue.value("100"));
+        bindings1.addNamedBinding("$1", BoundValue.value("101"));
+        bindings1.addNamedBinding("$2", BoundValue.value("102"));
 
         Bindings bindings2 = new Bindings();
-        bindings2.addIdentifierBinding("$2", BoundValue.value("202"));
-        bindings2.addIdentifierBinding("$1", BoundValue.nullValue(Long.class));
-        bindings2.addIdentifierBinding("$0", BoundValue.value("200"));
+        bindings2.addNamedBinding("$2", BoundValue.value("202"));
+        bindings2.addNamedBinding("$1", BoundValue.nullValue(Long.class));
+        bindings2.addNamedBinding("$0", BoundValue.value("200"));
 
         Bindings bindings3 = new Bindings();
-        bindings3.addIdentifierBinding("$1", BoundValue.value("300"));
-        bindings3.addIdentifierBinding("$2", BoundValue.value("302"));
-        bindings3.addIdentifierBinding("$0", BoundValue.nullValue(String.class));
+        bindings3.addNamedBinding("$1", BoundValue.value("300"));
+        bindings3.addNamedBinding("$2", BoundValue.value("302"));
+        bindings3.addNamedBinding("$0", BoundValue.nullValue(String.class));
 
         QueryInfo query1 = new QueryInfo("SELECT 1");  // will have 3 bindings
         QueryInfo query2 = new QueryInfo("SELECT 1");  // will have 1 bindings
@@ -478,21 +478,21 @@ public class QueryExecutionInfoFormatterTest {
         bindingsByIndex.addIndexBinding(0, BoundValue.value("100"));
         bindingsByIndex.addIndexBinding(1, BoundValue.nullValue(Object.class));
 
-        Bindings bindingsByIdentifier = new Bindings();
-        bindingsByIdentifier.addIdentifierBinding("$0", BoundValue.value("100"));
-        bindingsByIdentifier.addIdentifierBinding("$1", BoundValue.nullValue(Object.class));
+        Bindings bindingsByName = new Bindings();
+        bindingsByName.addNamedBinding("$0", BoundValue.value("100"));
+        bindingsByName.addNamedBinding("$1", BoundValue.nullValue(Object.class));
 
         QueryInfo queryWithIndexBindings = new QueryInfo("SELECT 1");
-        QueryInfo queryWithIdentifierBindings = new QueryInfo("SELECT 1");
+        QueryInfo queryWithNamedBindings = new QueryInfo("SELECT 1");
 
         queryWithIndexBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIndex));
-        queryWithIdentifierBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIdentifier));
+        queryWithNamedBindings.getBindingsList().addAll(Collections.singletonList(bindingsByName));
 
         QueryExecutionInfo execInfoWithIndexBindings = MockQueryExecutionInfo.builder()
             .queries(Collections.singletonList(queryWithIndexBindings))
             .build();
-        QueryExecutionInfo execInfoWithIdentifierBindings = MockQueryExecutionInfo.builder()
-            .queries(Collections.singletonList(queryWithIdentifierBindings))
+        QueryExecutionInfo execInfoWithNamedBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithNamedBindings))
             .build();
 
         String result;
@@ -500,7 +500,7 @@ public class QueryExecutionInfoFormatterTest {
         result = formatter.format(execInfoWithIndexBindings);
         assertThat(result).isEqualTo("Bindings:[(FOO,FOO)]");
 
-        result = formatter.format(execInfoWithIdentifierBindings);
+        result = formatter.format(execInfoWithNamedBindings);
         assertThat(result).isEqualTo("Bindings:[($0=FOO,$1=FOO)]");
     }
 
@@ -516,21 +516,21 @@ public class QueryExecutionInfoFormatterTest {
         bindingsByIndex.addIndexBinding(0, BoundValue.value(blob));
         bindingsByIndex.addIndexBinding(1, BoundValue.value(clob));
 
-        Bindings bindingsByIdentifier = new Bindings();
-        bindingsByIdentifier.addIdentifierBinding("$0", BoundValue.value(blob));
-        bindingsByIdentifier.addIdentifierBinding("$1", BoundValue.value(clob));
+        Bindings bindingsByName = new Bindings();
+        bindingsByName.addNamedBinding("$0", BoundValue.value(blob));
+        bindingsByName.addNamedBinding("$1", BoundValue.value(clob));
 
         QueryInfo queryWithIndexBindings = new QueryInfo("SELECT 1");
-        QueryInfo queryWithIdentifierBindings = new QueryInfo("SELECT 1");
+        QueryInfo queryWithNamedBindings = new QueryInfo("SELECT 1");
 
         queryWithIndexBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIndex));
-        queryWithIdentifierBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIdentifier));
+        queryWithNamedBindings.getBindingsList().addAll(Collections.singletonList(bindingsByName));
 
         QueryExecutionInfo execInfoWithIndexBindings = MockQueryExecutionInfo.builder()
             .queries(Collections.singletonList(queryWithIndexBindings))
             .build();
-        QueryExecutionInfo execInfoWithIdentifierBindings = MockQueryExecutionInfo.builder()
-            .queries(Collections.singletonList(queryWithIdentifierBindings))
+        QueryExecutionInfo execInfoWithNamedBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithNamedBindings))
             .build();
 
         String result;
@@ -538,7 +538,7 @@ public class QueryExecutionInfoFormatterTest {
         result = formatter.format(execInfoWithIndexBindings);
         assertThat(result).isEqualTo("Bindings:[(<blob>,<clob>)]");
 
-        result = formatter.format(execInfoWithIdentifierBindings);
+        result = formatter.format(execInfoWithNamedBindings);
         assertThat(result).isEqualTo("Bindings:[($0=<blob>,$1=<clob>)]");
     }
 
@@ -570,28 +570,28 @@ public class QueryExecutionInfoFormatterTest {
     }
 
     @Test
-    void identifierBindings() {
+    void namedBindings() {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
-        formatter.identifierBindings((boundValue, sb) -> {
+        formatter.namedBindings((boundValue, sb) -> {
             sb.append("FOO");
         });
         formatter.showBindings();
 
-        Bindings bindingsByIdentifier = new Bindings();
-        bindingsByIdentifier.addIdentifierBinding("$0", BoundValue.value("100"));
-        bindingsByIdentifier.addIdentifierBinding("$1", BoundValue.nullValue(Object.class));
+        Bindings bindingsByNamer = new Bindings();
+        bindingsByNamer.addNamedBinding("$0", BoundValue.value("100"));
+        bindingsByNamer.addNamedBinding("$1", BoundValue.nullValue(Object.class));
 
-        QueryInfo queryWithIdentifierBindings = new QueryInfo("SELECT 1");
+        QueryInfo queryWithNamedBindings = new QueryInfo("SELECT 1");
 
-        queryWithIdentifierBindings.getBindingsList().addAll(Collections.singletonList(bindingsByIdentifier));
+        queryWithNamedBindings.getBindingsList().addAll(Collections.singletonList(bindingsByNamer));
 
-        QueryExecutionInfo execInfoWithIdentifierBindings = MockQueryExecutionInfo.builder()
-            .queries(Collections.singletonList(queryWithIdentifierBindings))
+        QueryExecutionInfo execInfoWithNamedBindings = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryWithNamedBindings))
             .build();
 
         String result;
 
-        result = formatter.format(execInfoWithIdentifierBindings);
+        result = formatter.format(execInfoWithNamedBindings);
         assertThat(result).isEqualTo("Bindings:[(FOO)]");
     }
 

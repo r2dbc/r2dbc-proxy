@@ -94,7 +94,7 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
             if (args[0] instanceof Integer) {
                 bindings.addIndexBinding((int) args[0], boundValue);
             } else {
-                bindings.addIdentifierBinding(args[0], boundValue);
+                bindings.addNamedBinding((String) args[0], boundValue);
             }
             return proxy;
         } else if ("execute".equals(methodName)) {

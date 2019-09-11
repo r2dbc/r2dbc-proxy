@@ -35,7 +35,7 @@ public class Bindings {
 
     private final SortedSet<Binding> indexBindings = new TreeSet<>();
 
-    private final SortedSet<Binding> identifierBindings = new TreeSet<>();
+    private final SortedSet<Binding> namedBindings = new TreeSet<>();
 
     /**
      * Add an index binding.
@@ -51,18 +51,16 @@ public class Bindings {
     }
 
     /**
-     * Add an identifier binding.
+     * Add a named binding.
      *
-     * @param identifier identifier
+     * @param name       index name
      * @param boundValue boundValue
-     * @throws IllegalArgumentException if {@code identifier} is {@code null}
      * @throws IllegalArgumentException if {@code boundValue} is {@code null}
      */
-    public void addIdentifierBinding(Object identifier, BoundValue boundValue) {
-        Assert.requireNonNull(identifier, "identifier must not be null");
+    public void addNamedBinding(String name, BoundValue boundValue) {
         Assert.requireNonNull(boundValue, "boundValue must not be null");
 
-        this.identifierBindings.add(new IdentifierBinding(identifier, boundValue));
+        this.namedBindings.add(new NamedBinding(name, boundValue));
     }
 
     /**
@@ -75,12 +73,12 @@ public class Bindings {
     }
 
     /**
-     * Get a sorted set of identifier bindings.
+     * Get a sorted set of named bindings.
      *
-     * @return identifier bindings
+     * @return named bindings
      */
-    public SortedSet<Binding> getIdentifierBindings() {
-        return this.identifierBindings;
+    public SortedSet<Binding> getNamedBindings() {
+        return this.namedBindings;
     }
 
     /**
@@ -116,38 +114,37 @@ public class Bindings {
     }
 
     /**
-     * Represents identifier binding.
+     * Represents named(String) binding.
      */
-    public static class IdentifierBinding implements Binding, Comparable<IdentifierBinding> {
+    public static class NamedBinding implements Binding, Comparable<NamedBinding> {
 
-        private Object identifier;
+        private String name;
 
         private BoundValue boundValue;
 
-        public IdentifierBinding(Object identifier, BoundValue boundValue) {
-            Assert.requireNonNull(identifier, "identifier must not be null");
+        public NamedBinding(String name, BoundValue boundValue) {
+            Assert.requireNonNull(name, "name must not be null");
             Assert.requireNonNull(boundValue, "boundValue must not be null");
 
-            this.identifier = identifier;
+            this.name = name;
             this.boundValue = boundValue;
         }
 
         @Override
-        @SuppressWarnings("unchecked")
-        public int compareTo(@NonNull IdentifierBinding o) {
-            return Objects.compare((Comparable) this.identifier, (Comparable) o.identifier, naturalOrder());
+        public int compareTo(@NonNull NamedBinding o) {
+            // name is non-null
+            return Objects.compare(this.name, o.name, naturalOrder());
         }
 
         @Override
         public Object getKey() {
-            return this.identifier;
+            return this.name;
         }
 
         @Override
         public BoundValue getBoundValue() {
             return this.boundValue;
         }
-
     }
 
 }
