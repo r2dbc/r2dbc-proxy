@@ -17,6 +17,7 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
+import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
@@ -85,12 +86,12 @@ final class JdkProxyFactory implements ProxyFactory {
     }
 
     @Override
-    public Statement wrapStatement(Statement statement, String query, ConnectionInfo connectionInfo) {
+    public Statement wrapStatement(Statement statement, StatementInfo statementInfo, ConnectionInfo connectionInfo) {
         Assert.requireNonNull(statement, "statement must not be null");
-        Assert.requireNonNull(query, "query must not be null");
+        Assert.requireNonNull(statementInfo, "statementInfo must not be null");
         Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
 
-        CallbackHandler logic = new StatementCallbackHandler(statement, query, connectionInfo, this.proxyConfig);
+        CallbackHandler logic = new StatementCallbackHandler(statement, statementInfo, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Statement) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
             new Class<?>[]{Statement.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);

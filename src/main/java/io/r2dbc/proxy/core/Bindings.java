@@ -47,7 +47,19 @@ public class Bindings {
     public void addIndexBinding(int index, BoundValue boundValue) {
         Assert.requireNonNull(boundValue, "boundValue must not be null");
 
-        this.indexBindings.add(new IndexBinding(index, boundValue));
+        addIndexBinding(new IndexBinding(index, boundValue));
+    }
+
+    /**
+     * Add an index binding.
+     *
+     * @param indexBinding indexBinding
+     * @throws IllegalArgumentException if {@code indexBinding} is {@code null}
+     */
+    public void addIndexBinding(IndexBinding indexBinding) {
+        Assert.requireNonNull(indexBinding, "indexBinding must not be null");
+
+        this.indexBindings.add(indexBinding);
     }
 
     /**
@@ -60,7 +72,19 @@ public class Bindings {
     public void addNamedBinding(String name, BoundValue boundValue) {
         Assert.requireNonNull(boundValue, "boundValue must not be null");
 
-        this.namedBindings.add(new NamedBinding(name, boundValue));
+        addNamedBinding(new NamedBinding(name, boundValue));
+    }
+
+    /**
+     * Add a named binding.
+     *
+     * @param namedBinding namedBinding
+     * @throws IllegalArgumentException if {@code namedBinding} is {@code null}
+     */
+    public void addNamedBinding(NamedBinding namedBinding) {
+        Assert.requireNonNull(namedBinding, "namedBinding must not be null");
+
+        this.namedBindings.add(namedBinding);
     }
 
     /**

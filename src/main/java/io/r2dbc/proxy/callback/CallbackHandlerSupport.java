@@ -25,6 +25,7 @@ import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -141,8 +142,8 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      */
     protected Object proceedExecution(Method method, Object target, Object[] args,
                                       ProxyExecutionListener listener, ConnectionInfo connectionInfo,
-                                      BiFunction<Object, MutableMethodExecutionInfo, Object> onMap,
-                                      Consumer<MethodExecutionInfo> onComplete) throws Throwable {
+                                      @Nullable BiFunction<Object, MutableMethodExecutionInfo, Object> onMap,
+                                      @Nullable Consumer<MethodExecutionInfo> onComplete) throws Throwable {
         Assert.requireNonNull(method, "method must not be null");
         Assert.requireNonNull(target, "target must not be null");
         Assert.requireNonNull(listener, "listener must not be null");

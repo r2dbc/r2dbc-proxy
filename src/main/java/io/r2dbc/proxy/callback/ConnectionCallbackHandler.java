@@ -76,15 +76,30 @@ public final class ConnectionCallbackHandler extends CallbackHandlerSupport {
                 executionInfo.getConnectionInfo().setClosed(true);
             };
         }
+
+        if ("createStatement".equals(methodName)) {
+            String query = (String) args[0];
+
+            // create a value store
+            MutableStatementInfo statementInfo = new MutableStatementInfo();
+            statementInfo.setConnectionInfo(this.connectionInfo);
+            statementInfo.setOriginalQuery(query);
+
+            String updatedQuery = this.proxyConfig.getBindParameterConverter().onCreateStatement(query, statementInfo);
+            statementInfo.setUpdatedQuery(updatedQuery);
+
+            // replace the query
+            args[0] = updatedQuery;
+            Object result = proceedExecution(method, this.connection, args, this.proxyConfig.getListeners(), this.connectionInfo, null, onComplete);
+
+            return this.proxyConfig.getProxyFactory().wrapStatement((Statement) result, statementInfo, this.connectionInfo);
+        }
         // TODO: createSavepoint, releaseSavepoint, rollbackTransactionToSavepoint
 
         Object result = proceedExecution(method, this.connection, args, this.proxyConfig.getListeners(), this.connectionInfo, null, onComplete);
 
         if ("createBatch".equals(methodName)) {
             return this.proxyConfig.getProxyFactory().wrapBatch((Batch) result, this.connectionInfo);
-        } else if ("createStatement".equals(methodName)) {
-            String query = (String) args[0];
-            return this.proxyConfig.getProxyFactory().wrapStatement((Statement) result, query, this.connectionInfo);
         }
 
         return result;

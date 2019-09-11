@@ -16,11 +16,15 @@
 
 package io.r2dbc.proxy.callback;
 
+import io.r2dbc.proxy.core.Binding;
 import io.r2dbc.proxy.core.Bindings;
 import io.r2dbc.proxy.core.BoundValue;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.QueryInfo;
+import io.r2dbc.proxy.core.R2dbcProxyException;
+import io.r2dbc.proxy.core.StatementInfo;
+import io.r2dbc.proxy.listener.BindParameterConverter;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
@@ -44,16 +48,16 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
 
     private final ConnectionInfo connectionInfo;
 
-    private final String query;
+    private final StatementInfo statementInfo;
 
     private final List<Bindings> bindings = new ArrayList<>();
 
     private int currentBindingsIndex = 0;
 
-    public StatementCallbackHandler(Statement statement, String query, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
+    public StatementCallbackHandler(Statement statement, StatementInfo statementInfo, ConnectionInfo connectionInfo, ProxyConfig proxyConfig) {
         super(proxyConfig);
         this.statement = Assert.requireNonNull(statement, "statement must not be null");
-        this.query = Assert.requireNonNull(query, "query must not be null");
+        this.statementInfo = Assert.requireNonNull(statementInfo, "originalQuery must not be null");
         this.connectionInfo = Assert.requireNonNull(connectionInfo, "connectionInfo must not be null");
     }
 
@@ -71,18 +75,7 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
             return this.connectionInfo.getOriginalConnection();
         }
 
-        Object result = proceedExecution(method, this.statement, args, this.proxyConfig.getListeners(), this.connectionInfo, null, null);
-
-        // add, bind, bindNull, execute
-        if ("add".equals(methodName)) {
-            this.currentBindingsIndex++;
-            return proxy;
-        } else if ("bind".equals(methodName) || "bindNull".equals(methodName)) {
-
-            if (this.bindings.size() <= this.currentBindingsIndex) {
-                this.bindings.add(new Bindings());
-            }
-            Bindings bindings = this.bindings.get(this.currentBindingsIndex);
+        if ("bind".equals(methodName) || "bindNull".equals(methodName)) {
 
             BoundValue boundValue;
             if ("bind".equals(methodName)) {
@@ -91,16 +84,59 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
                 boundValue = BoundValue.nullValue((Class<?>) args[1]);
             }
 
-            if (args[0] instanceof Integer) {
-                bindings.addIndexBinding((int) args[0], boundValue);
+            boolean isIndexBinding = args[0] instanceof Integer;
+
+            Binding binding;
+            if (isIndexBinding) {
+                binding = new Bindings.IndexBinding((int) args[0], boundValue);
             } else {
-                bindings.addNamedBinding((String) args[0], boundValue);
+                binding = new Bindings.NamedBinding((String) args[0], boundValue);
             }
+
+            // when converter decides to perform original binding behavior, this lambda will be called.
+            BindParameterConverter.BindOperation onBind = () -> {
+
+                try {
+                    proceedExecution(method, this.statement, args, this.proxyConfig.getListeners(), this.connectionInfo, null, null);
+                } catch (Throwable throwable) {
+                    throw new R2dbcProxyException("Failed to perform " + methodName, throwable);
+                }
+
+                if (this.bindings.size() <= this.currentBindingsIndex) {
+                    this.bindings.add(new Bindings());
+                }
+
+                Bindings bindings = this.bindings.get(this.currentBindingsIndex);
+                if (isIndexBinding) {
+                    bindings.addIndexBinding((Bindings.IndexBinding) binding);
+                } else {
+                    bindings.addNamedBinding((Bindings.NamedBinding) binding);
+                }
+
+                return (Statement) proxy;
+            };
+
+
+            MutableBindInfo bindInfo = new MutableBindInfo();
+            bindInfo.setStatementInfo(this.statementInfo);
+            bindInfo.setBinding(binding);
+
+            // callback for binding operation
+            this.proxyConfig.getBindParameterConverter().onBind(bindInfo, (Statement) proxy, onBind);
+
+            return proxy;
+        }
+
+        Object result = proceedExecution(method, this.statement, args, this.proxyConfig.getListeners(), this.connectionInfo, null, null);
+
+        // add, bind, bindNull, execute
+        if ("add".equals(methodName)) {
+            this.currentBindingsIndex++;
             return proxy;
         } else if ("execute".equals(methodName)) {
 
             // build QueryExecutionInfo
-            QueryInfo queryInfo = new QueryInfo(this.query);
+            QueryInfo queryInfo = new QueryInfo(this.statementInfo.getUpdatedQuery()); // TODO: may include original query info
             queryInfo.getBindingsList().addAll(this.bindings);
             List<QueryInfo> queries = Stream.of(queryInfo).collect(toList());
 

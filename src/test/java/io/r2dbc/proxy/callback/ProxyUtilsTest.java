@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.callback;
 
+import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Result;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -41,6 +43,7 @@ public class ProxyUtilsTest {
         Batch originalBatch = MockBatch.empty();
         Statement originalStatement = MockStatement.empty();
         Result originalResult = MockResult.empty();
+        StatementInfo statementInfo = mock(StatementInfo.class);
 
         String query = "QUERY";
 
@@ -55,7 +58,7 @@ public class ProxyUtilsTest {
         queryExecutionInfo.setConnectionInfo(connectionInfo);
 
         Batch proxyBatch = proxyConfig.getProxyFactory().wrapBatch(originalBatch, connectionInfo);
-        Statement proxyStatement = proxyConfig.getProxyFactory().wrapStatement(originalStatement, query, connectionInfo);
+        Statement proxyStatement = proxyConfig.getProxyFactory().wrapStatement(originalStatement, statementInfo, connectionInfo);
         Result proxyResult = proxyConfig.getProxyFactory().wrapResult(originalResult, queryExecutionInfo);
 
         Optional<Connection> result;
