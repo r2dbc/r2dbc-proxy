@@ -199,12 +199,12 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     };
 
     /**
-     * Default implementation for formatting bindings by identifier.
+     * Default implementation for formatting bindings by name.
      *
      * Generate comma separated key-values pair string. "key1=val1,key2=val2,key3=val3"
      */
-    public BiConsumer<SortedSet<Binding>, StringBuilder> onIdentifierBindings = (identifierBindings, sb) -> {
-        String s = identifierBindings.stream()
+    public BiConsumer<SortedSet<Binding>, StringBuilder> onNamedBindings = (namedBindings, sb) -> {
+        String s = namedBindings.stream()
             .map(binding -> {
                 StringBuilder sbuilder = new StringBuilder();
                 sbuilder.append(binding.getKey());
@@ -235,9 +235,9 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
                             this.onIndexBindings.accept(indexBindings, sbForBindings);
                         }
 
-                        SortedSet<Binding> identifierBindings = binds.getIdentifierBindings();
-                        if (!identifierBindings.isEmpty()) {
-                            this.onIdentifierBindings.accept(identifierBindings, sbForBindings);
+                        SortedSet<Binding> namedBindings = binds.getNamedBindings();
+                        if (!namedBindings.isEmpty()) {
+                            this.onNamedBindings.accept(namedBindings, sbForBindings);
                         }
                         return sbForBindings.toString();
                     })
@@ -484,14 +484,14 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     }
 
     /**
-     * Set a consumer for converting {@link SortedSet} of {@link Binding} constructed by bind-by-identifier.
+     * Set a consumer for converting {@link SortedSet} of {@link Binding} constructed by bind-by-name.
      *
-     * @param onIdentifierBindings bi-consumer for identifier-bindings
+     * @param onNamedBindings bi-consumer for named-bindings
      * @return formatter
-     * @throws IllegalArgumentException if {@code onIdentifierBindings} is {@code null}
+     * @throws IllegalArgumentException if {@code onNamedBindings} is {@code null}
      */
-    public QueryExecutionInfoFormatter identifierBindings(BiConsumer<SortedSet<Binding>, StringBuilder> onIdentifierBindings) {
-        this.onIdentifierBindings = Assert.requireNonNull(onIdentifierBindings, "onIdentifierBindings must not be null");
+    public QueryExecutionInfoFormatter namedBindings(BiConsumer<SortedSet<Binding>, StringBuilder> onNamedBindings) {
+        this.onNamedBindings = Assert.requireNonNull(onNamedBindings, "onNamedBindings must not be null");
         return new QueryExecutionInfoFormatter(this);
     }
 

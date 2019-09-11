@@ -90,7 +90,7 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
             if (isIndexBinding) {
                 binding = new Bindings.IndexBinding((int) args[0], boundValue);
             } else {
-                binding = new Bindings.IdentifierBinding(args[0], boundValue);
+                binding = new Bindings.NamedBinding((String) args[0], boundValue);
             }
 
             // when converter decides to perform original binding behavior, this lambda will be called.
@@ -110,7 +110,7 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
                 if (isIndexBinding) {
                     bindings.addIndexBinding((Bindings.IndexBinding) binding);
                 } else {
-                    bindings.addIdentifierBinding((Bindings.IdentifierBinding) binding);
+                    bindings.addNamedBinding((Bindings.NamedBinding) binding);
                 }
 
                 return (Statement) proxy;

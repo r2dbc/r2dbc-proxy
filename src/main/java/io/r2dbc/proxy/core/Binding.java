@@ -21,14 +21,14 @@ package io.r2dbc.proxy.core;
  *
  * @author Tadaya Tsuyukubo
  * @see Bindings.IndexBinding
- * @see Bindings.IdentifierBinding
+ * @see Bindings.NamedBinding
  */
 public interface Binding {
 
     /**
-     * Get a key which represents index or identifier.
+     * Get a key which represents index or name of the binding.
      *
-     * @return an index or identifier
+     * @return an index or name
      */
     Object getKey();
 
