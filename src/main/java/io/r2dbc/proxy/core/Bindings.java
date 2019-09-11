@@ -38,16 +38,28 @@ public class Bindings {
     private final SortedSet<Binding> namedBindings = new TreeSet<>();
 
     /**
-     * Add an index binding.
+     * Factory method to create {@link IndexBinding}.
      *
      * @param index      index
-     * @param boundValue boundValue
+     * @param boundValue bound value
+     * @return an {@link IndexBinding}
      * @throws IllegalArgumentException if {@code boundValue} is {@code null}
      */
-    public void addIndexBinding(int index, BoundValue boundValue) {
-        Assert.requireNonNull(boundValue, "boundValue must not be null");
+    public static IndexBinding indexBinding(int index, BoundValue boundValue) {
+        return new IndexBinding(index, boundValue);
+    }
 
-        addIndexBinding(new IndexBinding(index, boundValue));
+    /**
+     * Factory method to create {@link NamedBinding}.
+     *
+     * @param name       name
+     * @param boundValue bound value
+     * @return a {@link NamedBinding}
+     * @throws IllegalArgumentException if {@code name} is {@code null}
+     * @throws IllegalArgumentException if {@code boundValue} is {@code null}
+     */
+    public static NamedBinding namedBinding(String name, BoundValue boundValue) {
+        return new NamedBinding(name, boundValue);
     }
 
     /**
@@ -60,19 +72,6 @@ public class Bindings {
         Assert.requireNonNull(indexBinding, "indexBinding must not be null");
 
         this.indexBindings.add(indexBinding);
-    }
-
-    /**
-     * Add a named binding.
-     *
-     * @param name       index name
-     * @param boundValue boundValue
-     * @throws IllegalArgumentException if {@code boundValue} is {@code null}
-     */
-    public void addNamedBinding(String name, BoundValue boundValue) {
-        Assert.requireNonNull(boundValue, "boundValue must not be null");
-
-        addNamedBinding(new NamedBinding(name, boundValue));
     }
 
     /**
@@ -114,7 +113,7 @@ public class Bindings {
 
         private BoundValue boundValue;
 
-        public IndexBinding(int index, BoundValue boundValue) {
+        private IndexBinding(int index, BoundValue boundValue) {
             Assert.requireNonNull(boundValue, "boundValue must not be null");
 
             this.index = index;
@@ -146,7 +145,7 @@ public class Bindings {
 
         private BoundValue boundValue;
 
-        public NamedBinding(String name, BoundValue boundValue) {
+        private NamedBinding(String name, BoundValue boundValue) {
             Assert.requireNonNull(name, "name must not be null");
             Assert.requireNonNull(boundValue, "boundValue must not be null");
 

@@ -88,9 +88,9 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
 
             Binding binding;
             if (isIndexBinding) {
-                binding = new Bindings.IndexBinding((int) args[0], boundValue);
+                binding = Bindings.indexBinding((int) args[0], boundValue);
             } else {
-                binding = new Bindings.NamedBinding((String) args[0], boundValue);
+                binding = Bindings.namedBinding((String) args[0], boundValue);
             }
 
             // when converter decides to perform original binding behavior, this lambda will be called.
