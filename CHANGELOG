@@ -1,6 +1,12 @@
 R2DBC Proxy Changelog
 =============================
 
+0.8.0.RC1
+------------------
+* Bind parameter substitution #26
+* Adapt SPI changes #36, #34, #33
+* Add ValueStore to store custom values in context #29
+
 0.8.0.M8
 ------------------
 * Support ConnectionFactoryProvider.getDriver() #19
