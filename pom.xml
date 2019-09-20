@@ -41,7 +41,7 @@
         <r2dbc-spi.version>${project.version}</r2dbc-spi.version>
         <reactor.version>Dysprosium-M1</reactor.version>
         <slf4j.version>1.7.26</slf4j.version>
-        <spring-boot.version>2.1.4.RELEASE</spring-boot.version>
+        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <mockito.version>2.27.0</mockito.version>
     </properties>
 
@@ -135,6 +135,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
