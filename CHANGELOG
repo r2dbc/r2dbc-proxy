@@ -3,9 +3,18 @@ R2DBC Proxy Changelog
 
 0.8.0.RC1
 ------------------
-* Bind parameter substitution #26
-* Adapt SPI changes #36, #34, #33
-* Add ValueStore to store custom values in context #29
+* Release 0.8.0.RC1 #41.
+* Remove repositories declaration from published pom #37.
+* Expose Connection metadata #36.
+* Implement validation and fetchSize SPI methods. #35.
+* Support Connection.validate() #34.
+* Support Statement.fetchSize() #33.
+* Use "*Info" instead of "Mono<*Info>" in builder of ProxyConnectionFactory #32.
+* Use "Atomic*Updater" for frequently created objects #31.
+* Add connection scope custom value store #30.
+* Add ValueStore API #29.
+* 0.8.0.RC1 Changelog #28.
+* Proxy mechanism to support converting bind marker #26.
 
 0.8.0.M8
 ------------------
