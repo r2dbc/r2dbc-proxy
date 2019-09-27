@@ -11,7 +11,7 @@ Both milestone and snapshot artifacts (library, source, and javadoc) can be foun
 <dependency>
   <groupId>io.r2dbc</groupId>
   <artifactId>r2dbc-proxy</artifactId>
-  <version>1.0.0.M7</version>
+  <version>0.8.0.RC1</version>
 </dependency>
 ```
 
@@ -72,10 +72,10 @@ When programmatically `ConnectionFactoryOptions` are constructed, `proxyListener
 ConnectionFactory original = ...
 
 ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
-    .onAfterQuery(mono ->
+    .onAfterQuery(queryInfo ->
         ...  // after query callback logic
     )
-    .onBeforeMethod(mono ->
+    .onBeforeMethod(methodInfo ->
         ...  // before method callback logic
     )
     .listener(...)  // add listener
@@ -352,9 +352,7 @@ MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefaul
 
 ProxyConnectionFactoryBuilder.create(connectionFactory)
   .onAfterMethod(execInfo ->
-     execInfo.map(methodExecutionFormatter::format)  // convert
-       .doOnNext(System.out::println)  // print out to sysout
-       .subscribe())
+     System.out.println(formatter.format(execInfo)))  // convert & print out to sysout
   .build();
 ```
 
@@ -379,9 +377,7 @@ ConnectionFactory proxyConnectionFactory =
   ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
     // on every query execution
     .onAfterQuery(execInfo ->
-      execInfo.map(queryExecutionFormatter::format)    // convert QueryExecutionInfo to String
-              .doOnNext(System.out::println)       // print out executed query
-              .subscribe())
+      System.out.println(formatter.format(execInfo)))  // convert & print out to sysout
     .build();
 ```
 
@@ -397,12 +393,11 @@ Duration threshold = Duration.of(...);
 
 ConnectionFactory proxyConnectionFactory =
   ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
-    .onAfterQuery(mono -> mono
-       .filter(execInfo -> threshold.minus(execInfo.getExecuteDuration()).isNegative())
-       .doOnNext(execInfo -> {
+    .onAfterQuery(execInfo -> {
+       if(threshold.minus(execInfo.getExecuteDuration()).isNegative()) {
          // slow query logic
-       })
-       .subscribe())
+       }
+    })
     .build();
 ```
 
@@ -421,9 +416,7 @@ ConnectionFactory proxyConnectionFactory =
   ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
     // on every method invocation
     .onAfterMethod(execInfo ->
-      execInfo.map(methodExecutionFormatter::format)    // convert MethodExecutionInfo to String
-              .doOnNext(System.out::println)        // print out method execution (method tracing)
-              .subscribe())
+      System.out.println(formatter.format(execInfo)))  // print out method execution (method tracing)
     .build();
 ```
 
