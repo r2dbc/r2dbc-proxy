@@ -373,7 +373,7 @@ public interface LifeCycleListener {
     }
 
     /**
-     * Callback that is invoked <em>before</em> {@link Statement#bind(int, int)} and its overloads are called.
+     * Callback that is invoked <em>before</em> {@link Statement#bind(int, Object)} or {@link Statement#bind(String, Object)} are called.
      *
      * @param methodExecutionInfo the current method execution info; never {@code null}.
      */
@@ -381,7 +381,7 @@ public interface LifeCycleListener {
     }
 
     /**
-     * Callback that is invoked <em>after</em> {@link Statement#bind(int, int)} and its overloads are called.
+     * Callback that is invoked <em>after</em> {@link Statement#bind(int, Object)} or {@link Statement#bind(String, Object)} are called.
      *
      * @param methodExecutionInfo the current method execution info; never {@code null}.
      */
@@ -389,7 +389,7 @@ public interface LifeCycleListener {
     }
 
     /**
-     * Callback that is invoked <em>before</em> {@link Statement#bindNull(int, Class)} and its overloads are called.
+     * Callback that is invoked <em>before</em> {@link Statement#bindNull(int, Class)} or {@link Statement#bindNull(String, Class)} are called.
      *
      * @param methodExecutionInfo the current method execution info; never {@code null}.
      */
@@ -397,7 +397,7 @@ public interface LifeCycleListener {
     }
 
     /**
-     * Callback that is invoked <em>after</em> {@link Statement#bindNull(int, Class)} and its overloads are called.
+     * Callback that is invoked <em>after</em> {@link Statement#bindNull(int, Class)} or {@link Statement#bindNull(String, Class)} are called.
      *
      * @param methodExecutionInfo the current method execution info; never {@code null}.
      */
