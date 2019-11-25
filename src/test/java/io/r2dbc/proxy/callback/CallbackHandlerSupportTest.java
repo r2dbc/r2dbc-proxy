@@ -56,7 +56,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -83,9 +83,7 @@ public class CallbackHandlerSupportTest {
                 return null;
             }
         };
-
     }
-
 
     @Test
     void interceptQueryExecution() {
@@ -149,7 +147,6 @@ public class CallbackHandlerSupportTest {
 
         Result captureResult = resultCaptor.getValue();
         assertThat(captureResult).isSameAs(mockResult);
-
     }
 
     @Test
@@ -615,7 +612,7 @@ public class CallbackHandlerSupportTest {
         assertThat(invokedArguments.getT3()).isSameAs(args);
 
         // target should not be invoked since invocation strategy returns resultMock
-        verifyZeroInteractions(target);
+        verifyNoInteractions(target);
 
         MethodExecutionInfo beforeMethodExecution = listener.getBeforeMethodExecutionInfo();
         MethodExecutionInfo afterMethodExecution = listener.getAfterMethodExecutionInfo();
@@ -641,8 +638,6 @@ public class CallbackHandlerSupportTest {
         assertThat(afterMethodExecution.getProxyEventType()).isEqualTo(ProxyEventType.AFTER_METHOD);
 
         assertThat(afterMethodExecution.getThrown()).isNull();
-
     }
-
 
 }

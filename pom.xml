@@ -28,10 +28,11 @@
     <packaging>jar</packaging>
 
     <name>Reactive Relational Database Connectivity - Proxy</name>
+    <description>Reactive Relational Database Connectivity Proxy Implementation</description>
     <url>https://github.com/r2dbc/r2dbc-proxy</url>
 
     <properties>
-        <assertj.version>3.12.0</assertj.version>
+        <assertj.version>3.14.0</assertj.version>
         <java.version>1.8</java.version>
         <jsr305.version>3.0.2</jsr305.version>
         <junit.version>5.5.2</junit.version>
@@ -39,11 +40,31 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>${project.version}</r2dbc-spi.version>
-        <reactor.version>Dysprosium-RELEASE</reactor.version>
+        <reactor.version>Dysprosium-SR1</reactor.version>
         <slf4j.version>1.7.26</slf4j.version>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
-        <mockito.version>2.27.0</mockito.version>
+        <mockito.version>3.1.0</mockito.version>
     </properties>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://github.com/r2dbc/r2dbc-proxy</connection>
+        <url>https://github.com/r2dbc/r2dbc-proxy</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Tadaya Tsuyukubo</name>
+            <email>tadaya@ttddyy.net</email>
+        </developer>
+    </developers>
 
     <dependencyManagement>
         <dependencies>
@@ -66,20 +87,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.r2dbc</groupId>
             <artifactId>r2dbc-spi</artifactId>
             <version>${r2dbc-spi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
@@ -87,12 +107,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- Test Dependencies -->
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
@@ -146,7 +161,7 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <version>RELEASE</version>
+            <version>2.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -159,6 +174,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
             <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -207,11 +228,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.1</version>
                 <configuration>
-                    <excludePackageNames>
-                    </excludePackageNames>
                     <links>
+                        <link>https://r2dbc.io/spec/${r2dbc-spi.version}/api/</link>
                         <link>https://projectreactor.io/docs/core/release/api/</link>
                         <link>https://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/</link>
                     </links>
@@ -228,7 +248,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -265,10 +285,10 @@
                             <updatePomFile>true</updatePomFile>
                             <flattenMode>oss</flattenMode>
                             <pomElements>
-                                <pluginManagement>keep</pluginManagement>
-                                <properties>keep</properties>
+                                <properties>remove</properties>
                                 <parent>expand</parent>
                                 <repositories>remove</repositories>
+                                <profiles>remove</profiles>
                             </pomElements>
                         </configuration>
                     </execution>
@@ -283,6 +303,15 @@
             </plugin>
         </plugins>
         <resources>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <includes>
+                    <include>LICENSE</include>
+                    <include>NOTICE</include>
+                    <include>CHANGELOG</include>
+                </includes>
+                <targetPath>META-INF</targetPath>
+            </resource>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
