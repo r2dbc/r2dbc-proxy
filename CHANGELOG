@@ -3,6 +3,7 @@ R2DBC Proxy Changelog
 
 0.8.0.RELEASE
 ------------------
+* Upgrade to Reactor Dysprosium SR2 #47.
 * Upgrade to R2DBC SPI 0.8.0.RELEASE #46.
 * Remove unused SLF4J dependency #45.
 * Remove dropped Statement.bind(int, <primitive>) overloads #42.
