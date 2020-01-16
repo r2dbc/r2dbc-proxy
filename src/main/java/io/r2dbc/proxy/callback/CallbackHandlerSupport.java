@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,9 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
             return Duration.between(this.startTime, this.clock.instant());
         }
 
+        public boolean isStarted() {
+            return this.startTime != null;
+        }
     }
 
     protected final ProxyConfig proxyConfig;
@@ -289,7 +292,11 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
 
             })
             .concatWith(flux)
-            .doOnComplete(() -> {
+            .doOnNext(result -> {
+                // When at least one element is emitted, consider query execution is success, even when
+                // the publisher is canceled. see https://github.com/r2dbc/r2dbc-proxy/issues/55
+                executionInfo.setSuccess(true);
+            }).doOnComplete(() -> {
                 executionInfo.setSuccess(true);
             })
             .doOnError(throwable -> {
@@ -297,8 +304,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
                 executionInfo.setSuccess(false);
             })
             .doFinally(signalType -> {
-
-                executionInfo.setExecuteDuration(stopWatch.getElapsedDuration());
+                executionInfo.setExecuteDuration(stopWatch.isStarted() ? stopWatch.getElapsedDuration() : Duration.ZERO);
                 executionInfo.setThreadName(Thread.currentThread().getName());
                 executionInfo.setThreadId(Thread.currentThread().getId());
                 executionInfo.setCurrentMappedResult(null);
