@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,13 @@ import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.proxy.test.MockStatementInfo;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
+import io.r2dbc.spi.test.MockResult;
 import io.r2dbc.spi.test.MockStatement;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.util.ReflectionUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.lang.reflect.Method;
@@ -271,6 +274,90 @@ public class StatementCallbackHandlerTest {
             .extracting(BoundValue::getValue)
             .isEqualTo(200);
 
+    }
+
+    @Test
+    void executeThenCancel() throws Throwable {
+        LastExecutionAwareListener testListener = new LastExecutionAwareListener();
+
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        StatementInfo statementInfo = MockStatementInfo.builder().updatedQuery("QUERY").build();
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
+
+        Statement statement = MockStatement.builder().result(MockResult.empty()).build();
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(statement, EXECUTE_METHOD, new Object[]{});
+
+        StepVerifier.create((Publisher<?>) result)
+            .expectSubscription()
+            .expectNextCount(1)
+            .thenCancel()// cancel after consuming one result
+            .verify();
+
+        QueryExecutionInfo afterQueryInfo = testListener.getAfterQueryExecutionInfo();
+
+        assertThat(afterQueryInfo).isNotNull();
+        assertThat(afterQueryInfo.isSuccess())
+            .as("Consuming at least one result is considered to query execution success")
+            .isTrue();
+
+    }
+
+    @Test
+    void executeThenImmediatelyCancel() throws Throwable {
+        LastExecutionAwareListener testListener = new LastExecutionAwareListener();
+
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        StatementInfo statementInfo = MockStatementInfo.builder().updatedQuery("QUERY").build();
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
+
+        Statement statement = MockStatement.builder().result(MockResult.empty()).build();
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(statement, EXECUTE_METHOD, new Object[]{});
+
+        StepVerifier.create((Publisher<?>) result)
+            .expectSubscription()
+            .thenCancel()// immediately cancel
+            .verify();
+
+        QueryExecutionInfo afterQueryInfo = testListener.getAfterQueryExecutionInfo();
+
+        assertThat(afterQueryInfo).isNotNull();
+        assertThat(afterQueryInfo.isSuccess())
+            .as("Not consuming any result is considered to query execution failure")
+            .isFalse();
+
+    }
+
+    @Test
+    void executeThenNext() throws Throwable {
+        LastExecutionAwareListener testListener = new LastExecutionAwareListener();
+
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        StatementInfo statementInfo = MockStatementInfo.builder().updatedQuery("QUERY").build();
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
+
+        Statement statement = MockStatement.builder().result(MockResult.empty()).build();
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(statement, EXECUTE_METHOD, new Object[]{});
+
+        // Flux.next() cancels upstream publisher
+        Mono<?> mono = ((Flux<?>) result).next();
+
+        StepVerifier.create(mono)
+            .expectSubscription()
+            .expectNextCount(1)
+            .verifyComplete();
+
+        QueryExecutionInfo afterQueryInfo = testListener.getAfterQueryExecutionInfo();
+
+        assertThat(afterQueryInfo).isNotNull();
+        assertThat(afterQueryInfo.isSuccess())
+            .as("Consuming at least one result is considered to query execution success")
+            .isTrue();
     }
 
     @Test

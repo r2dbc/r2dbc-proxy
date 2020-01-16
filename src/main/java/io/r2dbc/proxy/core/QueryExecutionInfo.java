@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,10 @@ public interface QueryExecutionInfo {
     /**
      * Indicate whether the query execution was successful or not.
      * Contains valid value only after the query execution.
+     *
+     * Query execution is considered successful when the {@link org.reactivestreams.Publisher}
+     * returned from {@link Statement#execute()} either received completion
+     * or at least one element is emitted regardless of it has received cancellation.
      *
      * @return true when query has successfully executed
      */
