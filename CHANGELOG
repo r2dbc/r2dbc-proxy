@@ -1,6 +1,10 @@
 R2DBC Proxy Changelog
 =============================
 
+0.8.1.RELEASE
+------------------
+* Make query execution success when at least one element is emitted #55.
+
 0.8.0.RELEASE
 ------------------
 * Upgrade to Reactor Dysprosium SR2 #47.
