@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package io.r2dbc.proxy.core;
 
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.spi.Connection;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -50,6 +51,7 @@ public interface MethodExecutionInfo {
      *
      * @return argument lists or {@code null} if the invoked method did not take any arguments
      */
+    @Nullable
     Object[] getMethodArgs();
 
     /**
@@ -58,6 +60,7 @@ public interface MethodExecutionInfo {
      *
      * @return result
      */
+    @Nullable
     Object getResult();
 
     /**
@@ -67,6 +70,7 @@ public interface MethodExecutionInfo {
      *
      * @return thrown exception
      */
+    @Nullable
     Throwable getThrown();
 
     /**
@@ -75,11 +79,12 @@ public interface MethodExecutionInfo {
      *
      * @return connection info
      */
+    @Nullable
     ConnectionInfo getConnectionInfo();
 
     /**
      * Get the duration of the method invocation.
-     * For {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback, this returns {@code null}.
+     * For {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback, this returns {@link Duration#ZERO}.
      *
      * @return execution duration
      */

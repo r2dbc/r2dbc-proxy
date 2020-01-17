@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.ValueStore;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -36,12 +37,16 @@ final class MutableMethodExecutionInfo implements MethodExecutionInfo {
 
     private Method method;
 
+    @Nullable
     private Object[] methodArgs;
 
+    @Nullable
     private Object result;
 
+    @Nullable
     private Throwable thrown;
 
+    @Nullable
     private ConnectionInfo connectionInfo;
 
     private Duration executeDuration = Duration.ZERO;
@@ -62,19 +67,19 @@ final class MutableMethodExecutionInfo implements MethodExecutionInfo {
         this.method = method;
     }
 
-    public void setMethodArgs(Object[] methodArgs) {
+    public void setMethodArgs(@Nullable Object[] methodArgs) {
         this.methodArgs = methodArgs;
     }
 
-    public void setResult(Object result) {
+    public void setResult(@Nullable Object result) {
         this.result = result;
     }
 
-    public void setThrown(Throwable thrown) {
+    public void setThrown(@Nullable Throwable thrown) {
         this.thrown = thrown;
     }
 
-    public void setConnectionInfo(ConnectionInfo connectionInfo) {
+    public void setConnectionInfo(@Nullable ConnectionInfo connectionInfo) {
         this.connectionInfo = connectionInfo;
     }
 

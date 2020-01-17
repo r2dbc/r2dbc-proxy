@@ -20,6 +20,7 @@ import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -46,6 +47,7 @@ public interface QueryExecutionInfo {
      *
      * @return argument lists or {@code null} if the invoked method did not take any arguments
      */
+    @Nullable
     Object[] getMethodArgs();
 
     /**
@@ -55,6 +57,7 @@ public interface QueryExecutionInfo {
      *
      * @return thrown exception
      */
+    @Nullable
     Throwable getThrowable();
 
     /**
@@ -163,6 +166,7 @@ public interface QueryExecutionInfo {
      *
      * @return currently mapped result
      */
+    @Nullable
     Object getCurrentMappedResult();
 
     /**

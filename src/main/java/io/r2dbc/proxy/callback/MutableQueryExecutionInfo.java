@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.core.ValueStore;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -40,8 +41,10 @@ final class MutableQueryExecutionInfo implements QueryExecutionInfo {
 
     private Method method;
 
+    @Nullable
     private Object[] methodArgs;
 
+    @Nullable
     private Throwable throwable;
 
     private boolean isSuccess;
@@ -62,6 +65,7 @@ final class MutableQueryExecutionInfo implements QueryExecutionInfo {
 
     private int currentResultCount;
 
+    @Nullable
     private Object currentMappedResult;
 
     private List<QueryInfo> queries = new ArrayList<>();
@@ -72,7 +76,7 @@ final class MutableQueryExecutionInfo implements QueryExecutionInfo {
         this.method = method;
     }
 
-    public void setMethodArgs(Object[] methodArgs) {
+    public void setMethodArgs(@Nullable Object[] methodArgs) {
         this.methodArgs = methodArgs;
     }
 
@@ -80,7 +84,7 @@ final class MutableQueryExecutionInfo implements QueryExecutionInfo {
         this.connectionInfo = connectionInfo;
     }
 
-    public void setThrowable(Throwable throwable) {
+    public void setThrowable(@Nullable Throwable throwable) {
         this.throwable = throwable;
     }
 
@@ -132,7 +136,7 @@ final class MutableQueryExecutionInfo implements QueryExecutionInfo {
         this.currentResultCount = currentResultCount;
     }
 
-    public void setCurrentMappedResult(Object currentResult) {
+    public void setCurrentMappedResult(@Nullable Object currentResult) {
         this.currentMappedResult = currentResult;
     }
 
