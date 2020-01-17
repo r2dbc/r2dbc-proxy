@@ -21,6 +21,7 @@ import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.util.Assert;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -57,11 +58,11 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
          *
          * @param method invocation method
          * @param target invocation target instance
-         * @param args   invocation arguments
+         * @param args   invocation arguments. {@code null} when invocation didn't take any arguments.
          * @return actual invocation result (not a proxy object)
          * @throws Throwable actual thrown exception
          */
-        Object invoke(Method method, Object target, Object[] args) throws Throwable;
+        Object invoke(Method method, Object target, @Nullable Object[] args) throws Throwable;
     }
 
     protected static final MethodInvocationStrategy DEFAULT_INVOCATION_STRATEGY = (method, target, args) -> {
@@ -132,9 +133,9 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      *
      * @param method         method to invoke on target
      * @param target         an object being invoked
-     * @param args           arguments for the method
-     * @param listener       listener that before/aftre method callbacks will be called
-     * @param connectionInfo current connection information
+     * @param args           arguments for the method. {@code null} if the method doesn't take any arguments.
+     * @param listener       listener that before/after method callbacks will be called
+     * @param connectionInfo current connection information. {@code null} when invoked operation is not associated to the {@link Connection}.
      * @param onMap          a callback that will be chained on "map()" right after the result of the method invocation
      * @param onComplete     a callback that will be chained as the first doOnComplete on the result of the method invocation
      * @return result of invoking the original object
@@ -143,8 +144,8 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      * @throws IllegalArgumentException if {@code target} is {@code null}
      * @throws IllegalArgumentException if {@code listener} is {@code null}
      */
-    protected Object proceedExecution(Method method, Object target, Object[] args,
-                                      ProxyExecutionListener listener, ConnectionInfo connectionInfo,
+    protected Object proceedExecution(Method method, Object target, @Nullable Object[] args,
+                                      ProxyExecutionListener listener, @Nullable ConnectionInfo connectionInfo,
                                       @Nullable BiFunction<Object, MutableMethodExecutionInfo, Object> onMap,
                                       @Nullable Consumer<MethodExecutionInfo> onComplete) throws Throwable {
         Assert.requireNonNull(method, "method must not be null");
