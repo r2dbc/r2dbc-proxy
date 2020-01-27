@@ -98,8 +98,9 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      */
     private static class StopWatch {
 
-        private Clock clock;
+        private final Clock clock;
 
+        @Nullable
         private Instant startTime;
 
         private StopWatch(Clock clock) {
@@ -112,11 +113,10 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         }
 
         public Duration getElapsedDuration() {
+            if (this.startTime == null) {
+                return Duration.ZERO;  // when stopwatch has not started
+            }
             return Duration.between(this.startTime, this.clock.instant());
-        }
-
-        public boolean isStarted() {
-            return this.startTime != null;
         }
     }
 
@@ -185,18 +185,17 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
 
             Publisher<?> result = (Publisher<?>) this.methodInvocationStrategy.invoke(method, target, args);
 
-            return Flux.empty()
-                .doOnSubscribe(s -> {
-
+            return Flux.from(result)
+                .doFirst(() -> {
                     executionInfo.setThreadName(Thread.currentThread().getName());
                     executionInfo.setThreadId(Thread.currentThread().getId());
                     executionInfo.setProxyEventType(ProxyEventType.BEFORE_METHOD);
 
                     listener.beforeMethod(executionInfo);
-
+                })
+                .doOnSubscribe(s -> {
                     stopWatch.start();
                 })
-                .concatWith(result)
                 .map(resultObj -> {
 
                     // set produced object as result
@@ -219,7 +218,6 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
                     executionInfo.setThrown(throwable);
                 })
                 .doFinally(signalType -> {
-
                     executionInfo.setExecuteDuration(stopWatch.getElapsedDuration());
                     executionInfo.setThreadName(Thread.currentThread().getName());
                     executionInfo.setThreadId(Thread.currentThread().getId());
@@ -278,21 +276,18 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
 
         StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
 
-        Flux<? extends Result> queryExecutionFlux = Flux.empty()
-            .ofType(Result.class)
-            .doOnSubscribe(s -> {
-
+        Flux<? extends Result> queryExecutionFlux = Flux.from(flux)
+            .doFirst(() -> {
                 executionInfo.setThreadName(Thread.currentThread().getName());
                 executionInfo.setThreadId(Thread.currentThread().getId());
                 executionInfo.setCurrentMappedResult(null);
                 executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
 
                 listener.beforeQuery(executionInfo);
-
-                stopWatch.start();
-
             })
-            .concatWith(flux)
+            .doOnSubscribe(s -> {
+                stopWatch.start();
+            })
             .doOnNext(result -> {
                 // When at least one element is emitted, consider query execution is success, even when
                 // the publisher is canceled. see https://github.com/r2dbc/r2dbc-proxy/issues/55
@@ -305,7 +300,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
                 executionInfo.setSuccess(false);
             })
             .doFinally(signalType -> {
-                executionInfo.setExecuteDuration(stopWatch.isStarted() ? stopWatch.getElapsedDuration() : Duration.ZERO);
+                executionInfo.setExecuteDuration(stopWatch.getElapsedDuration());
                 executionInfo.setThreadName(Thread.currentThread().getName());
                 executionInfo.setThreadId(Thread.currentThread().getId());
                 executionInfo.setCurrentMappedResult(null);
