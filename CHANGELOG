@@ -4,6 +4,7 @@ R2DBC Proxy Changelog
 0.8.1.RELEASE
 ------------------
 * Make query execution success when at least one element is emitted #55.
+* Avoid NPE when publisher operation is cancelled #56.
 
 0.8.0.RELEASE
 ------------------
