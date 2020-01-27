@@ -193,6 +193,36 @@ public class CallbackHandlerSupportTest {
     }
 
     @Test
+    void interceptQueryExecutionWithImmediateCancel() {
+        LastExecutionAwareListener listener = new LastExecutionAwareListener();
+        MutableQueryExecutionInfo executionInfo = new MutableQueryExecutionInfo();
+
+        ProxyFactory proxyFactory = mock(ProxyFactory.class);
+
+        CompositeProxyExecutionListener compositeListener = new CompositeProxyExecutionListener(listener);
+        when(this.proxyConfig.getListeners()).thenReturn(compositeListener);
+        when(this.proxyConfig.getProxyFactory()).thenReturn(proxyFactory);
+
+        // produce single result
+        Result mockResult = MockResult.empty();
+        Mono<Result> resultPublisher = Mono.just(mockResult);
+
+        Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(resultPublisher, executionInfo);
+
+        // Cancels immediately
+        StepVerifier.create(result)
+            .thenCancel()
+            .verify();
+
+        assertThat(listener.getBeforeMethodExecutionInfo()).isNull();
+        assertThat(listener.getAfterMethodExecutionInfo()).isNull();
+        assertThat(listener.getBeforeQueryExecutionInfo()).isSameAs(executionInfo);
+        assertThat(listener.getAfterQueryExecutionInfo()).isSameAs(executionInfo);
+
+        assertThat(executionInfo.getExecuteDuration()).isEqualTo(Duration.ZERO);
+    }
+
+    @Test
     void interceptQueryExecutionWithMultipleResult() {
 
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
@@ -450,6 +480,42 @@ public class CallbackHandlerSupportTest {
         assertThat(afterMethodExecution.getThrown()).isSameAs(exception);
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    void proceedExecutionWithPublisherImmediateCancel() throws Throwable {
+
+        // target method returns Publisher
+        Method executeMethod = ReflectionUtils.findMethod(Batch.class, "execute");
+        Batch target = mock(Batch.class);
+        Object[] args = new Object[]{};
+        LastExecutionAwareListener listener = new LastExecutionAwareListener();
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+
+        // produce single result in order to trigger StepVerifier#consumeNextWith.
+        Result mockResult = MockResult.empty();
+        Mono<Result> publisher = Mono.just(mockResult);
+
+        doReturn(publisher).when(target).execute();
+
+        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null, null);
+
+        // verify method on target is invoked
+        verify(target).execute();
+
+        StepVerifier.create((Publisher<Result>) result)
+            .thenCancel()
+            .verify();
+
+
+        MethodExecutionInfo beforeMethodExecution = listener.getBeforeMethodExecutionInfo();
+        MethodExecutionInfo afterMethodExecution = listener.getAfterMethodExecutionInfo();
+        assertThat(afterMethodExecution).isSameAs(beforeMethodExecution);
+
+        assertThat(listener.getBeforeQueryExecutionInfo()).isNull();
+        assertThat(listener.getAfterQueryExecutionInfo()).isNull();
+
+        assertThat(afterMethodExecution.getExecuteDuration()).isEqualTo(Duration.ZERO);
+    }
 
     @Test
     void proceedExecutionWithNonPublisher() throws Throwable {
