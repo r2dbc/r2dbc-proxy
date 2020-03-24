@@ -40,7 +40,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>0.8.1.RELEASE</r2dbc-spi.version>
-        <reactor.version>Dysprosium-SR4</reactor.version>
+        <reactor.version>Dysprosium-SR6</reactor.version>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <mockito.version>3.1.0</mockito.version>
     </properties>
@@ -311,7 +311,7 @@
             </resource>
         </resources>
     </build>
-    
+
     <profiles>
 
         <profile>
