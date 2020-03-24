@@ -1,4 +1,4 @@
-# Reactive Relational Database Connectivity Proxy Framework [![Concourse CI](https://ci.spring.io/api/v1/teams/r2dbc/pipelines/r2dbc/jobs/r2dbc-proxy/badge)](https://ci.spring.io/teams/r2dbc/pipelines/r2dbc/jobs/r2dbc-proxy/) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy)
+# Reactive Relational Database Connectivity Proxy Framework [![Build Status](https://travis-ci.org/r2dbc/r2dbc-postgresql.svg?branch=master)](https://travis-ci.org/r2dbc/r2dbc-proxy) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy)
 
 This project contains the proxy framework of the [R2DBC SPI][r].
 
@@ -6,13 +6,13 @@ This project contains the proxy framework of the [R2DBC SPI][r].
 
 ### Maven configuration
 
-Artifacts can be found on [Maven Central](https://search.maven.org/search?q=r2dbc-proxy).
+Artifacts can be found on [Maven Central](https://search.maven.org/search?q=r2dbc-proxy):
 
 ```xml
 <dependency>
   <groupId>io.r2dbc</groupId>
   <artifactId>r2dbc-proxy</artifactId>
-  <version>0.8.0.RELEASE</version>
+  <version>${version}</version>
 </dependency>
 ```
 
@@ -424,8 +424,8 @@ ConnectionFactory proxyConnectionFactory =
 
 Having trouble with R2DBC? We'd love to help!
 
-* Check the [spec documentation](https://r2dbc.io/spec/0.8.0.RELEASE/spec/html/), and [Javadoc](https://r2dbc.io/spec/0.8.0.RELEASE/api/).
-* If you are upgrading, check out the [changelog](https://r2dbc.io/spec/0.8.0.RELEASE/CHANGELOG.txt) for "new and noteworthy" features.
+* Check the [spec documentation](https://r2dbc.io/spec/0.8.1.RELEASE/spec/html/), and [Javadoc](https://r2dbc.io/spec/0.8.1.RELEASE/api/).
+* If you are upgrading, check out the [changelog](https://r2dbc.io/spec/0.8.1.RELEASE/CHANGELOG.txt) for "new and noteworthy" features.
 * Ask a question - we monitor [stackoverflow.com](https://stackoverflow.com) for questions
   tagged with [`r2dbc`](https://stackoverflow.com/tags/r2dbc). 
   You can also chat with the community on [Gitter](https://gitter.im/r2dbc/r2dbc).
