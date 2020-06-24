@@ -89,7 +89,7 @@ pipeline {
 			script {
 				slackSend(
 						color: (currentBuild.currentResult == 'SUCCESS') ? 'good' : 'danger',
-						channel: '#r2dbc',
+						channel: '#r2dbc-dev',
 						message: "${currentBuild.fullDisplayName} - `${currentBuild.currentResult}`\n${env.BUILD_URL}")
 				emailext(
 						subject: "[${currentBuild.fullDisplayName}] ${currentBuild.currentResult}",
