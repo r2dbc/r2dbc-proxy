@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.util.function.BiFunction;
@@ -37,6 +39,7 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
         this.connectionFactory = Assert.requireNonNull(connectionFactory, "connectionFactory must not be null");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Assert.requireNonNull(proxy, "proxy must not be null");
@@ -51,7 +54,6 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
         BiFunction<Object, MutableMethodExecutionInfo, Object> onMap = null;
 
         if ("create".equals(methodName)) {
-
             // callback for creating connection proxy
             onMap = (resultObj, executionInfo) -> {
                 executionInfo.setResult(resultObj);
@@ -67,13 +69,23 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
                 executionInfo.setConnectionInfo(connectionInfo);
 
                 Connection proxyConnection = this.proxyConfig.getProxyFactory().wrapConnection(connection, connectionInfo);
-
                 return proxyConnection;
             };
-
         }
 
         Object result = proceedExecution(method, this.connectionFactory, args, this.proxyConfig.getListeners(), null, onMap, null);
+
+        if ("create".equals(methodName)) {
+            // gh-68:
+            // "proceedExecution" returns a Flux that has logic to performs before/after method callbacks.
+            // When "usingWhen" is used with "create" method (e.g.: "Mono.usingWhen(connectionFactory.create(), resourceClosure, ...)"),
+            // the calling order becomes "before-method", actual "create", "resource-closure", then "after-method".
+            // Instead, we want "before-method", actual "create", *"after-method"*, then "resource-closure"
+            // By wrapping the Flux with Mono, when a connection is emitted (onNext), the Mono sends "cancel" to the Flux which triggers
+            // "doFinally" on Flux and calls "after-method" callback before "resource-closure" is called.
+            return Mono.from((Publisher<? extends Connection>) result);
+        }
+
         return result;
     }
 

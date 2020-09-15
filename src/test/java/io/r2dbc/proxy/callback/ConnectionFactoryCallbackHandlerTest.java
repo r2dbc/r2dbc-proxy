@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
+import io.r2dbc.proxy.listener.LifeCycleListener;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
@@ -26,10 +27,17 @@ import io.r2dbc.spi.Wrapped;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.util.ReflectionUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -128,6 +136,78 @@ public class ConnectionFactoryCallbackHandlerTest {
 
         Object result = callback.invoke(connectionFactory, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(connectionFactory);
+    }
+
+    // gh-68
+    @Test
+    void createConnectionWithUsingWhen() throws Throwable {
+        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+        Connection mockedConnection = mock(Connection.class);
+        doReturn(Mono.just(mockedConnection)).when(connectionFactory).create();
+
+        List<String> list = Collections.synchronizedList(new ArrayList<>());
+        AtomicReference<Object> createdConnectionHolder = new AtomicReference<>();
+
+        LifeCycleListener listener = new LifeCycleListener() {
+
+            @Override
+            public void beforeCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+                list.add("listener-before-create");
+            }
+
+            @Override
+            public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+                createdConnectionHolder.set(methodExecutionInfo.getResult());
+                list.add("listener-after-create");
+            }
+        };
+
+        Function<? super Connection, ? extends Mono<String>> resourceClosure = (conn) -> {
+            list.add("resource-closure");
+            return Mono.just("foo");
+        };
+        Function<? super Connection, ? extends Publisher<?>> asyncComplete = (conn) -> {
+            list.add("async-complete");
+            return Mono.empty();
+        };
+        BiFunction<? super Connection, ? super Throwable, ? extends Publisher<?>> asyncError = (conn, thr) -> {
+            list.add("async-error");
+            return Mono.empty();
+        };
+        Function<? super Connection, ? extends Publisher<?>> asyncCancel = (conn) -> {
+            list.add("resource-cancel");
+            return Mono.empty();
+        };
+
+        ProxyConfig proxyConfig = ProxyConfig.builder()
+            .listener(listener)
+            .build();
+
+        ProxyFactory proxyFactory = proxyConfig.getProxyFactory();
+        ConnectionFactory proxyConnectionFactory = proxyFactory.wrapConnectionFactory(connectionFactory);
+
+        // Mono#usingWhen
+        Mono<String> mono = Mono.usingWhen(proxyConnectionFactory.create(), resourceClosure, asyncComplete, asyncError, asyncCancel);
+        StepVerifier.create(mono)
+            .expectSubscription()
+            .expectNextCount(1)
+            .verifyComplete();
+
+        assertThat(list).containsExactly("listener-before-create", "listener-after-create", "resource-closure", "async-complete");
+        assertThat(createdConnectionHolder).hasValue(mockedConnection);
+
+        list.clear();
+        createdConnectionHolder.set(null);
+
+        // Flux#usingWhen
+        Flux<String> flux = Flux.usingWhen(proxyConnectionFactory.create(), resourceClosure, asyncComplete, asyncError, asyncCancel);
+        StepVerifier.create(flux)
+            .expectSubscription()
+            .expectNextCount(1)
+            .verifyComplete();
+
+        assertThat(list).containsExactly("listener-before-create", "listener-after-create", "resource-closure", "async-complete");
+        assertThat(createdConnectionHolder).hasValue(mockedConnection);
     }
 
 }
