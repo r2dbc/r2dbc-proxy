@@ -170,6 +170,11 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
             return sb.toString(); // differentiate toString message.
         }
 
+        // special handling for "ProxyConfigHolder#getProxyConfig"
+        if ("getProxyConfig".equals(method.getName())) {
+            return this.proxyConfig;
+        }
+
 
         StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
 
