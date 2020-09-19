@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,20 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
+import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.proxy.test.MockStatementInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockBatch;
 import io.r2dbc.spi.test.MockConnection;
 import io.r2dbc.spi.test.MockConnectionFactory;
+import io.r2dbc.spi.test.MockResult;
 import io.r2dbc.spi.test.MockStatement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +42,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test for {@link JdkProxyFactory}.
+ *
  * @author Tadaya Tsuyukubo
  */
 public class JdkProxyFactoryTest {
@@ -64,30 +69,42 @@ public class JdkProxyFactoryTest {
         Connection connection = MockConnection.empty();
         Batch batch = MockBatch.empty();
         Statement statement = MockStatement.empty();
+        Result result = MockResult.empty();
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         StatementInfo statementInfo = MockStatementInfo.empty();
+        QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();  // need to be mutable
 
-        Object result;
+        Object wrapped;
 
-        result = this.proxyFactory.wrapConnectionFactory(connectionFactory);
-        assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
-        assertThat(result).isInstanceOf(Wrapped.class);
-        assertThat(result).isNotInstanceOf(ConnectionHolder.class);
+        wrapped = this.proxyFactory.wrapConnectionFactory(connectionFactory);
+        assertThat(Proxy.isProxyClass(wrapped.getClass())).isTrue();
+        assertThat(wrapped).isInstanceOf(Wrapped.class);
+        assertThat(wrapped).isNotInstanceOf(ConnectionHolder.class);
+        assertThat(wrapped).isInstanceOf(ProxyConfigHolder.class);
 
-        result = this.proxyFactory.wrapConnection(connection, connectionInfo);
-        assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
-        assertThat(result).isInstanceOf(Wrapped.class);
-        assertThat(result).isInstanceOf(ConnectionHolder.class);
+        wrapped = this.proxyFactory.wrapConnection(connection, connectionInfo);
+        assertThat(Proxy.isProxyClass(wrapped.getClass())).isTrue();
+        assertThat(wrapped).isInstanceOf(Wrapped.class);
+        assertThat(wrapped).isInstanceOf(ConnectionHolder.class);
+        assertThat(wrapped).isInstanceOf(ProxyConfigHolder.class);
 
-        result = this.proxyFactory.wrapBatch(batch, connectionInfo);
-        assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
-        assertThat(result).isInstanceOf(Wrapped.class);
-        assertThat(result).isInstanceOf(ConnectionHolder.class);
+        wrapped = this.proxyFactory.wrapBatch(batch, connectionInfo);
+        assertThat(Proxy.isProxyClass(wrapped.getClass())).isTrue();
+        assertThat(wrapped).isInstanceOf(Wrapped.class);
+        assertThat(wrapped).isInstanceOf(ConnectionHolder.class);
+        assertThat(wrapped).isInstanceOf(ProxyConfigHolder.class);
 
-        result = this.proxyFactory.wrapStatement(statement, statementInfo, connectionInfo);
-        assertThat(Proxy.isProxyClass(result.getClass())).isTrue();
-        assertThat(result).isInstanceOf(Wrapped.class);
-        assertThat(result).isInstanceOf(ConnectionHolder.class);
+        wrapped = this.proxyFactory.wrapStatement(statement, statementInfo, connectionInfo);
+        assertThat(Proxy.isProxyClass(wrapped.getClass())).isTrue();
+        assertThat(wrapped).isInstanceOf(Wrapped.class);
+        assertThat(wrapped).isInstanceOf(ConnectionHolder.class);
+        assertThat(wrapped).isInstanceOf(ProxyConfigHolder.class);
+
+        wrapped = this.proxyFactory.wrapResult(result, queryExecutionInfo);
+        assertThat(Proxy.isProxyClass(wrapped.getClass())).isTrue();
+        assertThat(wrapped).isInstanceOf(Wrapped.class);
+        assertThat(wrapped).isInstanceOf(ConnectionHolder.class);
+        assertThat(wrapped).isInstanceOf(ProxyConfigHolder.class);
     }
 
     @Test

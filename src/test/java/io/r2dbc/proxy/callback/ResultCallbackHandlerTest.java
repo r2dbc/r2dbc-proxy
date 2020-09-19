@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test for {@link ResultCallbackHandler}.
+ *
  * @author Tadaya Tsuyukubo
  */
 public class ResultCallbackHandlerTest {
@@ -49,6 +51,8 @@ public class ResultCallbackHandlerTest {
     private static Method MAP_METHOD = ReflectionUtils.findMethod(Result.class, "map", BiFunction.class);
 
     private static Method UNWRAP_METHOD = ReflectionUtils.findMethod(Wrapped.class, "unwrap");
+
+    private static Method GET_PROXY_CONFIG_METHOD = ReflectionUtils.findMethod(ProxyConfigHolder.class, "getProxyConfig");
 
 
     @Test
@@ -266,6 +270,18 @@ public class ResultCallbackHandlerTest {
 
         Object result = callback.invoke(mockResult, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(mockResult);
+    }
+
+    @Test
+    void getProxyConfig() throws Throwable {
+        Result mockResult = MockResult.empty();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
+
+        Object result = callback.invoke(mockResult, GET_PROXY_CONFIG_METHOD, null);
+        assertThat(result).isSameAs(proxyConfig);
     }
 
 }

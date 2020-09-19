@@ -46,6 +46,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test for {@link StatementCallbackHandler}.
+ *
  * @author Tadaya Tsuyukubo
  */
 public class StatementCallbackHandlerTest {
@@ -63,6 +65,8 @@ public class StatementCallbackHandlerTest {
     private static Method BIND_NULL_BY_NAME_METHOD = ReflectionUtils.findMethod(Statement.class, "bindNull", String.class, Class.class);
 
     private static Method UNWRAP_METHOD = ReflectionUtils.findMethod(Wrapped.class, "unwrap");
+
+    private static Method GET_PROXY_CONFIG_METHOD = ReflectionUtils.findMethod(ProxyConfigHolder.class, "getProxyConfig");
 
     @Test
     void add() throws Throwable {
@@ -371,6 +375,19 @@ public class StatementCallbackHandlerTest {
 
         Object result = callback.invoke(statement, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(statement);
+    }
+
+    @Test
+    void getProxyConfig() throws Throwable {
+        Statement statement = MockStatement.empty();
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+        ProxyConfig proxyConfig = new ProxyConfig();
+        StatementInfo statementInfo = MockStatementInfo.empty();
+
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(statement, GET_PROXY_CONFIG_METHOD, null);
+        assertThat(result).isSameAs(proxyConfig);
     }
 
 }

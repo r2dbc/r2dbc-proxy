@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
-import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
@@ -60,7 +60,7 @@ final class JdkProxyFactory implements ProxyFactory {
         CallbackHandler logic = new ConnectionFactoryCallbackHandler(connectionFactory, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (ConnectionFactory) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{ConnectionFactory.class, Wrapped.class}, invocationHandler);
+            new Class<?>[]{ConnectionFactory.class, Wrapped.class, ProxyConfigHolder.class}, invocationHandler);
     }
 
     @Override
@@ -71,7 +71,7 @@ final class JdkProxyFactory implements ProxyFactory {
         CallbackHandler logic = new ConnectionCallbackHandler(connection, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Connection) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Connection.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
+            new Class<?>[]{Connection.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class}, invocationHandler);
     }
 
     @Override
@@ -82,7 +82,7 @@ final class JdkProxyFactory implements ProxyFactory {
         CallbackHandler logic = new BatchCallbackHandler(batch, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Batch) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Batch.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
+            new Class<?>[]{Batch.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class}, invocationHandler);
     }
 
     @Override
@@ -94,7 +94,7 @@ final class JdkProxyFactory implements ProxyFactory {
         CallbackHandler logic = new StatementCallbackHandler(statement, statementInfo, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Statement) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Statement.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
+            new Class<?>[]{Statement.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class}, invocationHandler);
     }
 
     @Override
@@ -105,7 +105,7 @@ final class JdkProxyFactory implements ProxyFactory {
         CallbackHandler logic = new ResultCallbackHandler(result, queryExecutionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return (Result) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Result.class, Wrapped.class, ConnectionHolder.class}, invocationHandler);
+            new Class<?>[]{Result.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class}, invocationHandler);
     }
 
 
@@ -114,7 +114,7 @@ final class JdkProxyFactory implements ProxyFactory {
      */
     static class CallbackInvocationHandler implements InvocationHandler {
 
-        private CallbackHandler delegate;
+        private final CallbackHandler delegate;
 
         public CallbackInvocationHandler(CallbackHandler delegate) {
             Assert.requireNonNull(delegate, "delegate must not be null");

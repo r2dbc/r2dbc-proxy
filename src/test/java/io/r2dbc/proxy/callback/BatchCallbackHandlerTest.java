@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test for {@link BatchCallbackHandler}.
+ *
  * @author Tadaya Tsuyukubo
  */
 public class BatchCallbackHandlerTest {
@@ -46,6 +48,8 @@ public class BatchCallbackHandlerTest {
     private static Method EXECUTE_METHOD = ReflectionUtils.findMethod(Batch.class, "execute");
 
     private static Method UNWRAP_METHOD = ReflectionUtils.findMethod(Wrapped.class, "unwrap");
+
+    private static Method GET_PROXY_CONFIG_METHOD = ReflectionUtils.findMethod(ProxyConfigHolder.class, "getProxyConfig");
 
     @Test
     @SuppressWarnings("unchecked")
@@ -127,6 +131,18 @@ public class BatchCallbackHandlerTest {
         Object result = callback.invoke(proxyBatch, ADD_METHOD, new String[]{query1});
 
         assertThat(result).isSameAs(proxyBatch);
+    }
+
+    @Test
+    void getProxyConfig() throws Throwable {
+        Batch batch = mock(Batch.class);
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        BatchCallbackHandler callback = new BatchCallbackHandler(batch, connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(batch, GET_PROXY_CONFIG_METHOD, null);
+        assertThat(result).isSameAs(proxyConfig);
     }
 
 }

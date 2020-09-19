@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test for {@link ConnectionCallbackHandler}.
+ *
  * @author Tadaya Tsuyukubo
  */
 public class ConnectionCallbackHandlerTest {
@@ -57,6 +59,8 @@ public class ConnectionCallbackHandlerTest {
     private static Method CLOSE_METHOD = ReflectionUtils.findMethod(Connection.class, "close");
 
     private static Method UNWRAP_METHOD = ReflectionUtils.findMethod(Wrapped.class, "unwrap");
+
+    private static Method GET_PROXY_CONFIG_METHOD = ReflectionUtils.findMethod(ProxyConfigHolder.class, "getProxyConfig");
 
     @Test
     void createBatch() throws Throwable {
@@ -253,6 +257,18 @@ public class ConnectionCallbackHandlerTest {
 
         Object result = callback.invoke(connection, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(connection);
+    }
+
+    @Test
+    void getProxyConfig() throws Throwable {
+        Connection connection = mock(Connection.class);
+        DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(connection, GET_PROXY_CONFIG_METHOD, null);
+        assertThat(result).isSameAs(proxyConfig);
     }
 
 }

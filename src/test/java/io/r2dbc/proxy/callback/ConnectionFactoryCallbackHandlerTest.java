@@ -46,6 +46,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test for {@link ConnectionFactoryCallbackHandler}.
+ *
  * @author Tadaya Tsuyukubo
  */
 public class ConnectionFactoryCallbackHandlerTest {
@@ -55,6 +57,8 @@ public class ConnectionFactoryCallbackHandlerTest {
     private static Method GET_METADATA_METHOD = ReflectionUtils.findMethod(ConnectionFactory.class, "getMetadata");
 
     private static Method UNWRAP_METHOD = ReflectionUtils.findMethod(Wrapped.class, "unwrap");
+
+    private static Method GET_PROXY_CONFIG_METHOD = ReflectionUtils.findMethod(ProxyConfigHolder.class, "getProxyConfig");
 
     @Test
     void createConnection() throws Throwable {
@@ -208,6 +212,17 @@ public class ConnectionFactoryCallbackHandlerTest {
 
         assertThat(list).containsExactly("listener-before-create", "listener-after-create", "resource-closure", "async-complete");
         assertThat(createdConnectionHolder).hasValue(mockedConnection);
+    }
+
+    @Test
+    void getProxyConfig() throws Throwable {
+        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        ConnectionFactoryCallbackHandler callback = new ConnectionFactoryCallbackHandler(connectionFactory, proxyConfig);
+
+        Object result = callback.invoke(connectionFactory, GET_PROXY_CONFIG_METHOD, null);
+        assertThat(result).isSameAs(proxyConfig);
     }
 
 }
