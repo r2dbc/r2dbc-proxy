@@ -96,14 +96,14 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
     /**
      * Utility class to get duration of executions.
      */
-    private static class StopWatch {
+    static class StopWatch {
 
         private final Clock clock;
 
         @Nullable
         private Instant startTime;
 
-        private StopWatch(Clock clock) {
+        StopWatch(Clock clock) {
             this.clock = clock;
         }
 
@@ -267,58 +267,23 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
     /**
      * Augment query execution result to hook up listener lifecycle.
      *
-     * @param flux          query invocation result publisher
+     * @param publisher     query invocation result publisher
      * @param executionInfo query execution context info
      * @return query invocation result flux
      * @throws IllegalArgumentException if {@code flux} is {@code null}
      * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
-    protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> flux, MutableQueryExecutionInfo executionInfo) {
-        Assert.requireNonNull(flux, "flux must not be null");
+    protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> publisher, MutableQueryExecutionInfo executionInfo) {
+        Assert.requireNonNull(publisher, "flux must not be null");
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
-
-        ProxyExecutionListener listener = this.proxyConfig.getListeners();
-
-        StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
-
-        Flux<? extends Result> queryExecutionFlux = Flux.from(flux)
-            .doFirst(() -> {
-                executionInfo.setThreadName(Thread.currentThread().getName());
-                executionInfo.setThreadId(Thread.currentThread().getId());
-                executionInfo.setCurrentMappedResult(null);
-                executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
-
-                listener.beforeQuery(executionInfo);
-            })
-            .doOnSubscribe(s -> {
-                stopWatch.start();
-            })
-            .doOnNext(result -> {
-                // When at least one element is emitted, consider query execution is success, even when
-                // the publisher is canceled. see https://github.com/r2dbc/r2dbc-proxy/issues/55
-                executionInfo.setSuccess(true);
-            }).doOnComplete(() -> {
-                executionInfo.setSuccess(true);
-            })
-            .doOnError(throwable -> {
-                executionInfo.setThrowable(throwable);
-                executionInfo.setSuccess(false);
-            })
-            .doFinally(signalType -> {
-                executionInfo.setExecuteDuration(stopWatch.getElapsedDuration());
-                executionInfo.setThreadName(Thread.currentThread().getName());
-                executionInfo.setThreadId(Thread.currentThread().getId());
-                executionInfo.setCurrentMappedResult(null);
-                executionInfo.setProxyEventType(ProxyEventType.AFTER_QUERY);
-
-                listener.afterQuery(executionInfo);
-            });
 
         ProxyFactory proxyFactory = this.proxyConfig.getProxyFactory();
 
-        // return a publisher that returns proxy Result
-        return Flux.from(queryExecutionFlux)
+        Flux<? extends Result> flux = new FluxQueryInvocation(Flux.from(publisher), executionInfo, this.proxyConfig)
+            // return a publisher that returns proxy Result
             .flatMap(queryResult -> Mono.just(proxyFactory.wrapResult(queryResult, executionInfo)));
+
+        return flux;
 
     }
 
