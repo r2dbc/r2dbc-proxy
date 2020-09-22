@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,7 +243,7 @@ public class CallbackHandlerSupportTest {
         Result mockResult2 = mock(Result.class);
         Result mockResult3 = mock(Result.class);
         Flux<Result> publisher = Flux.just(mockResult1, mockResult2, mockResult3)
-            .doOnSubscribe(subscription -> {
+            .doOnRequest(subscription -> {
                 // this will be called AFTER listener.beforeQuery() but BEFORE emitting query result from this publisher.
                 // verify BEFORE_QUERY
                 assertThat(executionInfo.getProxyEventType()).isEqualTo(ProxyEventType.BEFORE_QUERY);
@@ -315,7 +315,7 @@ public class CallbackHandlerSupportTest {
 
         // produce multiple results
         Flux<Result> publisher = Flux.<Result>empty()
-            .doOnSubscribe(subscription -> {
+            .doOnRequest(subscription -> {
                 // this will be called AFTER listener.beforeQuery() but BEFORE emitting query result from this publisher.
                 // verify BEFORE_QUERY
                 assertThat(executionInfo.getProxyEventType()).isEqualTo(ProxyEventType.BEFORE_QUERY);
@@ -324,7 +324,6 @@ public class CallbackHandlerSupportTest {
                 assertThat(executionInfo.getCurrentResultCount()).isEqualTo(0);
                 assertThat(executionInfo.getCurrentMappedResult()).isNull();
             });
-        ;
 
         Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(publisher, executionInfo);
 
