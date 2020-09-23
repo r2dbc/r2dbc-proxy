@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.callback;
 
+import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
@@ -23,7 +24,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
-import java.util.function.BiFunction;
 
 /**
  * Proxy callback handler for {@link ConnectionFactory}.
@@ -51,41 +51,58 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
             return this.connectionFactory;
         }
 
-        BiFunction<Object, MutableMethodExecutionInfo, Object> onMap = null;
-
         if ("create".equals(methodName)) {
-            // callback for creating connection proxy
-            onMap = (resultObj, executionInfo) -> {
-                executionInfo.setResult(resultObj);
+            Object target = this.connectionFactory;
+            StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
 
-                Connection connection = (Connection) resultObj;  // original connection
-                String connectionId = this.proxyConfig.getConnectionIdManager().getId(connection);
+            // Method execution info
+            // Since Connection is not yet created, do not set ConnectionInfo
+            MutableMethodExecutionInfo executionInfo = new MutableMethodExecutionInfo();
+            executionInfo.setMethod(method);
+            executionInfo.setMethodArgs(args);
+            executionInfo.setTarget(target);
 
-                DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
-                connectionInfo.setConnectionId(connectionId);
-                connectionInfo.setClosed(false);
-                connectionInfo.setOriginalConnection(connection);
+            Publisher<?> result = (Publisher<?>) this.methodInvocationStrategy.invoke(method, target, args);
 
-                executionInfo.setConnectionInfo(connectionInfo);
+            // gh-68: Use special operator dedicated to "ConnectionFactory#create" method.
+            // Normally, method that returns a Publisher uses "proceedExecution(...)" from parent class. This method returns
+            // a "[Mono|Flux]MethodInvocation" that have logic to performs before/after method callbacks.
+            // However, when "ConnectionFactory#create" is used with "usingWhen",
+            // (e.g.: "Mono.usingWhen(connectionFactory.create(), resourceClosure, ...)"), the calling order becomes
+            // ["before-method", actual "create", "resource-closure", "after-method"].
+            // Instead, we want ["before-method", actual "create", *"after-method"*, "resource-closure"]
+            // Therefore, here uses special mono operator that does not invoke "afterMethod" in "onComplete".
+            // Then, use "doOnSuccess()" to call "afterMethod" callback. This way, "after-method" is performed
+            // before "resource-closure"
+            return new MonoMethodInvocationConnectionFactoryCreate(Mono.from(result), executionInfo, proxyConfig)
+                .map(resultObj -> {
+                    // set produced object as result
+                    executionInfo.setResult(resultObj);
 
-                Connection proxyConnection = this.proxyConfig.getProxyFactory().wrapConnection(connection, connectionInfo);
-                return proxyConnection;
-            };
+                    // construct ConnectionInfo and returns proxy Connection
+                    Connection connection = (Connection) resultObj;  // original connection
+                    String connectionId = this.proxyConfig.getConnectionIdManager().getId(connection);
+
+                    DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
+                    connectionInfo.setConnectionId(connectionId);
+                    connectionInfo.setClosed(false);
+                    connectionInfo.setOriginalConnection(connection);
+                    executionInfo.setConnectionInfo(connectionInfo);
+
+                    Connection proxyConnection = this.proxyConfig.getProxyFactory().wrapConnection(connection, connectionInfo);
+                    return proxyConnection;
+                })
+                .doOnSuccess((o) -> {
+                    // invoke "afterMethod" callback
+                    executionInfo.setExecuteDuration(stopWatch.getElapsedDuration());
+                    executionInfo.setThreadName(Thread.currentThread().getName());
+                    executionInfo.setThreadId(Thread.currentThread().getId());
+                    executionInfo.setProxyEventType(ProxyEventType.AFTER_METHOD);
+                    this.proxyConfig.getListeners().afterMethod(executionInfo);
+                });
         }
 
-        Object result = proceedExecution(method, this.connectionFactory, args, this.proxyConfig.getListeners(), null, onMap, null);
-
-        if ("create".equals(methodName)) {
-            // gh-68:
-            // "proceedExecution" returns a Flux that has logic to performs before/after method callbacks.
-            // When "usingWhen" is used with "create" method (e.g.: "Mono.usingWhen(connectionFactory.create(), resourceClosure, ...)"),
-            // the calling order becomes "before-method", actual "create", "resource-closure", then "after-method".
-            // Instead, we want "before-method", actual "create", *"after-method"*, then "resource-closure"
-            // By wrapping the Flux with Mono, when a connection is emitted (onNext), the Mono sends "cancel" to the Flux which triggers
-            // "doFinally" on Flux and calls "after-method" callback before "resource-closure" is called.
-            return Mono.from((Publisher<? extends Connection>) result);
-        }
-
+        Object result = proceedExecution(method, this.connectionFactory, args, this.proxyConfig.getListeners(), null, null);
         return result;
     }
 
