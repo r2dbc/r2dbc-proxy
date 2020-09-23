@@ -63,7 +63,7 @@ public final class BatchCallbackHandler extends CallbackHandlerSupport {
             return this.connectionInfo.getOriginalConnection();
         }
 
-        Object result = proceedExecution(method, this.batch, args, this.proxyConfig.getListeners(), this.connectionInfo, null, null);
+        Object result = proceedExecution(method, this.batch, args, this.proxyConfig.getListeners(), this.connectionInfo, null);
 
         if ("add".equals(methodName)) {
             this.queries.add((String) args[0]);

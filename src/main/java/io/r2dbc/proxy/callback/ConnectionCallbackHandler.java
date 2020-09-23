@@ -90,13 +90,13 @@ public final class ConnectionCallbackHandler extends CallbackHandlerSupport {
 
             // replace the query
             args[0] = updatedQuery;
-            Object result = proceedExecution(method, this.connection, args, this.proxyConfig.getListeners(), this.connectionInfo, null, onComplete);
+            Object result = proceedExecution(method, this.connection, args, this.proxyConfig.getListeners(), this.connectionInfo, null);
 
             return this.proxyConfig.getProxyFactory().wrapStatement((Statement) result, statementInfo, this.connectionInfo);
         }
         // TODO: createSavepoint, releaseSavepoint, rollbackTransactionToSavepoint
 
-        Object result = proceedExecution(method, this.connection, args, this.proxyConfig.getListeners(), this.connectionInfo, null, onComplete);
+        Object result = proceedExecution(method, this.connection, args, this.proxyConfig.getListeners(), this.connectionInfo, onComplete);
 
         if ("createBatch".equals(methodName)) {
             return this.proxyConfig.getProxyFactory().wrapBatch((Batch) result, this.connectionInfo);

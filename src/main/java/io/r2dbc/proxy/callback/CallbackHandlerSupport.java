@@ -35,7 +35,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toSet;
@@ -136,8 +135,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      * @param args           arguments for the method. {@code null} if the method doesn't take any arguments.
      * @param listener       listener that before/after method callbacks will be called
      * @param connectionInfo current connection information. {@code null} when invoked operation is not associated to the {@link Connection}.
-     * @param onMap          a callback that will be chained on "map()" right after the result of the method invocation
-     * @param onComplete     a callback that will be chained as the first doOnComplete on the result of the method invocation
+     * @param onComplete     a callback that will be invoked at successful termination(onComplete) of the result publisher.
      * @return result of invoking the original object
      * @throws Throwable                thrown exception during the invocation
      * @throws IllegalArgumentException if {@code method} is {@code null}
@@ -146,7 +144,6 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      */
     protected Object proceedExecution(Method method, Object target, @Nullable Object[] args,
                                       ProxyExecutionListener listener, @Nullable ConnectionInfo connectionInfo,
-                                      @Nullable BiFunction<Object, MutableMethodExecutionInfo, Object> onMap,
                                       @Nullable Consumer<MethodExecutionInfo> onComplete) throws Throwable {
         Assert.requireNonNull(method, "method must not be null");
         Assert.requireNonNull(target, "target must not be null");
@@ -187,51 +184,12 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         Class<?> returnType = method.getReturnType();
 
         if (Publisher.class.isAssignableFrom(returnType)) {
-
             Publisher<?> result = (Publisher<?>) this.methodInvocationStrategy.invoke(method, target, args);
-
-            return Flux.from(result)
-                .doFirst(() -> {
-                    executionInfo.setThreadName(Thread.currentThread().getName());
-                    executionInfo.setThreadId(Thread.currentThread().getId());
-                    executionInfo.setProxyEventType(ProxyEventType.BEFORE_METHOD);
-
-                    listener.beforeMethod(executionInfo);
-                })
-                .doOnSubscribe(s -> {
-                    stopWatch.start();
-                })
-                .map(resultObj -> {
-
-                    // set produced object as result
-                    executionInfo.setResult(resultObj);
-
-                    // apply a function to flux-chain right after the original publisher operations
-                    if (onMap != null) {
-                        return onMap.apply(resultObj, executionInfo);
-                    }
-                    return resultObj;
-                })
-                .doOnComplete(() -> {
-                    // apply a consumer to flux-chain right after the original publisher operations
-                    // this is the first chained doOnComplete on the result publisher
-                    if (onComplete != null) {
-                        onComplete.accept(executionInfo);
-                    }
-                })
-                .doOnError(throwable -> {
-                    executionInfo.setThrown(throwable);
-                })
-                .doFinally(signalType -> {
-                    executionInfo.setExecuteDuration(stopWatch.getElapsedDuration());
-                    executionInfo.setThreadName(Thread.currentThread().getName());
-                    executionInfo.setThreadId(Thread.currentThread().getId());
-                    executionInfo.setProxyEventType(ProxyEventType.AFTER_METHOD);
-
-                    listener.afterMethod(executionInfo);
-                });
-
-
+            if (result instanceof Mono) {
+                return new MonoMethodInvocation((Mono<?>) result, executionInfo, proxyConfig, onComplete);
+            } else {
+                return new FluxMethodInvocation(Flux.from(result), executionInfo, proxyConfig, onComplete);
+            }
         } else {
             // for method that generates non-publisher, execution happens when it is invoked.
 
