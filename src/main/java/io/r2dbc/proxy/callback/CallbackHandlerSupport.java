@@ -26,6 +26,7 @@ import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Operators;
 import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,6 +37,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -185,10 +187,13 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
 
         if (Publisher.class.isAssignableFrom(returnType)) {
             Publisher<?> result = (Publisher<?>) this.methodInvocationStrategy.invoke(method, target, args);
+            Function<? super Publisher<Object>, ? extends Publisher<Object>> transformer =
+                Operators.liftPublisher((publisher, subscriber) ->
+                    new MethodInvocationSubscriber(subscriber, executionInfo, proxyConfig, onComplete));
             if (result instanceof Mono) {
-                return new MonoMethodInvocation((Mono<?>) result, executionInfo, proxyConfig, onComplete);
+                return ((Mono<?>) result).cast(Object.class).transform(transformer);
             } else {
-                return new FluxMethodInvocation(Flux.from(result), executionInfo, proxyConfig, onComplete);
+                return Flux.from(result).cast(Object.class).transform(transformer);
             }
         } else {
             // for method that generates non-publisher, execution happens when it is invoked.
@@ -236,13 +241,14 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 
         ProxyFactory proxyFactory = this.proxyConfig.getProxyFactory();
+        Function<? super Publisher<Result>, ? extends Publisher<Result>> transformer =
+            Operators.liftPublisher((pub, subscriber) ->
+                new QueryInvocationSubscriber(subscriber, executionInfo, proxyConfig));
 
-        Flux<? extends Result> flux = new FluxQueryInvocation(Flux.from(publisher), executionInfo, this.proxyConfig)
-            // return a publisher that returns proxy Result
-            .flatMap(queryResult -> Mono.just(proxyFactory.wrapResult(queryResult, executionInfo)));
-
-        return flux;
-
+        return Flux.from(publisher)
+            .cast(Result.class)
+            .transform(transformer)
+            .map(queryResult -> proxyFactory.wrapResult(queryResult, executionInfo));
     }
 
     /**
