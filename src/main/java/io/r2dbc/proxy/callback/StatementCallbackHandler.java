@@ -97,7 +97,7 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
             BindParameterConverter.BindOperation onBind = () -> {
 
                 try {
-                    proceedExecution(method, this.statement, args, this.proxyConfig.getListeners(), this.connectionInfo, null, null);
+                    proceedExecution(method, this.statement, args, this.proxyConfig.getListeners(), this.connectionInfo, null);
                 } catch (Throwable throwable) {
                     throw new R2dbcProxyException("Failed to perform " + methodName, throwable);
                 }
@@ -127,7 +127,7 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
             return proxy;
         }
 
-        Object result = proceedExecution(method, this.statement, args, this.proxyConfig.getListeners(), this.connectionInfo, null, null);
+        Object result = proceedExecution(method, this.statement, args, this.proxyConfig.getListeners(), this.connectionInfo, null);
 
         // add, bind, bindNull, execute
         if ("add".equals(methodName)) {

@@ -26,6 +26,7 @@ import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Operators;
 import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -35,8 +36,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -96,14 +97,14 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
     /**
      * Utility class to get duration of executions.
      */
-    private static class StopWatch {
+    static class StopWatch {
 
         private final Clock clock;
 
         @Nullable
         private Instant startTime;
 
-        private StopWatch(Clock clock) {
+        StopWatch(Clock clock) {
             this.clock = clock;
         }
 
@@ -136,8 +137,7 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      * @param args           arguments for the method. {@code null} if the method doesn't take any arguments.
      * @param listener       listener that before/after method callbacks will be called
      * @param connectionInfo current connection information. {@code null} when invoked operation is not associated to the {@link Connection}.
-     * @param onMap          a callback that will be chained on "map()" right after the result of the method invocation
-     * @param onComplete     a callback that will be chained as the first doOnComplete on the result of the method invocation
+     * @param onComplete     a callback that will be invoked at successful termination(onComplete) of the result publisher.
      * @return result of invoking the original object
      * @throws Throwable                thrown exception during the invocation
      * @throws IllegalArgumentException if {@code method} is {@code null}
@@ -146,7 +146,6 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
      */
     protected Object proceedExecution(Method method, Object target, @Nullable Object[] args,
                                       ProxyExecutionListener listener, @Nullable ConnectionInfo connectionInfo,
-                                      @Nullable BiFunction<Object, MutableMethodExecutionInfo, Object> onMap,
                                       @Nullable Consumer<MethodExecutionInfo> onComplete) throws Throwable {
         Assert.requireNonNull(method, "method must not be null");
         Assert.requireNonNull(target, "target must not be null");
@@ -187,51 +186,15 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         Class<?> returnType = method.getReturnType();
 
         if (Publisher.class.isAssignableFrom(returnType)) {
-
             Publisher<?> result = (Publisher<?>) this.methodInvocationStrategy.invoke(method, target, args);
-
-            return Flux.from(result)
-                .doFirst(() -> {
-                    executionInfo.setThreadName(Thread.currentThread().getName());
-                    executionInfo.setThreadId(Thread.currentThread().getId());
-                    executionInfo.setProxyEventType(ProxyEventType.BEFORE_METHOD);
-
-                    listener.beforeMethod(executionInfo);
-                })
-                .doOnSubscribe(s -> {
-                    stopWatch.start();
-                })
-                .map(resultObj -> {
-
-                    // set produced object as result
-                    executionInfo.setResult(resultObj);
-
-                    // apply a function to flux-chain right after the original publisher operations
-                    if (onMap != null) {
-                        return onMap.apply(resultObj, executionInfo);
-                    }
-                    return resultObj;
-                })
-                .doOnComplete(() -> {
-                    // apply a consumer to flux-chain right after the original publisher operations
-                    // this is the first chained doOnComplete on the result publisher
-                    if (onComplete != null) {
-                        onComplete.accept(executionInfo);
-                    }
-                })
-                .doOnError(throwable -> {
-                    executionInfo.setThrown(throwable);
-                })
-                .doFinally(signalType -> {
-                    executionInfo.setExecuteDuration(stopWatch.getElapsedDuration());
-                    executionInfo.setThreadName(Thread.currentThread().getName());
-                    executionInfo.setThreadId(Thread.currentThread().getId());
-                    executionInfo.setProxyEventType(ProxyEventType.AFTER_METHOD);
-
-                    listener.afterMethod(executionInfo);
-                });
-
-
+            Function<? super Publisher<Object>, ? extends Publisher<Object>> transformer =
+                Operators.liftPublisher((publisher, subscriber) ->
+                    new MethodInvocationSubscriber(subscriber, executionInfo, proxyConfig, onComplete));
+            if (result instanceof Mono) {
+                return ((Mono<?>) result).cast(Object.class).transform(transformer);
+            } else {
+                return Flux.from(result).cast(Object.class).transform(transformer);
+            }
         } else {
             // for method that generates non-publisher, execution happens when it is invoked.
 
@@ -267,59 +230,25 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
     /**
      * Augment query execution result to hook up listener lifecycle.
      *
-     * @param flux          query invocation result publisher
+     * @param publisher     query invocation result publisher
      * @param executionInfo query execution context info
      * @return query invocation result flux
      * @throws IllegalArgumentException if {@code flux} is {@code null}
      * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
-    protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> flux, MutableQueryExecutionInfo executionInfo) {
-        Assert.requireNonNull(flux, "flux must not be null");
+    protected Flux<? extends Result> interceptQueryExecution(Publisher<? extends Result> publisher, MutableQueryExecutionInfo executionInfo) {
+        Assert.requireNonNull(publisher, "flux must not be null");
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 
-        ProxyExecutionListener listener = this.proxyConfig.getListeners();
-
-        StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
-
-        Flux<? extends Result> queryExecutionFlux = Flux.from(flux)
-            .doFirst(() -> {
-                executionInfo.setThreadName(Thread.currentThread().getName());
-                executionInfo.setThreadId(Thread.currentThread().getId());
-                executionInfo.setCurrentMappedResult(null);
-                executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
-
-                listener.beforeQuery(executionInfo);
-            })
-            .doOnSubscribe(s -> {
-                stopWatch.start();
-            })
-            .doOnNext(result -> {
-                // When at least one element is emitted, consider query execution is success, even when
-                // the publisher is canceled. see https://github.com/r2dbc/r2dbc-proxy/issues/55
-                executionInfo.setSuccess(true);
-            }).doOnComplete(() -> {
-                executionInfo.setSuccess(true);
-            })
-            .doOnError(throwable -> {
-                executionInfo.setThrowable(throwable);
-                executionInfo.setSuccess(false);
-            })
-            .doFinally(signalType -> {
-                executionInfo.setExecuteDuration(stopWatch.getElapsedDuration());
-                executionInfo.setThreadName(Thread.currentThread().getName());
-                executionInfo.setThreadId(Thread.currentThread().getId());
-                executionInfo.setCurrentMappedResult(null);
-                executionInfo.setProxyEventType(ProxyEventType.AFTER_QUERY);
-
-                listener.afterQuery(executionInfo);
-            });
-
         ProxyFactory proxyFactory = this.proxyConfig.getProxyFactory();
+        Function<? super Publisher<Result>, ? extends Publisher<Result>> transformer =
+            Operators.liftPublisher((pub, subscriber) ->
+                new QueryInvocationSubscriber(subscriber, executionInfo, proxyConfig));
 
-        // return a publisher that returns proxy Result
-        return Flux.from(queryExecutionFlux)
-            .flatMap(queryResult -> Mono.just(proxyFactory.wrapResult(queryResult, executionInfo)));
-
+        return Flux.from(publisher)
+            .cast(Result.class)
+            .transform(transformer)
+            .map(queryResult -> proxyFactory.wrapResult(queryResult, executionInfo));
     }
 
     /**
