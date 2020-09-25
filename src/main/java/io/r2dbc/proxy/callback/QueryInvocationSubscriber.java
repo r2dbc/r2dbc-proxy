@@ -18,9 +18,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
-import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Result;
-import io.r2dbc.spi.Statement;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
@@ -42,7 +40,7 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
 
     private final ProxyExecutionListener listener;
 
-    private final CallbackHandlerSupport.StopWatch stopWatch;
+    private final StopWatch stopWatch;
 
     private Subscription subscription;
 
@@ -50,7 +48,7 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
         this.delegate = delegate;
         this.executionInfo = executionInfo;
         this.listener = proxyConfig.getListeners();
-        this.stopWatch = new CallbackHandlerSupport.StopWatch(proxyConfig.getClock());
+        this.stopWatch = new StopWatch(proxyConfig.getClock());
     }
 
     @Override
