@@ -43,7 +43,7 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
 
     protected final ProxyExecutionListener listener;
 
-    protected final CallbackHandlerSupport.StopWatch stopWatch;
+    protected final StopWatch stopWatch;
 
     protected Subscription subscription;
 
@@ -54,7 +54,7 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
         this.delegate = delegate;
         this.executionInfo = executionInfo;
         this.listener = proxyConfig.getListeners();
-        this.stopWatch = new CallbackHandlerSupport.StopWatch(proxyConfig.getClock());
+        this.stopWatch = new StopWatch(proxyConfig.getClock());
         this.onComplete = onComplete;
     }
 

@@ -94,33 +94,6 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         }
     }
 
-    /**
-     * Utility class to get duration of executions.
-     */
-    static class StopWatch {
-
-        private final Clock clock;
-
-        @Nullable
-        private Instant startTime;
-
-        StopWatch(Clock clock) {
-            this.clock = clock;
-        }
-
-        public StopWatch start() {
-            this.startTime = this.clock.instant();
-            return this;
-        }
-
-        public Duration getElapsedDuration() {
-            if (this.startTime == null) {
-                return Duration.ZERO;  // when stopwatch has not started
-            }
-            return Duration.between(this.startTime, this.clock.instant());
-        }
-    }
-
     protected final ProxyConfig proxyConfig;
 
     protected MethodInvocationStrategy methodInvocationStrategy = DEFAULT_INVOCATION_STRATEGY;
