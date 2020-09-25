@@ -22,6 +22,7 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Operators;
 
 import java.lang.reflect.Method;
 
@@ -64,17 +65,19 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
 
             Publisher<?> result = (Publisher<?>) this.methodInvocationStrategy.invoke(method, target, args);
 
-            // gh-68: Use special operator dedicated to "ConnectionFactory#create" method.
-            // Normally, method that returns a Publisher uses "proceedExecution(...)" from parent class. This method returns
-            // a "[Mono|Flux]MethodInvocation" that have logic to performs before/after method callbacks.
+            // gh-68: Use special subscriber/subscription dedicated to "ConnectionFactory#create" method.
+            // Normally, method that returns a Publisher uses "proceedExecution(...)" from parent class which uses
+            // "MethodInvocationSubscriber" to perform before/after callback logic.
             // However, when "ConnectionFactory#create" is used with "usingWhen",
             // (e.g.: "Mono.usingWhen(connectionFactory.create(), resourceClosure, ...)"), the calling order becomes
             // ["before-method", actual "create", "resource-closure", "after-method"].
             // Instead, we want ["before-method", actual "create", *"after-method"*, "resource-closure"]
-            // Therefore, here uses special mono operator that does not invoke "afterMethod" in "onComplete".
-            // Then, use "doOnSuccess()" to call "afterMethod" callback. This way, "after-method" is performed
-            // before "resource-closure"
-            return new MonoMethodInvocationConnectionFactoryCreate(Mono.from(result), executionInfo, proxyConfig)
+            // Therefore, here uses special subscriber that does not invoke "afterMethod" in "onComplete".
+            // Then, instead, use "doOnSuccess()" chained to this mono to call the "afterMethod" callback.
+            // This way, "after-method" is performed before "resource-closure"
+            return Mono.from(result)
+                .transform(Operators.liftPublisher((publisher, subscriber) ->
+                    new ConnectionFactoryCreateMethodInvocationSubscriber(subscriber, executionInfo, proxyConfig)))
                 .map(resultObj -> {
                     // set produced object as result
                     executionInfo.setResult(resultObj);

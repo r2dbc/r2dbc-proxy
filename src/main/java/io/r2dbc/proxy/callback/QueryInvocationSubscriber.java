@@ -16,74 +16,70 @@
 
 package io.r2dbc.proxy.callback;
 
-import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.spi.Batch;
+import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Statement;
+import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
 import reactor.core.Fuseable;
 import reactor.core.Scannable;
 import reactor.util.annotation.Nullable;
 
-import java.util.function.Consumer;
-
 /**
- * Custom subscriber/subscription to invoke method callback.
- *
- * This also implements {@link Subscription} to handle cancel case, and
- * {@link Fuseable.QueueSubscription} to disable fusion.
+ * Custom subscriber/subscription to invoke query callback.
  *
  * @author Tadaya Tsuyukubo
+ * @see CallbackHandlerSupport#interceptQueryExecution(Publisher, MutableQueryExecutionInfo)
  */
-class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription, Scannable, Fuseable.QueueSubscription<Object> {
+class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription, Scannable, Fuseable.QueueSubscription<Result> {
 
-    protected final CoreSubscriber<Object> delegate;
+    private final CoreSubscriber<? super Result> delegate;
 
-    protected final MutableMethodExecutionInfo executionInfo;
+    private final MutableQueryExecutionInfo executionInfo;
 
-    protected final ProxyExecutionListener listener;
+    private final ProxyExecutionListener listener;
 
-    protected final CallbackHandlerSupport.StopWatch stopWatch;
+    private final CallbackHandlerSupport.StopWatch stopWatch;
 
-    protected Subscription subscription;
+    private Subscription subscription;
 
-    @Nullable
-    protected Consumer<MethodExecutionInfo> onComplete;
-
-    public MethodInvocationSubscriber(CoreSubscriber<Object> delegate, MutableMethodExecutionInfo executionInfo, ProxyConfig proxyConfig, @Nullable Consumer<MethodExecutionInfo> onComplete) {
+    public QueryInvocationSubscriber(CoreSubscriber<? super Result> delegate, MutableQueryExecutionInfo executionInfo, ProxyConfig proxyConfig) {
         this.delegate = delegate;
         this.executionInfo = executionInfo;
         this.listener = proxyConfig.getListeners();
         this.stopWatch = new CallbackHandlerSupport.StopWatch(proxyConfig.getClock());
-        this.onComplete = onComplete;
     }
 
     @Override
     public void onSubscribe(Subscription s) {
         this.subscription = s;
-        beforeMethod();
+        beforeQuery();
         this.delegate.onSubscribe(this);
     }
 
     @Override
-    public void onNext(Object object) {
-        this.executionInfo.setResult(object); // set produced object as result
-        this.delegate.onNext(object);
+    public void onNext(Result result) {
+        // When at least one element is emitted, consider query execution is success, even when
+        // the publisher is canceled. see https://github.com/r2dbc/r2dbc-proxy/issues/55
+        this.executionInfo.setSuccess(true);
+        this.delegate.onNext(result);
     }
 
     @Override
     public void onError(Throwable t) {
-        this.executionInfo.setThrown(t);
-        afterMethod();
+        this.executionInfo.setThrowable(t);
+        this.executionInfo.setSuccess(false);
+        afterQuery();
         this.delegate.onError(t);
     }
 
     @Override
     public void onComplete() {
-        if (this.onComplete != null) {
-            this.onComplete.accept(this.executionInfo);
-        }
-        afterMethod();
+        this.executionInfo.setSuccess(true);
+        afterQuery();
         this.delegate.onComplete();
     }
 
@@ -94,18 +90,19 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
 
     @Override
     public void cancel() {
-        afterMethod();
+        // do not determine success/failure by cancel
+        afterQuery();
         this.subscription.cancel();
     }
 
     @Override
     @Nullable
     @SuppressWarnings("rawtypes")
-    public Object scanUnsafe(Scannable.Attr key) {
-        if (key == Scannable.Attr.ACTUAL) {
+    public Object scanUnsafe(Attr key) {
+        if (key == Attr.ACTUAL) {
             return this.delegate;
         }
-        if (key == Scannable.Attr.PARENT) {
+        if (key == Attr.PARENT) {
             return this.subscription;
         }
         return null;
@@ -116,9 +113,8 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
         return Fuseable.NONE;
     }
 
-    @Nullable
     @Override
-    public Object poll() {
+    public Result poll() {
         return null;
     }
 
@@ -137,23 +133,25 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
 
     }
 
-    private void beforeMethod() {
+    private void beforeQuery() {
         this.executionInfo.setThreadName(Thread.currentThread().getName());
         this.executionInfo.setThreadId(Thread.currentThread().getId());
-        this.executionInfo.setProxyEventType(ProxyEventType.BEFORE_METHOD);
+        this.executionInfo.setCurrentMappedResult(null);
+        this.executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
 
         this.stopWatch.start();
 
-        this.listener.beforeMethod(this.executionInfo);
+        this.listener.beforeQuery(this.executionInfo);
     }
 
-    private void afterMethod() {
+    private void afterQuery() {
         this.executionInfo.setExecuteDuration(this.stopWatch.getElapsedDuration());
         this.executionInfo.setThreadName(Thread.currentThread().getName());
         this.executionInfo.setThreadId(Thread.currentThread().getId());
-        this.executionInfo.setProxyEventType(ProxyEventType.AFTER_METHOD);
+        this.executionInfo.setCurrentMappedResult(null);
+        this.executionInfo.setProxyEventType(ProxyEventType.AFTER_QUERY);
 
-        this.listener.afterMethod(this.executionInfo);
+        this.listener.afterQuery(this.executionInfo);
     }
 
 }
