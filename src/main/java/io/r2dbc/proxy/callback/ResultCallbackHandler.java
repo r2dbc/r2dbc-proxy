@@ -73,7 +73,7 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
             return connectionInfo.getOriginalConnection();
         }
 
-        Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null, null);
+        Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null);
 
         if ("map".equals(methodName)) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,7 +243,7 @@ public class CallbackHandlerSupportTest {
         Result mockResult2 = mock(Result.class);
         Result mockResult3 = mock(Result.class);
         Flux<Result> publisher = Flux.just(mockResult1, mockResult2, mockResult3)
-            .doOnSubscribe(subscription -> {
+            .doOnRequest(subscription -> {
                 // this will be called AFTER listener.beforeQuery() but BEFORE emitting query result from this publisher.
                 // verify BEFORE_QUERY
                 assertThat(executionInfo.getProxyEventType()).isEqualTo(ProxyEventType.BEFORE_QUERY);
@@ -315,7 +315,7 @@ public class CallbackHandlerSupportTest {
 
         // produce multiple results
         Flux<Result> publisher = Flux.<Result>empty()
-            .doOnSubscribe(subscription -> {
+            .doOnRequest(subscription -> {
                 // this will be called AFTER listener.beforeQuery() but BEFORE emitting query result from this publisher.
                 // verify BEFORE_QUERY
                 assertThat(executionInfo.getProxyEventType()).isEqualTo(ProxyEventType.BEFORE_QUERY);
@@ -324,7 +324,6 @@ public class CallbackHandlerSupportTest {
                 assertThat(executionInfo.getCurrentResultCount()).isEqualTo(0);
                 assertThat(executionInfo.getCurrentMappedResult()).isNull();
             });
-        ;
 
         Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(publisher, executionInfo);
 
@@ -371,6 +370,7 @@ public class CallbackHandlerSupportTest {
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+        when(this.proxyConfig.getListeners()).thenReturn(new CompositeProxyExecutionListener(listener));
 
         // produce single result in order to trigger StepVerifier#consumeNextWith.
         Result mockResult = MockResult.empty();
@@ -378,7 +378,7 @@ public class CallbackHandlerSupportTest {
 
         doReturn(publisher).when(target).execute();
 
-        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null, null);
+        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null);
 
         // verify method on target is invoked
         verify(target).execute();
@@ -434,6 +434,7 @@ public class CallbackHandlerSupportTest {
         Batch target = mock(Batch.class);
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
+        when(this.proxyConfig.getListeners()).thenReturn(new CompositeProxyExecutionListener(listener));
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
 
         // publisher that throws exception
@@ -442,7 +443,7 @@ public class CallbackHandlerSupportTest {
 
         doReturn(publisher).when(target).execute();
 
-        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null, null);
+        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null);
 
         // verify method on target is invoked
         verify(target).execute();
@@ -489,6 +490,7 @@ public class CallbackHandlerSupportTest {
         Batch target = mock(Batch.class);
         Object[] args = new Object[]{};
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
+        when(this.proxyConfig.getListeners()).thenReturn(new CompositeProxyExecutionListener(listener));
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
 
         // produce single result in order to trigger StepVerifier#consumeNextWith.
@@ -497,7 +499,7 @@ public class CallbackHandlerSupportTest {
 
         doReturn(publisher).when(target).execute();
 
-        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null, null);
+        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null);
 
         // verify method on target is invoked
         verify(target).execute();
@@ -532,7 +534,7 @@ public class CallbackHandlerSupportTest {
 
         doReturn(mockBatch).when(target).add("QUERY");
 
-        Object result = this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null, null);
+        Object result = this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null);
 
         // verify method on target is invoked
         verify(target).add("QUERY");
@@ -580,7 +582,7 @@ public class CallbackHandlerSupportTest {
         when(target.add("QUERY")).thenThrow(exception);
 
         assertThatThrownBy(() -> {
-            this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null, null);
+            this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null);
         }).isInstanceOf(RuntimeException.class);
 
         verify(target).add("QUERY");
@@ -634,19 +636,19 @@ public class CallbackHandlerSupportTest {
         Object result;
 
         // verify toString()
-        result = this.callbackHandlerSupport.proceedExecution(toStringMethod, target, null, listener, null, null, null);
+        result = this.callbackHandlerSupport.proceedExecution(toStringMethod, target, null, listener, null, null);
         assertThat(result).isEqualTo("MyStub-proxy [FOO]");
 
         // verify hashCode()
-        result = this.callbackHandlerSupport.proceedExecution(hashCodeMethod, target, null, listener, null, null, null);
+        result = this.callbackHandlerSupport.proceedExecution(hashCodeMethod, target, null, listener, null, null);
         assertThat(result).isEqualTo(target.hashCode());
 
         // verify equals() with null
-        result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{null}, listener, null, null, null);
+        result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{null}, listener, null, null);
         assertThat(result).isEqualTo(false);
 
         // verify equals() with target
-        result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{target}, listener, null, null, null);
+        result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{target}, listener, null, null);
         assertThat(result).isEqualTo(true);
     }
 
@@ -668,7 +670,7 @@ public class CallbackHandlerSupportTest {
             return resultMock;
         });
 
-        Object result = this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null, null);
+        Object result = this.callbackHandlerSupport.proceedExecution(addMethod, target, args, listener, connectionInfo, null);
 
         assertThat(result).isSameAs(resultMock);
 
