@@ -1,6 +1,14 @@
 R2DBC Proxy Changelog
 =============================
 
+0.8.3.RELEASE
+------------------
+* Use custom subscribers to manage callback #70
+* Add ProxyConfigHolder #69
+* Fix "ConnectionFactory#create" after-method callback #68
+* Rename master branch to main #67
+* Upgrade to Reactor Dysprosium-SR7 #66
+
 0.8.2.RELEASE
 ------------------
 * Upgrade build and test dependencies #65
