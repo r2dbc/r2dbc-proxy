@@ -1,6 +1,13 @@
 R2DBC Proxy Changelog
 =============================
 
+0.8.2.RELEASE
+------------------
+* Upgrade build and test dependencies #65
+* Release 0.8.2.RELEASE #64
+* Upgrade to Reactor Dysprosium-SR6 #63
+* Stage releases directly on maven central #62
+
 0.8.1.RELEASE
 ------------------
 * Make query execution success when at least one element is emitted #55.
