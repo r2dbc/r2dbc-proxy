@@ -47,10 +47,8 @@ public interface ProxyExecutionListener {
     }
 
     /**
-     * Called before execution of query.
-     *
-     * Query execution is {@link Batch#execute()} or {@link Statement#execute()}.
-     *
+     * Called before executing a query ({@link Batch#execute()} or {@link Statement#execute()}).
+     * <p>
      * Note: this callback is called when the publisher, result of the {@code execute()}, is being
      * subscribed. Not at the time of {@code execute()} is called,
      *
@@ -60,10 +58,20 @@ public interface ProxyExecutionListener {
     }
 
     /**
-     * Called after execution of query.
-     *
-     * Query execution is {@link Batch#execute()} or {@link Statement#execute()}.
-     *
+     * Called after executing a query ({@link Batch#execute()} or {@link Statement#execute()}).
+     * <p>
+     * The callback order is:
+     * <ul>
+     *     <li>{@link #beforeQuery(QueryExecutionInfo)}
+     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for 1st result
+     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for 2nd result
+     *     <li>...
+     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for Nth result
+     *     <li>{@link #afterQuery(QueryExecutionInfo)}
+     * </ul>
+     * {@link QueryExecutionInfo#getExecuteDuration()} is available in this callback and it holds
+     * the duration since {@link #beforeQuery(QueryExecutionInfo)}.
+     * <p>
      * Note: this callback is called when the publisher, result of the {@code execute()}, is being
      * subscribed. Not at the time of {@code execute()} is called,
      *
@@ -74,9 +82,10 @@ public interface ProxyExecutionListener {
 
     /**
      * Called on processing each query {@link io.r2dbc.spi.Result}.
-     *
+     * <p>
      * While processing query results with {@link io.r2dbc.spi.Result#map(BiFunction)}, this callback
      * is called per result.
+     * <p>
      * {@link QueryExecutionInfo#getCurrentMappedResult()} contains the mapped result.
      *
      * @param execInfo query execution context

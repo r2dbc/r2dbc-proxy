@@ -113,6 +113,9 @@ public interface QueryExecutionInfo {
 
     /**
      * Get the time that took queries to execute.
+     * <p>
+     * Duration is only populated in appropriate phase.
+     * (e.g.: {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)})
      *
      * @return query execution duration
      */
