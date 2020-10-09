@@ -3,6 +3,7 @@ R2DBC Proxy Changelog
 
 0.8.3.RELEASE
 ------------------
+* Introduce "ProxyMethodExecutionListener" and deprecate "LifeCycleListener" #72
 * Use custom subscribers to manage callback #70
 * Add ProxyConfigHolder #69
 * Fix "ConnectionFactory#create" after-method callback #68
