@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@ import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
+ * Test for {@link ProxyMethodExecutionListener}.
+ *
  * @author Tadaya Tsuyukubo
  */
-public class LifeCycleListenerTest {
+public class ProxyMethodExecutionListenerTest {
 
     @ParameterizedTest
     @ProxyClassesSource
-    @SuppressWarnings("deprecation")
     void verifyMethodNames(Class<?> clazz) {
 
         String className = clazz.getSimpleName();
@@ -47,11 +48,9 @@ public class LifeCycleListenerTest {
             })
             .collect(toSet());
 
-        Set<String> actual = Stream.of(LifeCycleListener.class.getDeclaredMethods())
-            .map(Method::getName)
-            .collect(toSet());
-
-        assertThat(actual).containsAll(expected);
+        assertThat(ProxyMethodExecutionListener.class.getDeclaredMethods())
+            .extracting(Method::getName)
+            .containsAll(expected);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.listener.BindParameterConverter;
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
-import io.r2dbc.proxy.listener.LifeCycleExecutionListener;
-import io.r2dbc.proxy.listener.LifeCycleListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.proxy.listener.ProxyMethodExecutionListener;
 import io.r2dbc.proxy.util.Assert;
 
 import java.time.Clock;
@@ -112,7 +111,7 @@ public class ProxyConfig {
     /**
      * Register {@link ProxyExecutionListener}.
      *
-     * @param listener listner to register
+     * @param listener a listener to register
      * @throws IllegalArgumentException if {@code proxyFactoryFactory} is {@code null}
      */
     public void addListener(ProxyExecutionListener listener) {
@@ -209,16 +208,18 @@ public class ProxyConfig {
         }
 
         /**
-         * Add a {@link LifeCycleListener}.
+         * Add a {@link io.r2dbc.proxy.listener.LifeCycleListener}.
          *
          * @param lifeCycleListener a listener to add
          * @return builder
          * @throws IllegalArgumentException if {@code listener} is {@code null}
+         * @deprecated Use {@link #listener(ProxyExecutionListener)} with {@link ProxyMethodExecutionListener}.
          */
-        public Builder listener(LifeCycleListener lifeCycleListener) {
+        @Deprecated
+        public Builder listener(io.r2dbc.proxy.listener.LifeCycleListener lifeCycleListener) {
             Assert.requireNonNull(lifeCycleListener, "lifeCycleListener must not be null");
 
-            return listener(LifeCycleExecutionListener.of(lifeCycleListener));
+            return listener(io.r2dbc.proxy.listener.LifeCycleExecutionListener.of(lifeCycleListener));
         }
 
         /**

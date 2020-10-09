@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package io.r2dbc.proxy.listener;
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
-import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
@@ -29,38 +28,49 @@ import io.r2dbc.spi.Statement;
 import java.lang.reflect.Method;
 
 /**
- * Provides explicit callbacks on all SPI invocations and query executions on given {@link LifeCycleListener}.
+ * Adapter to make {@link ProxyMethodExecutionListener} work as {@link ProxyExecutionListener}.
  *
  * @author Tadaya Tsuyukubo
- * @deprecated Use {@link ProxyMethodExecutionListener} and {@link ProxyMethodExecutionListenerAdapter}.
+ * @since 0.8.3
  */
-@Deprecated
-public final class LifeCycleExecutionListener implements ProxyExecutionListener {
+public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListener {
 
-    private final LifeCycleListener delegate;
+    private final ProxyMethodExecutionListener delegate;
 
-    public static LifeCycleExecutionListener of(LifeCycleListener lifeCycleListener) {
-        Assert.requireNonNull(lifeCycleListener, "lifeCycleListener must not be null");
-        return new LifeCycleExecutionListener(lifeCycleListener);
-    }
-
-    private LifeCycleExecutionListener(LifeCycleListener delegate) {
+    public ProxyMethodExecutionListenerAdapter(ProxyMethodExecutionListener delegate) {
         this.delegate = delegate;
     }
 
     @Override
     public void beforeMethod(MethodExecutionInfo executionInfo) {
         this.delegate.beforeMethod(executionInfo);
-        methodCallback(executionInfo, true);
+        invokeMethodCallback(executionInfo, true);
     }
 
     @Override
     public void afterMethod(MethodExecutionInfo executionInfo) {
-        methodCallback(executionInfo, false);
+        invokeMethodCallback(executionInfo, false);
         this.delegate.afterMethod(executionInfo);
     }
 
-    private void methodCallback(MethodExecutionInfo executionInfo, boolean isBefore) {
+    @Override
+    public void beforeQuery(QueryExecutionInfo execInfo) {
+        this.delegate.beforeQuery(execInfo);
+        invokeQueryCallback(execInfo, true);
+    }
+
+    @Override
+    public void afterQuery(QueryExecutionInfo execInfo) {
+        invokeQueryCallback(execInfo, false);
+        this.delegate.afterQuery(execInfo);
+    }
+
+    @Override
+    public void eachQueryResult(QueryExecutionInfo execInfo) {
+        this.delegate.eachQueryResult(execInfo);
+    }
+
+    private void invokeMethodCallback(MethodExecutionInfo executionInfo, boolean isBefore) {
         Method method = executionInfo.getMethod();
         String methodName = method.getName();
         Class<?> methodDeclaringClass = method.getDeclaringClass();
@@ -242,22 +252,9 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
                 }
             }
         }
-
     }
 
-    @Override
-    public void beforeQuery(QueryExecutionInfo execInfo) {
-        this.delegate.beforeQuery(execInfo);
-        queryCallback(execInfo, true);
-    }
-
-    @Override
-    public void afterQuery(QueryExecutionInfo execInfo) {
-        queryCallback(execInfo, false);
-        this.delegate.afterQuery(execInfo);
-    }
-
-    private void queryCallback(QueryExecutionInfo execInfo, boolean isBefore) {
+    private void invokeQueryCallback(QueryExecutionInfo execInfo, boolean isBefore) {
         ExecutionType executionType = execInfo.getType();
 
         if (executionType == ExecutionType.BATCH) {
@@ -275,8 +272,8 @@ public final class LifeCycleExecutionListener implements ProxyExecutionListener 
         }
     }
 
-    @Override
-    public void eachQueryResult(QueryExecutionInfo execInfo) {
-        this.delegate.onEachQueryResult(execInfo);
+    public ProxyMethodExecutionListener getDelegate() {
+        return this.delegate;
     }
+
 }
