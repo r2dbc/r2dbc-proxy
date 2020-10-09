@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,43 +23,37 @@ import io.r2dbc.proxy.test.MockMethodExecutionInfo;
 import io.r2dbc.proxy.test.MockQueryExecutionInfo;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
-import org.aopalliance.intercept.MethodInterceptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.springframework.aop.framework.ProxyFactory;
+import org.mockito.invocation.Invocation;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
-import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 
 /**
+ * Test for {@link ProxyMethodExecutionListenerAdapter}.
+ *
  * @author Tadaya Tsuyukubo
  */
-@SuppressWarnings("deprecation")
-public class LifeCycleExecutionListenerTest {
+public class ProxyMethodExecutionListenerAdapterTest {
 
     /**
-     * Test invoking {@link LifeCycleExecutionListener#beforeMethod(MethodExecutionInfo)} and
-     * {@link LifeCycleExecutionListener#afterMethod(MethodExecutionInfo)} invokes corresponding
-     * before/after methods defined on {@link LifeCycleListener}.
+     * Test to verify invocation on delegated {@link ProxyMethodExecutionListener} by calling
+     * {@link ProxyMethodExecutionListenerAdapter#beforeMethod(MethodExecutionInfo)} and
+     * {@link ProxyMethodExecutionListenerAdapter#afterMethod(MethodExecutionInfo)}.
      *
-     * @param clazz class that datasource-proxy-r2dbc creates proxy
+     * @param clazz class that r2dbc-proxy creates a proxy
      */
     @ParameterizedTest
     @ProxyClassesSource
     void methodInvocations(Class<?> clazz) {
         String className = clazz.getSimpleName();
-
-        List<Method> invokedMethods = new ArrayList<>();
-        LifeCycleListener lifeCycleListener = createLifeCycleListener(invokedMethods);
-        LifeCycleExecutionListener listener = LifeCycleExecutionListener.of(lifeCycleListener);
-
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method methodToInvoke : declaredMethods) {
             String methodName = methodToInvoke.getName();
@@ -73,50 +67,42 @@ public class LifeCycleExecutionListenerTest {
                 .method(methodToInvoke)
                 .build();
 
+            ProxyMethodExecutionListener methodListener = mock(ProxyMethodExecutionListener.class);
+            ProxyExecutionListener listener = new ProxyMethodExecutionListenerAdapter(methodListener);
+
             // invoke beforeMethod()
             listener.beforeMethod(methodExecutionInfo);
 
-            // first method is beforeMethod
-            // second method is beforeXxxOnYyy
-            assertThat(invokedMethods)
+            // ProxyMethodExecutionListenerAdapter#beforeMethod calls its delegate in this order:
+            // - "beforeMethod"
+            // - "beforeXxxOnYyy"
+            assertThat(mockingDetails(methodListener).getInvocations())
                 .hasSize(2)
+                .extracting(Invocation::getMethod)
                 .extracting(Method::getName)
-                .containsExactly("beforeMethod", expectedBeforeMethodName)
-            ;
-
-            // extra check for beforeXxxOnYyy
-            Method beforeXxxOnYyy = invokedMethods.get(1);
-            assertThat(beforeXxxOnYyy.getDeclaringClass()).isEqualTo(LifeCycleListener.class);
+                .containsExactly("beforeMethod", expectedBeforeMethodName);
 
             // reset
-            invokedMethods.clear();
+            clearInvocations(methodListener);
 
             listener.afterMethod(methodExecutionInfo);
 
-            // first method is afterXxxOnYyy
-            // second method is afterMethod
-            assertThat(invokedMethods)
+            // ProxyMethodExecutionListenerAdapter#afterMethod calls its delegate in this order:
+            // - "afterXxxOnYyy"
+            // - "afterMethod"
+            assertThat(mockingDetails(methodListener).getInvocations())
                 .hasSize(2)
+                .extracting(Invocation::getMethod)
                 .extracting(Method::getName)
-                .containsExactly(expectedAfterMethodName, "afterMethod")
-            ;
-
-            // extra check for afterXxxOnYyy
-            Method afterXxxOnYyy = invokedMethods.get(0);
-            assertThat(afterXxxOnYyy.getDeclaringClass()).isEqualTo(LifeCycleListener.class);
-
-            // reset
-            invokedMethods.clear();
+                .containsExactly(expectedAfterMethodName, "afterMethod");
         }
 
     }
 
     @Test
     void queryExecution() {
-
-        List<Method> invokedMethods = new ArrayList<>();
-        LifeCycleListener lifeCycleListener = createLifeCycleListener(invokedMethods);
-        LifeCycleExecutionListener listener = LifeCycleExecutionListener.of(lifeCycleListener);
+        ProxyMethodExecutionListener methodListener = mock(ProxyMethodExecutionListener.class);
+        ProxyExecutionListener listener = new ProxyMethodExecutionListenerAdapter(methodListener);
 
         QueryExecutionInfo queryExecutionInfo;
 
@@ -127,18 +113,15 @@ public class LifeCycleExecutionListenerTest {
 
         // test beforeQuery
         listener.beforeQuery(queryExecutionInfo);
-        verifyQueryExecutionInvocation(invokedMethods, "beforeQuery", "beforeExecuteOnStatement");
+        verifyQueryExecutionInvocation(methodListener, "beforeQuery", "beforeExecuteOnStatement");
 
-        invokedMethods.clear();
+        clearInvocations(methodListener);
 
         // test afterQuery
         listener.afterQuery(queryExecutionInfo);
-        verifyQueryExecutionInvocation(invokedMethods, "afterExecuteOnStatement", "afterQuery");
+        verifyQueryExecutionInvocation(methodListener, "afterExecuteOnStatement", "afterQuery");
 
-        assertThat(invokedMethods.get(0).getDeclaringClass()).isEqualTo(LifeCycleListener.class);
-        assertThat(invokedMethods.get(1).getDeclaringClass()).isEqualTo(LifeCycleListener.class);
-
-        invokedMethods.clear();
+        clearInvocations(methodListener);
 
 
         // for Batch#execute
@@ -148,44 +131,26 @@ public class LifeCycleExecutionListenerTest {
 
         // test beforeQuery
         listener.beforeQuery(queryExecutionInfo);
-        verifyQueryExecutionInvocation(invokedMethods, "beforeQuery", "beforeExecuteOnBatch");
-        invokedMethods.clear();
+        verifyQueryExecutionInvocation(methodListener, "beforeQuery", "beforeExecuteOnBatch");
+
+        clearInvocations(methodListener);
 
         // test afterQuery
         listener.afterQuery(queryExecutionInfo);
-        verifyQueryExecutionInvocation(invokedMethods, "afterExecuteOnBatch", "afterQuery");
-
+        verifyQueryExecutionInvocation(methodListener, "afterExecuteOnBatch", "afterQuery");
     }
 
-    private void verifyQueryExecutionInvocation(List<Method> invokedMethods, String... expectedMethodNames) {
-        assertThat(invokedMethods)
+    private void verifyQueryExecutionInvocation(ProxyMethodExecutionListener mockListener, String... expectedMethodNames) {
+        assertThat(mockingDetails(mockListener).getInvocations())
             .hasSize(2)
+            .extracting(Invocation::getMethod)
             .extracting(Method::getName)
-            .containsExactly(expectedMethodNames)
-        ;
-
-        assertThat(invokedMethods.get(0).getDeclaringClass()).isEqualTo(LifeCycleListener.class);
-        assertThat(invokedMethods.get(1).getDeclaringClass()).isEqualTo(LifeCycleListener.class);
-
+            .containsExactly(expectedMethodNames);
     }
 
-    private LifeCycleListener createLifeCycleListener(List<Method> invokedMethods) {
-        // use spring aop framework to create a proxy of LifeCycleListener that just keeps the
-        // invoked methods
-        MethodInterceptor interceptor = invocation -> {
-            invokedMethods.add(invocation.getMethod());
-            return null;  // don't proceed the proxy
-        };
-
-        ProxyFactory proxyFactory = new ProxyFactory();
-        proxyFactory.addAdvice(interceptor);
-        proxyFactory.addInterface(LifeCycleListener.class);
-        return (LifeCycleListener) proxyFactory.getProxy();
-    }
 
     @Test
     void methodInvocationWithConcreteClass() {
-
         // just declare an abstract class to get Method object
         abstract class MyConnectionFactory implements ConnectionFactory {
 
@@ -195,9 +160,8 @@ public class LifeCycleExecutionListenerTest {
             }
         }
 
-        List<Method> invokedMethods = new ArrayList<>();
-        LifeCycleListener lifeCycleListener = createLifeCycleListener(invokedMethods);
-        LifeCycleExecutionListener listener = LifeCycleExecutionListener.of(lifeCycleListener);
+        ProxyMethodExecutionListener methodListener = mock(ProxyMethodExecutionListener.class);
+        ProxyExecutionListener listener = new ProxyMethodExecutionListenerAdapter(methodListener);
 
         Method getMetadataMethod = ReflectionUtils.findMethod(MyConnectionFactory.class, "getMetadata");
 
@@ -212,14 +176,13 @@ public class LifeCycleExecutionListenerTest {
         // test beforeQuery
         listener.beforeMethod(methodExecutionInfo);
 
-        Set<String> invokedMethodNames = invokedMethods.stream().map(Method::getName).collect(toSet());
-
-        assertThat(invokedMethodNames).contains("beforeGetMetadataOnConnectionFactory");
-
+        assertThat(mockingDetails(methodListener).getInvocations())
+            .extracting(Invocation::getMethod)
+            .extracting(Method::getName)
+            .contains("beforeGetMetadataOnConnectionFactory");
     }
 
 
     // TODO: add test for onEachQueryResult
-
 
 }

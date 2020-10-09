@@ -247,9 +247,31 @@ Users can write own logic that performs any actions, such as audit logging, send
 notifications, calling external system, etc.
 
 
+## Implementing custom listener
+
+In order to create a custom listener, simply implement `ProxyExecutionListener` or `ProxyMethodExecutionListener`
+interface.
+
+```java
+static class MyListener implements ProxyMethodExecutionListener {
+	@Override
+	public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+		System.out.println("connection created");
+	}
+}
+```
+
+```java
+ConnectionFactory proxyConnectionFactory =
+    ProxyConnectionFactory.builder(connectionFactory)
+    	.listener(new MyListener())
+		.build();
+```
+
+
 ## API
 
-Currently, there are two listener interfaces - `ProxyExecutionListener` and `LifeCycleListener`.
+Currently, there are two listener interfaces - `ProxyExecutionListener` and `ProxyMethodExecutionListener`.
 These listeners define callback APIs for method and query executions.
 
 Formatters are used for converting execution information object to `String`.
@@ -287,17 +309,17 @@ and `afterQuery()`.(Specifically, when returned result-publisher is subscribed.)
 `eachQueryResult()` is called on each mapped query result when `Result#map()` is subscribed.
 
 
-### LifeCycleListener
+### ProxyMethodExecutionListener
 
-`LifeCycleListener` provides before/after methods for all methods defined on `ConnectionFactory`,
-`Connection`, `Batch`, `Statement`, and `Result`, as well as method executions(`beforeMethod`, `afterMethod`),
-query executions(`beforeQuery`, `afterQuery`) and result processing(`onEachQueryResult`).
-This listener is built on top of method and query interceptor API on `ProxyExecutionListener`.
+`ProxyMethodExecutionListener` is an extension of `ProxyExecutionListener`.
+In addition to the methods defined in `ProxyExecutionListener`, `ProxyMethodExecutionListener` provides
+before/after methods for all methods defined on `ConnectionFactory`, `Connection`, `Batch`,
+`Statement`, and `Result`.
 
 For example, if you want know the creation of connection and close of it:
 
 ```java
-public class ConnectionStartToEndListener implements LifeCycleListener {
+public class ConnectionStartToEndListener implements ProxyMethodExecutionListener {
 
   @Override
   public void beforeCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {

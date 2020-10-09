@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package io.r2dbc.proxy.listener;
 
-import java.util.function.BiFunction;
-
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.spi.Batch;
@@ -28,15 +26,18 @@ import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.ValidationDepth;
 
+import java.util.function.BiFunction;
+
 /**
- * Provides callback methods for each SPI call.
+ * Listener interface called back when corresponding method on proxy is invoked.
+ *
+ * This interface extends {@link ProxyExecutionListener} interface and provides
+ * explicit before/after callback on each method on proxy.
  *
  * @author Tadaya Tsuyukubo
- * @see LifeCycleExecutionListener
- * @deprecated Use {@link ProxyMethodExecutionListener}
+ * @since 0.8.3
  */
-@Deprecated
-public interface LifeCycleListener {
+public interface ProxyMethodExecutionListener extends ProxyExecutionListener {
 
     //
     // for ConnectionFactory
@@ -524,79 +525,6 @@ public interface LifeCycleListener {
      * @param queryExecutionInfo the current query execution info; never {@code null}.
      */
     default void afterExecuteOnStatement(QueryExecutionInfo queryExecutionInfo) {
-    }
-
-    //
-    // processing query result
-    //
-
-    /**
-     * Query result processing callback that is invoked on each query result while processed by {@link Result#map(BiFunction)}.
-     *
-     * @param queryExecutionInfo the current query execution info; never {@code null}.
-     */
-    default void onEachQueryResult(QueryExecutionInfo queryExecutionInfo) {
-
-    }
-
-    //
-    // For every method
-    //
-
-    /**
-     * Called at every method invocation.
-     *
-     * When any methods on proxied classes are called, this callback is called first. Then, corresponding
-     * beforeXxxOnYyy callback will be called.
-     *
-     * Analogous to {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)}
-     *
-     * @param methodExecutionInfo method execution info
-     */
-    default void beforeMethod(MethodExecutionInfo methodExecutionInfo) {
-    }
-
-    /**
-     * Called at every method invocation.
-     *
-     * When any methods on proxied classes are called and after actual method is invoked, corresponding
-     * afterXxxOnYyy callback is called, then this callback method will be invoked.
-     *
-     * Analogous to {@link ProxyExecutionListener#afterMethod(MethodExecutionInfo)}
-     *
-     * @param methodExecutionInfo method execution info
-     */
-    default void afterMethod(MethodExecutionInfo methodExecutionInfo) {
-    }
-
-    //
-    // For every query
-    //
-
-    /**
-     * Called before execution of query.
-     *
-     * When query is executed, this callback method is called first, then {@link #beforeExecuteOnStatement(QueryExecutionInfo)}
-     * or {@link #beforeExecuteOnBatch(QueryExecutionInfo)} will be called.
-     *
-     * Analogous to {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)}
-     *
-     * @param queryExecutionInfo query execution info
-     */
-    default void beforeQuery(QueryExecutionInfo queryExecutionInfo) {
-    }
-
-    /**
-     * Called after execution of query.
-     *
-     * When query is executed, after original method is called, then {@link #afterExecuteOnStatement(QueryExecutionInfo)}
-     * or {@link #afterExecuteOnBatch(QueryExecutionInfo)}, then this method is invoked.
-     *
-     * Analogous to {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}
-     *
-     * @param queryExecutionInfo query execution info
-     */
-    default void afterQuery(QueryExecutionInfo queryExecutionInfo) {
     }
 
 }

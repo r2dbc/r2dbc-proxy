@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,10 @@ import io.r2dbc.proxy.test.MockQueryExecutionInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -47,7 +50,6 @@ public class CompositeProxyExecutionListenerTest {
 
     @Test
     void beforeMethod() {
-
         MethodExecutionInfo executionInfo = MockMethodExecutionInfo.builder()
             .proxyEventType(ProxyEventType.BEFORE_METHOD)
             .build();
@@ -61,7 +63,6 @@ public class CompositeProxyExecutionListenerTest {
 
     @Test
     void afterMethod() {
-
         MethodExecutionInfo executionInfo = MockMethodExecutionInfo.builder()
             .proxyEventType(ProxyEventType.AFTER_METHOD)
             .build();
@@ -75,7 +76,6 @@ public class CompositeProxyExecutionListenerTest {
 
     @Test
     void beforeQuery() {
-
         QueryExecutionInfo executionInfo = MockQueryExecutionInfo.empty();
 
         this.compositeListener.beforeQuery(executionInfo);
@@ -86,27 +86,58 @@ public class CompositeProxyExecutionListenerTest {
 
     @Test
     void afterQuery() {
-
         QueryExecutionInfo executionInfo = MockQueryExecutionInfo.empty();
 
         this.compositeListener.afterQuery(executionInfo);
 
         assertThat(this.listener1.getAfterQueryExecutionInfo()).isSameAs(executionInfo);
         assertThat(this.listener2.getAfterQueryExecutionInfo()).isSameAs(executionInfo);
-
     }
 
     @Test
     void eachQueryResult() {
-
         QueryExecutionInfo executionInfo = MockQueryExecutionInfo.empty();
 
         this.compositeListener.eachQueryResult(executionInfo);
 
         assertThat(this.listener1.getEachQueryResultExecutionInfo()).isSameAs(executionInfo);
         assertThat(this.listener2.getEachQueryResultExecutionInfo()).isSameAs(executionInfo);
-
     }
 
+
+    @Test
+    void add() {
+        ProxyExecutionListener proxyListener = mock(ProxyExecutionListener.class);
+        ProxyMethodExecutionListener proxyMethodListener = mock(ProxyMethodExecutionListener.class);
+
+        CompositeProxyExecutionListener composite = new CompositeProxyExecutionListener();
+        composite.add(proxyListener);
+        composite.add(proxyMethodListener);
+
+        assertThat(composite.getListeners()).hasSize(2);
+        assertThat(composite.getListeners()).first().isSameAs(proxyListener);
+
+        assertThat(composite.getListeners()).element(1)
+            .isInstanceOfSatisfying(ProxyMethodExecutionListenerAdapter.class, adapter -> {
+                assertThat(adapter.getDelegate()).isSameAs(proxyMethodListener);
+            });
+    }
+
+    @Test
+    void addAll() {
+        ProxyExecutionListener proxyListener = mock(ProxyExecutionListener.class);
+        ProxyMethodExecutionListener proxyMethodListener = mock(ProxyMethodExecutionListener.class);
+
+        CompositeProxyExecutionListener composite = new CompositeProxyExecutionListener();
+        composite.addAll(Arrays.asList(proxyListener, proxyMethodListener));
+
+        assertThat(composite.getListeners()).hasSize(2);
+        assertThat(composite.getListeners()).first().isSameAs(proxyListener);
+
+        assertThat(composite.getListeners()).element(1)
+            .isInstanceOfSatisfying(ProxyMethodExecutionListenerAdapter.class, adapter -> {
+                assertThat(adapter.getDelegate()).isSameAs(proxyMethodListener);
+            });
+    }
 
 }

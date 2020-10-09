@@ -17,7 +17,6 @@
 
 package io.r2dbc.proxy;
 
-import io.r2dbc.proxy.listener.LifeCycleListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.ConnectionFactories;
@@ -119,6 +118,7 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
         return builder.build();
     }
 
+    @SuppressWarnings("deprecation")
     private void registerProxyListeners(Object optionValue, ProxyConnectionFactory.Builder builder) {
         if (optionValue instanceof Collection) {
             ((Collection<?>) optionValue).forEach(element -> registerProxyListeners(element, builder));
@@ -129,8 +129,8 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
             registerProxyListenerClass((Class<?>) optionValue, builder);
         } else if (optionValue instanceof ProxyExecutionListener) {
             builder.listener((ProxyExecutionListener) optionValue);
-        } else if (optionValue instanceof LifeCycleListener) {
-            builder.listener((LifeCycleListener) optionValue);
+        } else if (optionValue instanceof io.r2dbc.proxy.listener.LifeCycleListener) {
+            builder.listener((io.r2dbc.proxy.listener.LifeCycleListener) optionValue);
         } else {
             throw new IllegalArgumentException(optionValue + " is not a proxy listener instance");
         }
