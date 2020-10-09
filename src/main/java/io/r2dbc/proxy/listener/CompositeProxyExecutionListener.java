@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,9 @@ public class CompositeProxyExecutionListener implements ProxyExecutionListener {
     public boolean add(ProxyExecutionListener listener) {
         Assert.requireNonNull(listener, "listener must not be null");
 
+        if (listener instanceof ProxyMethodExecutionListener) {
+            return this.listeners.add(new ProxyMethodExecutionListenerAdapter((ProxyMethodExecutionListener) listener));
+        }
         return this.listeners.add(listener);
     }
 
@@ -85,8 +88,11 @@ public class CompositeProxyExecutionListener implements ProxyExecutionListener {
      */
     public boolean addAll(Collection<ProxyExecutionListener> listeners) {
         Assert.requireNonNull(listeners, "listeners must not be null");
-
-        return this.listeners.addAll(listeners);
+        boolean result = false;
+        for (ProxyExecutionListener listener : listeners) {
+            result |= add(listener);  // perform "ProxyMethodExecutionListener" conversion
+        }
+        return result;
     }
 
     /**

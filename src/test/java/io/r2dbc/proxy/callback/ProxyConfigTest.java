@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.listener.LifeCycleListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.proxy.listener.ProxyMethodExecutionListener;
+import io.r2dbc.proxy.listener.ProxyMethodExecutionListenerAdapter;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
@@ -52,7 +54,6 @@ public class ProxyConfigTest {
 
     @Test
     void builder() {
-
         ConnectionIdManager connectionIdManager = mock(ConnectionIdManager.class);
         Clock clock = mock(Clock.class);
         ProxyExecutionListener listener = mock(ProxyExecutionListener.class);
@@ -85,6 +86,47 @@ public class ProxyConfigTest {
         assertThat(proxyConfig.getClock()).isNotNull();
         assertThat(proxyConfig.getListeners()).isNotNull();
         assertThat(proxyConfig.getProxyFactory()).isNotNull();
+    }
+
+    @Test
+    void builderWithProxyMethodExecutionListener() {
+        ProxyMethodExecutionListener methodListener = mock(ProxyMethodExecutionListener.class);
+
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(methodListener).build();
+        assertThat(proxyConfig.getListeners().getListeners())
+            .hasSize(1)
+            .first()
+            .isInstanceOfSatisfying(ProxyMethodExecutionListenerAdapter.class, listener -> {
+                assertThat(listener.getDelegate()).isSameAs(methodListener);
+            });
+    }
+
+    @Test
+    void addListener() {
+        ProxyConfig proxyConfig = ProxyConfig.builder().build();
+
+        ProxyExecutionListener listener = mock(ProxyExecutionListener.class);
+        proxyConfig.addListener(listener);
+
+        assertThat(proxyConfig.getListeners().getListeners())
+            .hasSize(1)
+            .first()
+            .isSameAs(listener);
+    }
+
+    @Test
+    void addListenerWithProxyMethodExecutionListener() {
+        ProxyConfig proxyConfig = ProxyConfig.builder().build();
+
+        ProxyMethodExecutionListener methodListener = mock(ProxyMethodExecutionListener.class);
+        proxyConfig.addListener(methodListener);
+
+        assertThat(proxyConfig.getListeners().getListeners())
+            .hasSize(1)
+            .first()
+            .isInstanceOfSatisfying(ProxyMethodExecutionListenerAdapter.class, listener -> {
+                assertThat(listener.getDelegate()).isSameAs(methodListener);
+            });
     }
 
 }
