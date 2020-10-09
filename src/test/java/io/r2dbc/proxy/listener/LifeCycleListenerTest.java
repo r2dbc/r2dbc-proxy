@@ -33,6 +33,7 @@ public class LifeCycleListenerTest {
 
     @ParameterizedTest
     @ProxyClassesSource
+    @SuppressWarnings("deprecation")
     void verifyMethodNames(Class<?> clazz) {
 
         String className = clazz.getSimpleName();

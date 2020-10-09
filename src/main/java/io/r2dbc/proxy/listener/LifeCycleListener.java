@@ -33,7 +33,9 @@ import io.r2dbc.spi.ValidationDepth;
  *
  * @author Tadaya Tsuyukubo
  * @see LifeCycleExecutionListener
+ * @deprecated Use {@link ProxyMethodExecutionListener}
  */
+@Deprecated
 public interface LifeCycleListener {
 
     //
