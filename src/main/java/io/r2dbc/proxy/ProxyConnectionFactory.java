@@ -20,9 +20,8 @@ package io.r2dbc.proxy;
 import io.r2dbc.proxy.callback.ProxyConfig;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
-import io.r2dbc.proxy.listener.LifeCycleExecutionListener;
-import io.r2dbc.proxy.listener.LifeCycleListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.proxy.listener.ProxyMethodExecutionListener;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.ConnectionFactory;
 
@@ -229,16 +228,18 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Register a {@link LifeCycleListener}.
+         * Register a {@link io.r2dbc.proxy.listener.LifeCycleListener}.
          *
          * @param lifeCycleListener a listener to register
          * @return builder
          * @throws IllegalArgumentException if {@code lifeCycleListener} is {@code null}
+         * @deprecated Use {@link #listener(ProxyExecutionListener)} with {@link ProxyMethodExecutionListener}
          */
-        public Builder listener(LifeCycleListener lifeCycleListener) {
+        @Deprecated
+        public Builder listener(io.r2dbc.proxy.listener.LifeCycleListener lifeCycleListener) {
             Assert.requireNonNull(lifeCycleListener, "lifeCycleListener must not be null");
 
-            this.listener(LifeCycleExecutionListener.of(lifeCycleListener));
+            this.listener(io.r2dbc.proxy.listener.LifeCycleExecutionListener.of(lifeCycleListener));
             return this;
         }
 

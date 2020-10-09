@@ -16,8 +16,6 @@
 
 package io.r2dbc.proxy.listener;
 
-import java.lang.reflect.Method;
-
 import io.r2dbc.proxy.core.ExecutionType;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
@@ -28,12 +26,15 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
 
+import java.lang.reflect.Method;
+
 /**
  * Provides explicit callbacks on all SPI invocations and query executions on given {@link LifeCycleListener}.
  *
  * @author Tadaya Tsuyukubo
- * @see LifeCycleListener
+ * @deprecated Use {@link ProxyMethodExecutionListener} and {@link ProxyMethodExecutionListenerAdapter}.
  */
+@Deprecated
 public final class LifeCycleExecutionListener implements ProxyExecutionListener {
 
     private final LifeCycleListener delegate;

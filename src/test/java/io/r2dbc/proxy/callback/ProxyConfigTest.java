@@ -17,7 +17,6 @@
 
 package io.r2dbc.proxy.callback;
 
-import io.r2dbc.proxy.listener.LifeCycleListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.listener.ProxyMethodExecutionListener;
 import io.r2dbc.proxy.listener.ProxyMethodExecutionListenerAdapter;
@@ -53,11 +52,12 @@ public class ProxyConfigTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     void builder() {
         ConnectionIdManager connectionIdManager = mock(ConnectionIdManager.class);
         Clock clock = mock(Clock.class);
         ProxyExecutionListener listener = mock(ProxyExecutionListener.class);
-        LifeCycleListener lifeCycleListener = mock(LifeCycleListener.class);
+        io.r2dbc.proxy.listener.LifeCycleListener lifeCycleListener = mock(io.r2dbc.proxy.listener.LifeCycleListener.class);
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
         ProxyFactoryFactory proxyFactoryFactory = config -> proxyFactory;
 
