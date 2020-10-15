@@ -1,4 +1,4 @@
-# Reactive Relational Database Connectivity Proxy Framework [![Build Status](https://travis-ci.org/r2dbc/r2dbc-postgresql.svg?branch=main)](https://travis-ci.org/r2dbc/r2dbc-proxy) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy)
+# Reactive Relational Database Connectivity Proxy Framework [![Java CI with Maven](https://github.com/r2dbc/r2dbc-proxy/workflows/Java%20CI%20with%20Maven/badge.svg?branch=main)](https://github.com/r2dbc/r2dbc-proxy/actions?query=workflow%3A%22Java+CI+with+Maven%22+branch%3Amain) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy)
 
 This project contains the proxy framework of the [R2DBC SPI][r].
 
@@ -31,9 +31,9 @@ If you'd rather like the latest snapshots of the upcoming major version, use our
 </dependency>
 
 <repository>
-  <id>spring-libs-snapshot</id>
-  <name>Spring Snapshot Repository</name>
-  <url>https://repo.spring.io/libs-snapshot</url>
+  <id>sonatype-nexus-snapshots</id>
+  <name>Sonatype OSS Snapshot Repository</name>
+  <url>https://oss.sonatype.org/content/repositories/snapshots</url>
 </repository>
 ```
 
@@ -44,7 +44,7 @@ Configuration of the `ConnectionFactory` can be accomplished in two ways:
 ```java
 ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder()
    .option(DRIVER, "proxy")
-   .option(PROTOCOL, "proxy")
+   .option(PROTOCOL, "postgresql")
    .build());
 
 Mono<Connection> connection = connectionFactory.create();
@@ -482,6 +482,10 @@ You don't need to build from source to use R2DBC Proxy (binaries in Maven Centra
 If you want to build with the regular `mvn` command, you will need [Maven v3.5.0 or above](https://maven.apache.org/run-maven/index.html).
 
 _Also see [CONTRIBUTING.adoc](https://github.com/r2dbc/.github/blob/main/CONTRIBUTING.adoc) if you wish to submit pull requests, and in particular please sign the [Contributor's Agreement](https://cla.pivotal.io/sign/reactor) before your first change, however trivial._
+
+## Staging to Maven Central
+
+To stage a release to Maven Central, you need to create a release tag (release version) that contains the desired state and version numbers (`mvn versions:set versions:commit -q -o -DgenerateBackupPoms=false -DnewVersion=x.y.z.(RELEASE|Mnnn|RCnnn`) and force-push it to the `release-0.x` branch. This push will trigger a Maven staging build (see `build-and-deploy-to-maven-central.sh`).
 
 ## License
 This project is released under version 2.0 of the [Apache License][l].
