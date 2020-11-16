@@ -1,8 +1,9 @@
 # Reactive Relational Database Connectivity Proxy Framework [![Java CI with Maven](https://github.com/r2dbc/r2dbc-proxy/workflows/Java%20CI%20with%20Maven/badge.svg?branch=main)](https://github.com/r2dbc/r2dbc-proxy/actions?query=workflow%3A%22Java+CI+with+Maven%22+branch%3Amain) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy)
 
-This project contains the proxy framework of the [R2DBC SPI][r].
+This project contains the proxy framework of the [R2DBC SPI][r]. R2DBC is a [Reactive Foundation][rf] project.
 
 [r]: https://github.com/r2dbc/r2dbc-spi
+[rf]: https://reactive.foundation
 
 ## Code of Conduct
 
@@ -481,7 +482,7 @@ You don't need to build from source to use R2DBC Proxy (binaries in Maven Centra
 
 If you want to build with the regular `mvn` command, you will need [Maven v3.5.0 or above](https://maven.apache.org/run-maven/index.html).
 
-_Also see [CONTRIBUTING.adoc](https://github.com/r2dbc/.github/blob/main/CONTRIBUTING.adoc) if you wish to submit pull requests, and in particular please sign the [Contributor's Agreement](https://cla.pivotal.io/sign/reactor) before your first change, however trivial._
+_Also see [CONTRIBUTING.adoc](https://github.com/r2dbc/.github/blob/main/CONTRIBUTING.adoc) if you wish to submit pull requests. Commits require `Signed-off-by` (`git commit -s`) to ensure [Developer Certificate of Origin](https://developercertificate.org/)._
 
 ## Staging to Maven Central
 
