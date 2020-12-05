@@ -59,8 +59,7 @@ final class JdkProxyFactory implements ProxyFactory {
 
         CallbackHandler logic = new ConnectionFactoryCallbackHandler(connectionFactory, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-        return (ConnectionFactory) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{ConnectionFactory.class, Wrapped.class, ProxyConfigHolder.class}, invocationHandler);
+        return createProxy(invocationHandler, ConnectionFactory.class, Wrapped.class, ProxyConfigHolder.class);
     }
 
     @Override
@@ -70,8 +69,7 @@ final class JdkProxyFactory implements ProxyFactory {
 
         CallbackHandler logic = new ConnectionCallbackHandler(connection, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-        return (Connection) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Connection.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class}, invocationHandler);
+        return createProxy(invocationHandler, Connection.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
     }
 
     @Override
@@ -81,8 +79,7 @@ final class JdkProxyFactory implements ProxyFactory {
 
         CallbackHandler logic = new BatchCallbackHandler(batch, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-        return (Batch) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Batch.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class}, invocationHandler);
+        return createProxy(invocationHandler, Batch.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
     }
 
     @Override
@@ -93,8 +90,7 @@ final class JdkProxyFactory implements ProxyFactory {
 
         CallbackHandler logic = new StatementCallbackHandler(statement, statementInfo, connectionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-        return (Statement) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Statement.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class}, invocationHandler);
+        return createProxy(invocationHandler, Statement.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
     }
 
     @Override
@@ -104,10 +100,13 @@ final class JdkProxyFactory implements ProxyFactory {
 
         CallbackHandler logic = new ResultCallbackHandler(result, queryExecutionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-        return (Result) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-            new Class<?>[]{Result.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class}, invocationHandler);
+        return createProxy(invocationHandler, Result.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
     }
 
+    @SuppressWarnings("unchecked")
+    protected <T> T createProxy(InvocationHandler invocationHandler, Class<?>... interfaces) {
+        return (T) Proxy.newProxyInstance(getClass().getClassLoader(), interfaces, invocationHandler);
+    }
 
     /**
      * {@link InvocationHandler} implementation that delegates to {@link CallbackHandler}.
