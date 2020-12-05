@@ -36,9 +36,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Proxy;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -135,6 +138,31 @@ public class JdkProxyFactoryTest {
         expected = getExpectedToString(statement);
         assertThat(result.toString()).isEqualTo(expected);
 
+    }
+
+    @Test
+    void noThreadContextClassloader() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+
+        AtomicReference<Exception> exHolder = new AtomicReference<>();
+        Runnable logic = () -> {
+            try {
+                this.proxyFactory.wrapConnectionFactory(MockConnectionFactory.empty());
+            } catch (Exception ex) {
+                exHolder.set(ex);
+            }
+            latch.countDown();
+        };
+
+        ClassLoader classLoader = mock(ClassLoader.class);
+        Thread thread = new Thread(logic);
+        thread.setContextClassLoader(classLoader);
+        thread.start();
+
+        latch.await();
+
+        assertThat(exHolder.get()).isNull();
+        verifyNoInteractions(classLoader);
     }
 
     private String getExpectedToString(Object target) {
