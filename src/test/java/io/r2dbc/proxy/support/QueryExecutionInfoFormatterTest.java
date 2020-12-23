@@ -26,19 +26,30 @@ import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.proxy.test.MockQueryExecutionInfo;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
+import io.r2dbc.spi.Parameter;
+import io.r2dbc.spi.Parameters;
+import io.r2dbc.spi.R2dbcType;
+import io.r2dbc.spi.Type;
 import io.r2dbc.spi.test.MockBlob;
 import io.r2dbc.spi.test.MockClob;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static io.r2dbc.proxy.core.Bindings.indexBinding;
 import static io.r2dbc.proxy.core.Bindings.namedBinding;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -544,6 +555,26 @@ public class QueryExecutionInfoFormatterTest {
         assertThat(result).isEqualTo("Bindings:[($0=<blob>,$1=<clob>)]");
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(BoundValueParameterProvider.class)
+    void boundValueParameter(Parameter parameter, String expected) {
+        QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
+        formatter.showBindings();
+
+        Bindings bindings = new Bindings();
+        bindings.addIndexBinding(indexBinding(0, BoundValue.value(parameter)));
+
+        QueryInfo queryInfo = new QueryInfo("SELECT 1");
+        queryInfo.getBindingsList().addAll(Collections.singletonList(bindings));
+
+        QueryExecutionInfo executionInfo = MockQueryExecutionInfo.builder()
+            .queries(Collections.singletonList(queryInfo))
+            .build();
+
+        String result = formatter.format(executionInfo);
+        assertThat(result).isEqualTo(expected);
+    }
+
     @Test
     void indexBindings() {
         QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
@@ -595,6 +626,95 @@ public class QueryExecutionInfoFormatterTest {
 
         result = formatter.format(execInfoWithNamedBindings);
         assertThat(result).isEqualTo("Bindings:[(FOO)]");
+    }
+
+    static class BoundValueParameterProvider implements ArgumentsProvider {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+            Blob blob = MockBlob.empty();
+            Clob clob = MockClob.empty();
+            return Stream.of(
+                // in parameters
+                arguments(Parameters.in(R2dbcType.BOOLEAN), "Bindings:[(null(in,BOOLEAN))]"),
+                arguments(Parameters.in(String.class), "Bindings:[(null(in,String))]"),
+                arguments(Parameters.in("FOO"), "Bindings:[(FOO(in,String))]"),
+                arguments(Parameters.in(R2dbcType.INTEGER, 10), "Bindings:[(10(in,INTEGER))]"),
+                arguments(Parameters.in(R2dbcType.DOUBLE, null), "Bindings:[(null(in,DOUBLE))]"),
+                // clob/blob
+                arguments(Parameters.in(Clob.class), "Bindings:[(null(in,Clob))]"),
+                arguments(Parameters.in(clob), "Bindings:[(<clob>(in,MockClob))]"),
+                arguments(Parameters.in(R2dbcType.CLOB, clob), "Bindings:[(<clob>(in,CLOB))]"),
+                arguments(Parameters.in(Blob.class), "Bindings:[(null(in,Blob))]"),
+                arguments(Parameters.in(blob), "Bindings:[(<blob>(in,MockBlob))]"),
+                arguments(Parameters.in(R2dbcType.BLOB, blob), "Bindings:[(<blob>(in,BLOB))]"),
+                // custom type
+                arguments(Parameters.in(new ClassCustomType()), "Bindings:[(null(in,CustomJavaType))]"),
+                arguments(Parameters.in(EnumCustomType.ENUM_CUSTOM_FOO), "Bindings:[(null(in,ENUM_CUSTOM_FOO))]"),
+                arguments(Parameters.in(ClassCustomType.class), "Bindings:[(null(in,ClassCustomType))]"),
+                arguments(Parameters.in(new ClassCustomType(), "abc"), "Bindings:[(abc(in,CustomJavaType))]"),
+                arguments(Parameters.in(EnumCustomType.ENUM_CUSTOM_FOO, "abc"), "Bindings:[(abc(in,ENUM_CUSTOM_FOO))]"),
+
+                // out parameters
+                arguments(Parameters.out(R2dbcType.BOOLEAN), "Bindings:[(null(out,BOOLEAN))]"),
+                arguments(Parameters.out(String.class), "Bindings:[(null(out,String))]"),
+                arguments(Parameters.out("FOO"), "Bindings:[(FOO(out,String))]"),
+                arguments(Parameters.out(R2dbcType.INTEGER, 10), "Bindings:[(10(out,INTEGER))]"),
+                arguments(Parameters.out(R2dbcType.DOUBLE, null), "Bindings:[(null(out,DOUBLE))]"),
+                // clob/blob
+                arguments(Parameters.out(Clob.class), "Bindings:[(null(out,Clob))]"),
+                arguments(Parameters.out(clob), "Bindings:[(<clob>(out,MockClob))]"),
+                arguments(Parameters.out(R2dbcType.CLOB, clob), "Bindings:[(<clob>(out,CLOB))]"),
+                arguments(Parameters.out(Blob.class), "Bindings:[(null(out,Blob))]"),
+                arguments(Parameters.out(blob), "Bindings:[(<blob>(out,MockBlob))]"),
+                arguments(Parameters.out(R2dbcType.BLOB, blob), "Bindings:[(<blob>(out,BLOB))]"),
+                // custom type
+                arguments(Parameters.out(new ClassCustomType()), "Bindings:[(null(out,CustomJavaType))]"),
+                arguments(Parameters.out(EnumCustomType.ENUM_CUSTOM_FOO), "Bindings:[(null(out,ENUM_CUSTOM_FOO))]"),
+                arguments(Parameters.out(ClassCustomType.class), "Bindings:[(null(out,ClassCustomType))]"),
+                arguments(Parameters.out(new ClassCustomType(), "abc"), "Bindings:[(abc(out,CustomJavaType))]"),
+                arguments(Parameters.out(EnumCustomType.ENUM_CUSTOM_FOO, "abc"), "Bindings:[(abc(out,ENUM_CUSTOM_FOO))]")
+
+            );
+        }
+    }
+
+    static class ClassCustomType implements Type {
+
+        @Override
+        public Class<?> getJavaType() {
+            return CustomJavaType.class;
+        }
+
+        @Override
+        public String getName() {
+            return "custom-name";
+        }
+
+    }
+
+    static class CustomJavaType {
+
+    }
+
+    enum EnumCustomType implements Type {
+        ENUM_CUSTOM_FOO(CustomJavaType.class);
+
+        private final Class<?> javaType;
+
+        EnumCustomType(Class<?> javaType) {
+            this.javaType = javaType;
+        }
+
+        @Override
+        public Class<?> getJavaType() {
+            return this.javaType;
+        }
+
+        @Override
+        public String getName() {
+            return name();
+        }
     }
 
 }

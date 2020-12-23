@@ -26,7 +26,9 @@ import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
+import io.r2dbc.spi.Parameter;
 import io.r2dbc.spi.Statement;
+import io.r2dbc.spi.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,14 +172,50 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
             sb.append(")");
         } else {
             Object value = boundValue.getValue();
-            if (value instanceof Clob) {
-                sb.append("<clob>");
-            } else if (value instanceof Blob) {
-                sb.append("<blob>");
+            if (value instanceof Parameter) {
+                this.onBoundValueParameter.accept((Parameter) value, sb);
             } else {
-                sb.append(value);
+                this.onBoundValueRaw.accept(value, sb);
             }
         }
+    };
+
+    /**
+     * Default implementation for formatting actual value of bound value.
+     *
+     * <p> Example: "100", "Foo", "&lt;clob&gt;".
+     */
+    public BiConsumer<Object, StringBuilder> onBoundValueRaw = (value, sb) -> {
+        if (value instanceof Clob) {
+            sb.append("<clob>");
+        } else if (value instanceof Blob) {
+            sb.append("<blob>");
+        } else {
+            sb.append(value);
+        }
+    };
+
+    /**
+     * Default implementation for formatting {@link Parameter} value.
+     *
+     * <p> Example: "null(in,INTEGER)", "Foo(out,String)".
+     */
+    public BiConsumer<Parameter, StringBuilder> onBoundValueParameter = (parameter, sb) -> {
+
+        this.onBoundValueRaw.accept(parameter.getValue(), sb);
+
+        Type type = parameter.getType();
+        boolean isEnum = type instanceof Enum;
+        String typeStr = isEnum ? type.toString() : type.getJavaType().getSimpleName();
+
+        sb.append("(");
+        if (parameter instanceof Parameter.In) {
+            sb.append("in,");
+        } else if (parameter instanceof Parameter.Out) {
+            sb.append("out,");
+        }
+        sb.append(typeStr);
+        sb.append(")");
     };
 
     /**
