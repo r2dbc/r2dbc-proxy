@@ -1,0 +1,99 @@
+[[setup]]
+= Setup
+
+To obtain a proxy `ConnectionFactory`, R2DBC Proxy provides two mechanisms:
+
+- <<setup_connection-factory-discovery>>
+- <<setup_programmatic-proxy-construction>>
+
+[[setup_connection-factory-discovery]]
+== Connection Factory Discovery
+
+R2DBC specifies two types of connection factory discovery, <<setup_connection-factory-discovery_url-based>> and
+<<setup_connection-factory-discovery_programmatic>>.
+R2DBC Proxy supports both with `proxy` as the driver identifier.
+
+[[setup_connection-factory-discovery_url-based]]
+=== URL-based
+
+When a connection URL contains `proxy` in its driver segment, `ConnectionFactories`
+delegates the `protocol` segment(required) to the another connection
+discovery.(pass-through) Then, it wraps the returned `ConnectionFactory` with a proxy.
+
+[source]
+----
+r2dbc:proxy:<my-driver>://<host>:<port>/<database>[?proxyListener=<fqdn>]
+----
+
+
+[source]
+.Examples
+----
+# with driver
+r2dbc:proxy:postgresql://localhost:5432/myDB?proxyListener=com.example.MyListener
+
+# with pooling
+r2dbc:proxy:pool:postgresql://localhost:5432/myDB?proxyListener=com.example.MyListener&maxIdleTime=PT60S
+----
+
+[[setup_connection-factory-discovery_programmatic]]
+=== Programmatic
+
+Another variant of the `ConnectionFactory` discovery is a programmatic creation of the `ConnectionFactoryOptions`.
+
+Same as URL based discovery, when the DRIVER Option is `proxy`, it delegates PROTOCOL Option(required)
+to another connection factory discovery request. The result of delegated discovery
+request is wrapped by a proxy.
+
+[source,java]
+----
+ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder()
+   .option(ConnectionFactoryOptions.DRIVER, "proxy")
+   .option(ConnectionFactoryOptions.PROTOCOL, "postgresql")
+   .option(ConnectionFactoryOptions.HOST, "localhost")
+   .option(ConnectionFactoryOptions.PORT, 5432)
+   .option(ConnectionFactoryOptions.DATABASE, "myDB")
+   .option(ProxyConnectionFactoryProvider.PROXY_LISTENERS, myListener)
+   .build());
+
+Mono<Connection> connection = connectionFactory.create();
+----
+
+.Supported Connection Factory Discovery options
+|===
+| Option | Description
+
+| `driver` | Must be `proxy`
+| `protocol` | Delegating connection factory driver
+| `proxyListener` | Comma separated list of fully qualified proxy listener class names  _(Optional)_
+|===
+
+When programmatically construct `ConnectionFactoryOptions`, in addition to the "comma separated listener class FQDN",
+`proxyListener` option allows following values:
+
+- Proxy listener class (java `Class` object)
+- Proxy listener instance
+- `Collection` of above
+
+
+[[setup_programmatic-proxy-construction]]
+== Programmatic Proxy Construction
+
+`ProxyConnectionFactory` provides a builder to construct a proxy `ConnectionFactory`.
+The builder has methods to register concrete and adhoc listeners.
+
+[source,java]
+----
+ConnectionFactory original = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
+    .onAfterQuery(queryInfo ->
+        ...  // after query callback logic
+    )
+    .onBeforeMethod(methodInfo ->
+        ...  // before method callback logic
+    )
+    .listener(...)  // add listener
+    .build();
+
+----

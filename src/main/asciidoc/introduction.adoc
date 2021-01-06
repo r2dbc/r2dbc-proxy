@@ -1,0 +1,33 @@
+[[introduction]]
+= Introduction
+
+R2DBC Proxy is a proxy framework providing callbacks for query executions,
+method invocations, and parameter bindings.
+
+The proxy holds proxy listeners.
+When a caller(application or upper layer library) interacts with the proxy, the registered
+proxy listeners receive callbacks.
+
+Followings are the sample usages of the proxy listeners:
+
+- Logging on each query execution
+- Detect slow queries
+- Method tracing
+- Metrics
+- Distributed tracing
+- Assertion and verification
+- Own action
+
+The proxy is a thin transparent layer which suits to implement cross-cutting concerns, agnostic to
+the underlying implementation such as drivers; yet, it is viewed as R2DBC SPI from the above layer.
+
+image::images/r2dbc-proxy-diagram.png[R2DBC Proxy diagram]
+
+
+[[introduction_project-metadata]]
+== Project Metadata
+
+* Version control: https://github.com/r2dbc/r2dbc-proxy
+* Issue tracker: https://github.com/r2dbc/r2dbc-proxy/issues
+* Release repository: https://repo1.maven.org/maven2
+* Snapshot repository: https://oss.sonatype.org/content/repositories/snapshots

@@ -1,0 +1,33 @@
+[[getting-started]]
+= Getting Started
+
+[[getting-started_dependencies]]
+== Dependencies
+
+Artifacts are available on https://search.maven.org/search?q=r2dbc-proxy[Maven Central]:
+
+[source,xml]
+----
+<dependency>
+  <groupId>io.r2dbc</groupId>
+  <artifactId>r2dbc-proxy</artifactId>
+  <version>${version}</version>
+</dependency>
+----
+
+If you'd rather like the latest snapshots of the upcoming major version, use the Maven snapshot repository and declare the appropriate dependency version.
+
+[source,xml]
+----
+<dependency>
+  <groupId>io.r2dbc</groupId>
+  <artifactId>r2dbc-proxy</artifactId>
+  <version>${version}.BUILD-SNAPSHOT</version>
+</dependency>
+
+<repository>
+  <id>sonatype-nexus-snapshots</id>
+  <name>Sonatype OSS Snapshot Repository</name>
+  <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+</repository>
+----

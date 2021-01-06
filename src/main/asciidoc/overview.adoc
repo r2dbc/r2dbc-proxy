@@ -1,0 +1,51 @@
+[[overview]]
+= Overview
+
+R2DBC Proxy is a framework that generates proxies to R2DBC SPI objects via `ProxyConnectionFactory`
+and provides callbacks to the method and query invocations.
+
+R2DBC Proxy is a thin transparent layer.
+From callers(application or another library), proxies are simply viewed as R2DBC SPI objects.
+This is similar to how connection pooling is viewed from upper layer.
+
+This section describes three key concept of the R2DBC Proxy:
+
+- <<overview_proxies>>
+- <<overview_listeners>>
+- <<overview_formatters>>
+
+
+[[overview_proxies]]
+== Proxies
+
+Each SPI object(`Connection`, `Statement`, `Batch`, and `Result`) created by `ProxyConnectionFactory`
+is wrapped by a proxy.
+
+When a caller invokes a method on the proxy, it triggers corresponding callback methods on the registered listeners.
+
+
+[[overview_listeners]]
+== Listeners
+
+Listeners are the callback implementation.
+Each listener implements the `ProxyExecutionListener` interface, which defines
+`[before|after]Query`, `[before|after]Method`, and `eachQueryResult` methods.
+
+When triggered, these callback methods receive contextual information as a parameter.
+The `MethodExecutionInfo` is a parameter that contains the information about the invoked method, and the
+`QueryExecutionInfo` holds the information of the query execution.
+
+Users would write a listener implementation to perform custom actions.
+
+
+[[overview_formatters]]
+== Formatters
+
+One of the main action performed by a listener is logging.
+When a listener received a callback, the passed contextual information
+requires a transformation to a `String` in order to be an entry for the logging.
+
+Formatters are utility classes that covert `MethodExecutionInfo` and `QueryExecutionInfo` to `String`.
+
+`QueryExecutionInfoFormatter` and `MethodExecutionInfoFormatter` are available out of the box
+to transform `QueryExecutionInfo` and `MethodExecutionInfo`, respectively.

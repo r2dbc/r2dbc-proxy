@@ -1,0 +1,21 @@
+= R2DBC Proxy - R2DBC Proxying Framework
+:author: Tadaya Tsuyukubo <tadaya@ttddyy.net>
+:revnumber: {version}
+:revdate: {localdate}
+ifdef::backend-pdf[]
+:pagenums:
+:toc:
+endif::[]
+
+(C) 2017-2021 The original authors.
+
+NOTE: Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.
+
+toc::[]
+
+include::introduction.adoc[leveloffset=+1]
+include::overview.adoc[leveloffset=+1]
+include::getting-started.adoc[leveloffset=+1]
+include::setup.adoc[leveloffset=+1]
+include::components.adoc[leveloffset=+1]
+include::use-cases.adoc[leveloffset=+1]
