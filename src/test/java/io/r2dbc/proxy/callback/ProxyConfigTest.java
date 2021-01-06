@@ -52,12 +52,10 @@ public class ProxyConfigTest {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
     void builder() {
         ConnectionIdManager connectionIdManager = mock(ConnectionIdManager.class);
         Clock clock = mock(Clock.class);
         ProxyExecutionListener listener = mock(ProxyExecutionListener.class);
-        io.r2dbc.proxy.listener.LifeCycleListener lifeCycleListener = mock(io.r2dbc.proxy.listener.LifeCycleListener.class);
         ProxyFactory proxyFactory = mock(ProxyFactory.class);
         ProxyFactoryFactory proxyFactoryFactory = config -> proxyFactory;
 
@@ -65,7 +63,6 @@ public class ProxyConfigTest {
         builder.connectionIdManager(connectionIdManager)
             .clock(clock)
             .listener(listener)
-            .listener(lifeCycleListener)
             .proxyFactoryFactory(proxyFactoryFactory);
 
         ProxyConfig proxyConfig = builder.build();
@@ -73,7 +70,7 @@ public class ProxyConfigTest {
         assertThat(proxyConfig.getConnectionIdManager()).isSameAs(connectionIdManager);
         assertThat(proxyConfig.getClock()).isSameAs(clock);
         assertThat(proxyConfig.getListeners().getListeners())
-            .hasSize(2)
+            .hasSize(1)
             .contains(listener);
         assertThat(proxyConfig.getProxyFactory()).isSameAs(proxyFactory);
     }

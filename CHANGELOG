@@ -1,6 +1,10 @@
 R2DBC Proxy Changelog
 =============================
 
+0.9.0.RELEASE
+------------------
+* Remove deprecated "LifeCycleListener" and "LifeCycleExecutionListener" #80
+
 0.8.4.RELEASE
 ------------------
 * Use caller's classloader when creating a proxy #78

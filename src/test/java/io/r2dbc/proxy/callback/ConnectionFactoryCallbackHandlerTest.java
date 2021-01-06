@@ -19,6 +19,7 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
+import io.r2dbc.proxy.listener.ProxyMethodExecutionListener;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
@@ -143,8 +144,7 @@ public class ConnectionFactoryCallbackHandlerTest {
 
     // gh-68
     @Test
-    @SuppressWarnings("deprecation")
-    void createConnectionWithUsingWhen() throws Throwable {
+    void createConnectionWithUsingWhen() {
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
         Connection mockedConnection = mock(Connection.class);
         doReturn(Mono.just(mockedConnection)).when(connectionFactory).create();
@@ -152,7 +152,7 @@ public class ConnectionFactoryCallbackHandlerTest {
         List<String> list = Collections.synchronizedList(new ArrayList<>());
         AtomicReference<Object> createdConnectionHolder = new AtomicReference<>();
 
-        io.r2dbc.proxy.listener.LifeCycleListener listener = new io.r2dbc.proxy.listener.LifeCycleListener() {
+        ProxyMethodExecutionListener listener = new ProxyMethodExecutionListener() {
 
             @Override
             public void beforeCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {

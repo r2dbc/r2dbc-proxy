@@ -129,8 +129,6 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
             registerProxyListenerClass((Class<?>) optionValue, builder);
         } else if (optionValue instanceof ProxyExecutionListener) {
             builder.listener((ProxyExecutionListener) optionValue);
-        } else if (optionValue instanceof io.r2dbc.proxy.listener.LifeCycleListener) {
-            builder.listener((io.r2dbc.proxy.listener.LifeCycleListener) optionValue);
         } else {
             throw new IllegalArgumentException(optionValue + " is not a proxy listener instance");
         }
