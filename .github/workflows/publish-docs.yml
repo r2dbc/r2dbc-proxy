@@ -53,7 +53,7 @@ jobs:
           cp -Rf target/site/apidocs/* target/deploy-documents/${{ env.project_version }}/javadoc-api/
 
       - name: Prepare "current-snapshot" documents
-        if: "github.branch == 'main' && contains(env.project_version, 'snapshot')"
+        if: "github.ref == 'refs/heads/main' && contains(env.project_version, 'snapshot')"
         run: |
           mkdir -p target/deploy-documents/current-snapshot/reference
           mkdir -p target/deploy-documents/current-snapshot/javadoc-api
