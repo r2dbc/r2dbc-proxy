@@ -34,39 +34,45 @@ jobs:
 
         #
         # construct a directory to be copied to "gh-pages" branch
-        #    target/deploy-documents/             -- root dir in "gh-pages"
+        #    target/deploy-documents/             -- map to "docs" dir in "gh-pages"
         #                 `-- <PROJECT_VERSION>   -- e.g. "0.9.0.BUILD-SNAPSHOT"
-        #                       `-- reference
-        #                       `-- javadoc-api
-        #                 `-- current-snapshot    -- for latest snapshot
-        #                       `-- reference
-        #                       `-- javadoc-api
+        #                       `-- docs/html/
+        #                       `-- api/
+        #                       `-- CHANGELOG.txt
+        #                 `-- current-snapshot    -- for latest snapshot from main
+        #                       `-- docs/html/
+        #                       `-- api/
+        #                       `-- CHANGELOG.txt
         #                 `-- current             -- for latest release version
-        #                       `-- reference
-        #                       `-- javadoc-api
+        #                       `-- docs/html/
+        #                       `-- api/
+        #                       `-- CHANGELOG.txt
 
       - name: Prepare "project-version" documents
         run: |
-          mkdir -p target/deploy-documents/${{ env.project_version }}/reference
-          mkdir -p target/deploy-documents/${{ env.project_version }}/javadoc-api
-          cp -Rf target/generated-docs/* target/deploy-documents/${{ env.project_version }}/reference/
-          cp -Rf target/site/apidocs/* target/deploy-documents/${{ env.project_version }}/javadoc-api/
+          mkdir -p target/deploy-documents/${{ env.project_version }}/docs/html
+          mkdir -p target/deploy-documents/${{ env.project_version }}/api
+          cp -Rf target/generated-docs/* target/deploy-documents/${{ env.project_version }}/docs/html/
+          cp -Rf target/site/apidocs/* target/deploy-documents/${{ env.project_version }}/api/
+          cp CHANGELOG target/deploy-documents/${{ env.project_version }}/CHANGELOG.txt
 
       - name: Prepare "current-snapshot" documents
         if: "github.ref == 'refs/heads/main' && contains(env.project_version, 'snapshot')"
         run: |
-          mkdir -p target/deploy-documents/current-snapshot/reference
-          mkdir -p target/deploy-documents/current-snapshot/javadoc-api
-          cp -Rf target/generated-docs/* target/deploy-documents/current-snapshot/reference/
-          cp -Rf target/site/apidocs/* target/deploy-documents/current-snapshot/javadoc-api/
+          mkdir -p target/deploy-documents/current-snapshot/docs/html
+          mkdir -p target/deploy-documents/current-snapshot/api
+          cp -Rf target/generated-docs/* target/deploy-documents/current-snapshot/docs/html/
+          cp -Rf target/site/apidocs/* target/deploy-documents/current-snapshot/api/
+          cp CHANGELOG target/deploy-documents/current-snapshot/CHANGELOG.txt
 
       - name: Prepare "current" documents
-        if: "!contains(env.project_version, 'snapshot')"
+        if: "contains(env.project_version, 'release')"
         run: |
-          mkdir -p target/deploy-documents/current/reference
-          mkdir -p target/deploy-documents/current/javadoc-api
-          cp -Rf target/generated-docs/* target/deploy-documents/current/reference/
-          cp -Rf target/site/apidocs/* target/deploy-documents/current/javadoc-api/
+          mkdir -p target/deploy-documents/current/docs/html
+          mkdir -p target/deploy-documents/current/api
+          cp -Rf target/generated-docs/* target/deploy-documents/current/docs/html/
+          cp -Rf target/site/apidocs/* target/deploy-documents/current/api/
+          cp CHANGELOG target/deploy-documents/current/CHANGELOG.txt
 
       - name: Deploy documents
         uses: peaceiris/actions-gh-pages@v3
