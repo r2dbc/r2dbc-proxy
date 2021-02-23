@@ -1,0 +1,7 @@
+io.r2dbc.proxy
+io.r2dbc.proxy.callback
+io.r2dbc.proxy.core
+io.r2dbc.proxy.listener
+io.r2dbc.proxy.support
+io.r2dbc.proxy.test
+io.r2dbc.proxy.util
