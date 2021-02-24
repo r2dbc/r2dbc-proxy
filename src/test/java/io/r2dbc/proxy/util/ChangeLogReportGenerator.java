@@ -48,16 +48,20 @@ final class ChangeLogReportGenerator {
 
         HttpEntity<String> response = webClient //
             .get().uri(URI_TEMPLATE, MILESTONE_ID) //
-            .exchange() //
-            .flatMap(clientResponse -> clientResponse.toEntity(String.class)) //
+            .exchangeToMono(clientResponse -> clientResponse.toEntity(String.class)) //
             .block(Duration.ofSeconds(10));
+
+        Assert.requireNonNull(response, "response must not be null");
 
         boolean keepChecking = true;
         boolean printHeader = true;
 
         while (keepChecking) {
 
-            readPage(response.getBody(), printHeader);
+            String content = response.getBody();
+            Assert.requireNonNull(content, "response must not be null");
+
+            readPage(content, printHeader);
             printHeader = false;
 
             List<String> linksInHeader = response.getHeaders().get(HttpHeaders.LINK);
@@ -67,9 +71,10 @@ final class ChangeLogReportGenerator {
 
                 response = webClient //
                     .get().uri(links.getRequiredLink(IanaLinkRelations.NEXT).expand().getHref()) //
-                    .exchange() //
-                    .flatMap(clientResponse -> clientResponse.toEntity(String.class)) //
+                    .exchangeToMono(clientResponse -> clientResponse.toEntity(String.class))
                     .block(Duration.ofSeconds(10));
+
+                Assert.requireNonNull(response, "response must not be null");
 
             } else {
                 keepChecking = false;
@@ -78,6 +83,7 @@ final class ChangeLogReportGenerator {
     }
 
     private static void readPage(String content, boolean header) {
+        Assert.requireNonNull(content, "content must not be null");
 
         JsonPath titlePath = JsonPath.compile("$[*].title");
         JsonPath idPath = JsonPath.compile("$[*].number");

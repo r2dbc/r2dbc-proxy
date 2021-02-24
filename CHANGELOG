@@ -3,6 +3,7 @@ R2DBC Proxy Changelog
 
 0.9.0.M1
 ------------------
+* Upgrade to Reactor 2020.0.4 #87
 * Upgrade to R2DBC SPI 0.9.0.M1 #85
 * Support "io.r2dbc.spi.Parameter" in formatter
 * Remove deprecated "LifeCycleListener" and "LifeCycleExecutionListener" #80
