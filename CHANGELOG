@@ -1,6 +1,10 @@
 R2DBC Proxy Changelog
 =============================
 
+0.8.5.RELEASE
+------------------
+* Upgrade to R2DBC SPI 0.8.4.RELEASE #83
+
 0.8.4.RELEASE
 ------------------
 * Use caller's classloader when creating a proxy #78
