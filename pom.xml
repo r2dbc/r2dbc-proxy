@@ -14,13 +14,13 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="                 http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.r2dbc</groupId>
     <artifactId>r2dbc-proxy</artifactId>
-    <version>0.8.5.RELEASE</version>
+    <version>0.8.6.BUILD-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Reactive Relational Database Connectivity - Proxy</name>
@@ -52,7 +52,7 @@
     <scm>
         <connection>scm:git:https://github.com/r2dbc/r2dbc-proxy</connection>
         <url>https://github.com/r2dbc/r2dbc-proxy</url>
-      <tag>v0.8.5.RELEASE</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <developers>
