@@ -1,0 +1,85 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Publish documentation to the project page
+
+on:
+  push:
+    branches: [ main, release-0.x ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Get project version
+        run: |
+            VERSION=$( ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout )
+            echo "project_version=$VERSION" >> $GITHUB_ENV
+
+      - name: Process asciidoc and javadoc
+        run: ./mvnw -q asciidoctor:process-asciidoc javadoc:javadoc
+
+        #
+        # construct a directory to be copied to "gh-pages" branch
+        #    target/deploy-documents/             -- map to "docs" dir in "gh-pages"
+        #                 `-- <PROJECT_VERSION>   -- e.g. "0.9.0.BUILD-SNAPSHOT"
+        #                       `-- docs/html/
+        #                       `-- api/
+        #                       `-- CHANGELOG.txt
+        #                 `-- current-snapshot    -- for latest snapshot from main
+        #                       `-- docs/html/
+        #                       `-- api/
+        #                       `-- CHANGELOG.txt
+        #                 `-- current             -- for latest release version
+        #                       `-- docs/html/
+        #                       `-- api/
+        #                       `-- CHANGELOG.txt
+
+      - name: Prepare "project-version" documents
+        run: |
+          mkdir -p target/deploy-documents/${{ env.project_version }}/docs/html
+          mkdir -p target/deploy-documents/${{ env.project_version }}/api
+          cp -Rf target/generated-docs/* target/deploy-documents/${{ env.project_version }}/docs/html/
+          cp -Rf target/site/apidocs/* target/deploy-documents/${{ env.project_version }}/api/
+          cp CHANGELOG target/deploy-documents/${{ env.project_version }}/CHANGELOG.txt
+
+      - name: Prepare "current-snapshot" documents
+        if: "github.ref == 'refs/heads/main' && contains(env.project_version, 'snapshot')"
+        run: |
+          mkdir -p target/deploy-documents/current-snapshot/docs/html
+          mkdir -p target/deploy-documents/current-snapshot/api
+          cp -Rf target/generated-docs/* target/deploy-documents/current-snapshot/docs/html/
+          cp -Rf target/site/apidocs/* target/deploy-documents/current-snapshot/api/
+          cp CHANGELOG target/deploy-documents/current-snapshot/CHANGELOG.txt
+
+      - name: Prepare "current" documents
+        if: "contains(env.project_version, 'release')"
+        run: |
+          mkdir -p target/deploy-documents/current/docs/html
+          mkdir -p target/deploy-documents/current/api
+          cp -Rf target/generated-docs/* target/deploy-documents/current/docs/html/
+          cp -Rf target/site/apidocs/* target/deploy-documents/current/api/
+          cp CHANGELOG target/deploy-documents/current/CHANGELOG.txt
+
+      - name: Deploy documents
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: target/deploy-documents
+          destination_dir: docs
+          keep_files: true
+          full_commit_message: "Deploying documents(${{ env.project_version}}) to ${{ github.ref }} from ${{ github.repository }}@${{ github.sha }}"
