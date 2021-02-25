@@ -1,0 +1,68 @@
+R2DBC Proxy Changelog
+=============================
+
+0.8.5.RELEASE
+------------------
+* Upgrade to Reactor Dysprosium SR17 #84
+* Upgrade to R2DBC SPI 0.8.4.RELEASE #83
+
+0.8.4.RELEASE
+------------------
+* Use caller's classloader when creating a proxy #78
+
+0.8.3.RELEASE
+------------------
+* Upgrade dependencies #75
+* Introduce "ProxyMethodExecutionListener" and deprecate "LifeCycleListener" #72
+* Use custom subscribers to manage callback #70
+* Add ProxyConfigHolder #69
+* Fix "ConnectionFactory#create" after-method callback #68
+* Rename master branch to main #67
+* Upgrade to Reactor Dysprosium-SR7 #66
+
+0.8.2.RELEASE
+------------------
+* Upgrade build and test dependencies #65
+* Release 0.8.2.RELEASE #64
+* Upgrade to Reactor Dysprosium-SR6 #63
+* Stage releases directly on maven central #62
+
+0.8.1.RELEASE
+------------------
+* Make query execution success when at least one element is emitted #55.
+* Avoid NPE when publisher operation is cancelled #56.
+
+0.8.0.RELEASE
+------------------
+* Upgrade to Reactor Dysprosium SR2 #47.
+* Upgrade to R2DBC SPI 0.8.0.RELEASE #46.
+* Remove unused SLF4J dependency #45.
+* Remove dropped Statement.bind(int, <primitive>) overloads #42.
+
+0.8.0.RC1
+------------------
+* Release 0.8.0.RC1 #41.
+* Remove repositories declaration from published pom #37.
+* Expose Connection metadata #36.
+* Implement validation and fetchSize SPI methods. #35.
+* Support Connection.validate() #34.
+* Support Statement.fetchSize() #33.
+* Use "*Info" instead of "Mono<*Info>" in builder of ProxyConnectionFactory #32.
+* Use "Atomic*Updater" for frequently created objects #31.
+* Add connection scope custom value store #30.
+* Add ValueStore API #29.
+* 0.8.0.RC1 Changelog #28.
+* Proxy mechanism to support converting bind marker #26.
+
+0.8.0.M8
+------------------
+* Support ConnectionFactoryProvider.getDriver() #19
+* BLOB/CLOB support in query formatter
+* Add ProxyConfig.Builder
+* Support comma separated proxyListener parameter #17
+* Update LifeCycleExecutionListener dispatching logic #16
+* Use strategy pattern to invoke original method #15
+
+1.0.0.M7
+------------------
+* Inception
