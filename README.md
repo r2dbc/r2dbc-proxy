@@ -38,10 +38,46 @@ If you'd rather like the latest snapshots of the upcoming major version, use our
 </repository>
 ```
 
-## Usage
-Configuration of the `ConnectionFactory` can be accomplished in two ways:
+## Documentation
 
-### Connection Factory Discovery
+- Current release
+  - Reference Doc. (TBD until `0.9.0` release, please refer to the [snapshot][reference-snapshot])
+  - [API Doc.][javadoc-current]
+  - [Changelog][changelog-current]
+- Snapshot
+  - [Reference Doc.][reference-snapshot]
+  - [API Doc.][javadoc-snapshot]
+  - [Changelog][changelog-snapshot]
+- Other versions (TBD)
+
+[reference-current]: http://r2dbc.io/r2dbc-proxy/docs/current/docs/html
+[reference-snapshot]: http://r2dbc.io/r2dbc-proxy/docs/current-snapshot/docs/html
+[javadoc-current]: http://r2dbc.io/r2dbc-proxy/docs/current/api/
+[javadoc-snapshot]: http://r2dbc.io/r2dbc-proxy/docs/current-snapshot/api/
+[changelog-current]: http://r2dbc.io/r2dbc-proxy/docs/current/CHANGELOG.txt
+[changelog-snapshot]: http://r2dbc.io/r2dbc-proxy/docs/current-snapshot/CHANGELOG.txt
+
+
+## Getting Started
+
+Here shows how to create a proxy `ConnectionFactory`.
+
+### URL Connection Factory Discovery
+
+```java
+ConnectionFactory connectionFactory = ConnectionFactories.get("r2dbc:proxy:<driver>//<host>:<port>>/<database>[?proxyListener=<fqdn>]");
+```
+
+Sample URLs:
+```
+# with driver
+r2dbc:proxy:postgresql://localhost:5432/myDB?proxyListener=com.example.MyListener
+
+# with pooling
+r2dbc:proxy:pool:postgresql://localhost:5432/myDB?proxyListener=com.example.MyListener&maxIdleTime=PT60S
+```
+
+### Programmatic Connection Factory Discovery
 ```java
 ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder()
    .option(DRIVER, "proxy")
@@ -65,7 +101,8 @@ When programmatically `ConnectionFactoryOptions` are constructed, `proxyListener
 - Proxy listener instance
 - Collection of above
 
-### Programmatic
+### Programmatic creation with `ProxyConnectionFactory`
+
 ```java
 ConnectionFactory original = ...
 
@@ -83,356 +120,6 @@ Publisher<? extends Connection> connectionPublisher = connectionFactory.create()
 
 // Alternative: Creating a Mono using Project Reactor
 Mono<Connection> connectionMono = Mono.from(connectionFactory.create());
-```
-
-----
-
-## Use cases
-
-### Query logging
-
-When query is executed by `Batch#execute()` or `Statement#execute()`, listener receives query
-callbacks.
-The callback contains query execution information(`QueryExecutionInfo`) such as query string,
-execution type, bindings, execution time, etc.  
-Users can format this contextual information and perform logging.
-
-*Sample Output (wrapped for display purpose):*
-```sql
-# Statement with no bindings
-#
-Thread:reactor-tcp-nio-1(30) Connection:1
-Transaction:{Create:1 Rollback:0 Commit:0}
-Success:True Time:34
-Type:Statement BatchSize:0 BindingsSize:0
-Query:["SELECT value FROM test"], Bindings:[]
-
-# Batch query
-#
-Thread:reactor-tcp-nio-3(32) Connection:2
-Transaction:{Create:1 Rollback:0 Commit:0}
-Success:True Time:4
-Type:Batch BatchSize:2 BindingsSize:0
-Query:["INSERT INTO test VALUES(200)","SELECT value FROM test"], Bindings:[]
-
-# Statement with multiple bindings
-#
-Thread:reactor-tcp-nio-1(30) Connection:3
-Transaction:{Create:1 Rollback:0 Commit:0}
-Success:True Time:21
-Type:Statement BatchSize:0 BindingsSize:2
-Query:["INSERT INTO test VALUES ($1,$2)"], Bindings:[(100,101),(200,null(int))]
-```
-
-### Method tracing
-
-When any methods on proxy classes(`ConnectionFactory`, `Connection`, `Batch`, `Statement`, or `Result`)
-are called, listeners receive callbacks on before and after invocations.
-
-Below output simply printed out the method execution information(`MethodExecutionInfo`)
-at each method invocation.  
-Essentially, this shows interaction with R2DBC SPI.
-
-*Sample: Execution with transaction:*
-```sql
-  1: Thread:34 Connection:1 Time:16  PostgresqlConnectionFactory#create()
-  2: Thread:34 Connection:1 Time:0  PostgresqlConnection#createStatement()
-  3: Thread:34 Connection:1 Time:0  ExtendedQueryPostgresqlStatement#bind()
-  4: Thread:34 Connection:1 Time:0  ExtendedQueryPostgresqlStatement#add()
-  5: Thread:34 Connection:1 Time:5  PostgresqlConnection#beginTransaction()
-  6: Thread:34 Connection:1 Time:5  ExtendedQueryPostgresqlStatement#execute()
-  7: Thread:34 Connection:1 Time:3  PostgresqlConnection#commitTransaction()
-  8: Thread:34 Connection:1 Time:4  PostgresqlConnection#close()
-```
-
-### Slow query detection
-
-There are two types of slow query detection.
-- Detect slow query *AFTER* query has executed.
-- Detect slow query *WHILE* query is running.
-
-Former is simple. On `afterQuery` callback, check the execution time.
-If it took more than threshold, perform an action such as logging, send notification, etc.
-
-To perform some action _while_ query is still executing and it has passed the threshold time, one implementation
-is to create a watcher that checks running queries and notify ones exceeded the threshold.
-In [datasource-proxy](datasource-proxy), [`SlowQueryListener` is implemented in this way][slow-query-doc].
-
-[datasource-proxy]: https://github.com/ttddyy/datasource-proxy
-[slow-query-doc]: https://ttddyy.github.io/datasource-proxy/docs/current/user-guide/#_slow_query_logging_listener
-
-
-### Distributed Tracing
-
-Using before and after callbacks with contextual information, it can easily construct tracing spans.
-
-Sample implementation: [TracingExecutionListener][TracingExecutionListener]
-
-*Tracing*
-![Tracing][zipkin-tracing-rollback]
-
-*Connection Span*
-![Connection Span][zipkin-span-connection]
-
-*Query Span*
-![Query Span][zipkin-span-batch-query]
-
-[zipkin-tracing-rollback]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/zipkin-tracing-rollback.png
-[zipkin-span-connection]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/zipkin-span-connection.png
-[zipkin-span-batch-query]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/zipkin-span-batch-query.png
-
-
-### Metrics
-
-Similar to distributed tracing, on every callback, any obtained information can be used to update metrics.
-
-For example:
-- Number of opened connections
-- Number of rollbacks
-- Method execution time
-- Number of queries
-- Type of query (SELECT, DELETE, ...)
-- Query execution time
-- etc.
-
-Sample implementation: [MetricsExecutionListener][MetricsExecutionListener]
-
-This listener populates following metrics:
-- Time took to create a connection
-- Commit and rollback counts
-- Executed query count
-- Slow query count
-
-In addition, this listener logs slow queries.
-
-
-*Connection metrics on JMX*
-![Connection JMX][metrics-jmx-connection]
-
-*Query metrics on JMX:*
-![Query JMX][metrics-jmx-query]
-
-*Transaction metrics on actuator (`/actuator/metrics/r2dbc.transaction`):*
-![Transaction Actuator][metrics-actuator-connection]
-
-[metrics-jmx-connection]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/metrics-jmx-connection.png
-[metrics-jmx-query]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/metrics-jmx-query.png
-[metrics-actuator-connection]: https://github.com/ttddyy/r2dbc-proxy-examples/raw/master/listener-example/images/metrics-actuator-connection.png
-
-### Assertion/Verification
-
-By inspecting invoked methods and/or executed queries, you can verify the target logic has performed
-as expected.
-
-For example, by keeping track of connection open/close method calls, connection leaks can be
-detected or verified.
-
-Another example is to check group of queries are executed on the same connection.
-This could verify the premise of transaction - queries need to be performed on the same
-connection in order to be in the same transaction.
-
-
-### Custom logic injection
-
-Any logic can be performed on callbacks.
-Users can write own logic that performs any actions, such as audit logging, sending
-notifications, calling external system, etc.
-
-
-## Implementing custom listener
-
-In order to create a custom listener, simply implement `ProxyExecutionListener` or `ProxyMethodExecutionListener`
-interface.
-
-```java
-static class MyListener implements ProxyMethodExecutionListener {
-	@Override
-	public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
-		System.out.println("connection created");
-	}
-}
-```
-
-```java
-ConnectionFactory proxyConnectionFactory =
-    ProxyConnectionFactory.builder(connectionFactory)
-    	.listener(new MyListener())
-		.build();
-```
-
-
-## API
-
-Currently, there are two listener interfaces - `ProxyExecutionListener` and `ProxyMethodExecutionListener`.
-These listeners define callback APIs for method and query executions.
-
-Formatters are used for converting execution information object to `String`.
-Mainly used for preparing log entries.
-
-### ProxyExecutionListener
-
-`ProxyExecutionListener` is the foundation listener interface.
-This listener defines callbacks for method invocation, query execution, and query
-result processing.
-
-```java
-// invoked before any method on proxy is called
-void beforeMethod(MethodExecutionInfo executionInfo);
-
-// invoked after any method on proxy is called
-void afterMethod(MethodExecutionInfo executionInfo);
-
-// invoked before query gets executed
-void beforeQuery(QueryExecutionInfo execInfo);
-
-// invoked after query is executed
-void afterQuery(QueryExecutionInfo execInfo);
-
-// invoked on processing(subscribing) each query result
-void eachQueryResult(QueryExecutionInfo execInfo);
-```
-
-`MethodExecutionInfo` and `QueryExecutionInfo` contains contextual information about the
-method/query execution.
-
-Any method calls on proxy triggers method callbacks - `beforeMethod()` and `afterMethod()`.  
-`Batch#execute()` and `Statement#execute()` triggers query callbacks - `beforeQuery()`
-and `afterQuery()`.(Specifically, when returned result-publisher is subscribed.)  
-`eachQueryResult()` is called on each mapped query result when `Result#map()` is subscribed.
-
-
-### ProxyMethodExecutionListener
-
-`ProxyMethodExecutionListener` is an extension of `ProxyExecutionListener`.
-In addition to the methods defined in `ProxyExecutionListener`, `ProxyMethodExecutionListener` provides
-before/after methods for all methods defined on `ConnectionFactory`, `Connection`, `Batch`,
-`Statement`, and `Result`.
-
-For example, if you want know the creation of connection and close of it:
-
-```java
-public class ConnectionStartToEndListener implements ProxyMethodExecutionListener {
-
-  @Override
-  public void beforeCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
-    // callback at ConnectionFactory#create()
-  }
-
-  @Override
-  public void afterCloseOnConnection(MethodExecutionInfo methodExecutionInfo) {
-    // callback at Connection#close()
-  }
-
-}
-```
-
-
-### QueryExecutionInfoFormatter
-
-This class converts `QueryExecutionInfo` to `String`. Mainly used for preparing log entries.  
-Internally, this class has multiple consumers for `QueryExecutionInfo` and loop through them to
-populate the output `StringBuilder`.
-
-This class implements `Function<QueryExecutionInfo,String>` and can be used in functional style as well.
-
-```java
-// convert all info
-QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter#showAll();
-String str = formatter.format(queryExecutionInfo);
-
-// customize conversion
-QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
-formatter.addConsumer((execInfo, sb) -> {
-  sb.append("MY-QUERY-EXECUTION="); // add prefix
-};
-formatter.newLine();  // new line
-formatter.showSuccess();
-formatter.showConnection((execInfo, sb)  -> {
-    // custom conversion
-    sb.append("MY-ID=" + executionInfo.getConnectionInfo().getConnectionId());
-});
-formatter.showQuery();
-
-// convert it
-String str = formatter.format(queryExecutionInfo);
-```
-
-### MethodExecutionInfoFormatter
-
-Similar to `QueryExecutionInfoFormatter`, `MethodExecutionInfoFormatter` converts `MethodExecutionInfo` to
-`String`.
-
-```java
-MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
-
-ProxyConnectionFactoryBuilder.create(connectionFactory)
-  .onAfterMethod(execInfo ->
-     System.out.println(formatter.format(execInfo)))  // convert & print out to sysout
-  .build();
-```
-
-----
-
-## Configuration examples
-
-### Query logging
-
-Query logging can be achieved by logging executed query information on after-query callback.
-This can be done in **before** query callback(`beforeQuery`); however, some of the attributes are only
-available at **after** query callback(`afterQuery`) such as execution time, successfully executed, etc.
-
-`QueryExecutionInfoFormatter`, which converts `QueryExecutionInfo` to `String`, can be used
-out of the box to generate log statements.
-
-```java
-QueryExecutionInfoFormatter queryExecutionFormatter = QueryExecutionInfoFormatter.showAll();
-
-
-ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
-    // on every query execution
-    .onAfterQuery(execInfo ->
-      System.out.println(formatter.format(execInfo)))  // convert & print out to sysout
-    .build();
-```
-
-### Slow query detection
-
-#### Detect slow query AFTER query has executed
-
-On after query execution, check whether the query execution time has exceeded the threshold
-time, then perform any action.
-
-```java
-Duration threshold = Duration.of(...);
-
-ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
-    .onAfterQuery(execInfo -> {
-       if(threshold.minus(execInfo.getExecuteDuration()).isNegative()) {
-         // slow query logic
-       }
-    })
-    .build();
-```
-
-
-### Method tracing
-
-At each invocation of methods, perform action such as printing out the invoked method,
-create a span, or update metrics.
-
-`MethodExecutionInfoFormatter` is used to generate log string.
-
-```java
-MethodExecutionInfoFormatter methodExecutionFormatter = MethodExecutionInfoFormatter.withDefault();
-
-ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
-    // on every method invocation
-    .onAfterMethod(execInfo ->
-      System.out.println(formatter.format(execInfo)))  // print out method execution (method tracing)
-    .build();
 ```
 
 
@@ -483,6 +170,17 @@ You don't need to build from source to use R2DBC Proxy (binaries in Maven Centra
 If you want to build with the regular `mvn` command, you will need [Maven v3.5.0 or above](https://maven.apache.org/run-maven/index.html).
 
 _Also see [CONTRIBUTING.adoc](https://github.com/r2dbc/.github/blob/main/CONTRIBUTING.adoc) if you wish to submit pull requests. Commits require `Signed-off-by` (`git commit -s`) to ensure [Developer Certificate of Origin](https://developercertificate.org/)._
+
+### Building the documentation
+
+Building the documentation uses [maven asciidoctor plugin][asciidoctor-maven-plugin].
+
+```bash
+ $ ./mvnw clean asciidoctor:process-asciidoc
+```
+
+[asciidoctor-maven-plugin]: https://github.com/asciidoctor/asciidoctor-maven-plugin
+
 
 ## Staging to Maven Central
 
