@@ -19,6 +19,7 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.listener.BindParameterConverter;
 import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
+import io.r2dbc.proxy.listener.ResultRowConverter;
 import io.r2dbc.proxy.util.Assert;
 
 import java.time.Clock;
@@ -38,6 +39,8 @@ public class ProxyConfig {
 
     private static final BindParameterConverter DEFAULT_BIND_PARAMETER_CONVERTER = BindParameterConverter.create();
 
+    private static final ResultRowConverter DEFAULT_RESULT_ROW_CONVERTER = ResultRowConverter.create();
+
     private static final Clock DEFAULT_CLOCK = Clock.systemUTC();
 
     private final CompositeProxyExecutionListener listeners = new CompositeProxyExecutionListener();
@@ -49,6 +52,8 @@ public class ProxyConfig {
     private Clock clock = DEFAULT_CLOCK;
 
     private BindParameterConverter bindParameterConverter = DEFAULT_BIND_PARAMETER_CONVERTER;
+
+    private ResultRowConverter resultRowConverter = DEFAULT_RESULT_ROW_CONVERTER;
 
     /**
      * Create a new {@link Builder}.
@@ -177,6 +182,16 @@ public class ProxyConfig {
         this.bindParameterConverter = Assert.requireNonNull(bindParameterConverter, "bindParameterConverter must not be null");
     }
 
+    // TODO: doc
+    public ResultRowConverter getResultRowConverter() {
+        return this.resultRowConverter;
+    }
+
+    // TODO: doc
+    public void setResultRowConverter(ResultRowConverter resultRowConverter) {
+        this.resultRowConverter = resultRowConverter;
+    }
+
     /**
      * Builder to create a {@link ProxyConfig}.
      *
@@ -191,6 +206,8 @@ public class ProxyConfig {
         private ProxyFactoryFactory proxyFactoryFactory = DEFAULT_PROXY_FACTORY_FACTORY;
 
         private BindParameterConverter bindParameterConverter = DEFAULT_BIND_PARAMETER_CONVERTER;
+
+        // TODO: ResultRowConverter
 
         private Clock clock = DEFAULT_CLOCK;
 

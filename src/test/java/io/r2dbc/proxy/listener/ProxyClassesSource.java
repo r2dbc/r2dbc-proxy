@@ -20,6 +20,7 @@ import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Statement;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -34,7 +35,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Tadaya Tsuyukubo
  */
 @Retention(RetentionPolicy.RUNTIME)
-@ValueSource(classes = {ConnectionFactory.class, Connection.class, Batch.class, Statement.class, Result.class})
+@ValueSource(classes = {ConnectionFactory.class, Connection.class, Batch.class, Statement.class, Result.class, Row.class})
 public @interface ProxyClassesSource {
 
 }
