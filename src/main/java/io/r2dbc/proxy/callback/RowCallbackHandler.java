@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
  * Proxy callback handler for {@link Row}.
  *
  * @author Tadaya Tsuyukubo
+ * @since 0.9.0
  */
 public final class RowCallbackHandler extends CallbackHandlerSupport {
 
@@ -76,8 +77,8 @@ public final class RowCallbackHandler extends CallbackHandlerSupport {
             }
         };
 
-        // callback for Row#get(...)
-        Object result = this.proxyConfig.getResultRowConverter().onGet((Row) proxy, args, onGet);
+        // callback for "Row#get(...)"
+        Object result = this.proxyConfig.getResultRowConverter().onGet((Row) proxy, method, args, onGet);
         return result;
     }
 

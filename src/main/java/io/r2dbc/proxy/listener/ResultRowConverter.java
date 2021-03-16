@@ -20,22 +20,24 @@ package io.r2dbc.proxy.listener;
 import io.r2dbc.spi.Row;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 
 /**
- * TODO: document
+ * Callback for {@link Row Row#get(...)} methods.
  *
  * @author Tadaya Tsuyukubo
+ * @since 0.9.0
  */
 @FunctionalInterface
 public interface ResultRowConverter {
 
     /**
-     * Create the default {@link ResultRowConverter}.
+     * Create a default {@link ResultRowConverter}.
      *
      * @return a bindParameterConverter
      */
     static ResultRowConverter create() {
-        return (proxyRow, args, getOperation) -> getOperation.proceed();
+        return (proxyRow, method, args, getOperation) -> getOperation.proceed();
     }
 
     /**
@@ -46,17 +48,14 @@ public interface ResultRowConverter {
      * <p>
      * To perform the original {@code Row#get(...)} method, invoke {@code getOperation.proceed()}.
      *
-     * @param proxyRow     proxy {@link Row}.
+     * @param proxyRow     proxy {@link Row}
+     * @param method       invoked method
      * @param args         arguments of the original {@code Row#get(...)} call
      * @param getOperation perform {@code Row#get(...)} operation and returns its result
      * @return return value from {@code Row#get(...)} operation
      */
     @Nullable
-    Object onGet(Row proxyRow, Object[] args, GetOperation getOperation);
-
-    //    default Object onGet(Row proxyRow, Object[] args, GetOperation getOperation) {
-//        return getOperation.proceed();  // just perform default behavior
-//    }
+    Object onGet(Row proxyRow, Method method, Object[] args, GetOperation getOperation);
 
     /**
      * Represent {@code Row#get(...)} operation.
@@ -65,7 +64,7 @@ public interface ResultRowConverter {
     interface GetOperation {
 
         /**
-         * Perform the get operation.
+         * Perform the original {@code Row#get(...)} operation.
          *
          * @return result of the {@code Row#get(...)} operation
          */

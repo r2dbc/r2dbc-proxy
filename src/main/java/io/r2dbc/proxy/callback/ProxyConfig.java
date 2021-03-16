@@ -72,6 +72,7 @@ public class ProxyConfig {
         this.clock = builder.clock;
         this.listeners.addAll(builder.listeners);
         this.bindParameterConverter = builder.bindParameterConverter;
+        this.resultRowConverter = builder.resultRowConverter;
         this.proxyFactory = builder.proxyFactoryFactory.create(this);
     }
 
@@ -182,14 +183,25 @@ public class ProxyConfig {
         this.bindParameterConverter = Assert.requireNonNull(bindParameterConverter, "bindParameterConverter must not be null");
     }
 
-    // TODO: doc
+    /**
+     * Get {@link ResultRowConverter}.
+     *
+     * @return resultRowConverter to use
+     * @since 0.9.0
+     */
     public ResultRowConverter getResultRowConverter() {
         return this.resultRowConverter;
     }
 
-    // TODO: doc
+    /**
+     * Set {@link ResultRowConverter}.
+     *
+     * @param resultRowConverter the result row converter
+     * @throws IllegalArgumentException if {@code resultRowConverter} is {@code null}
+     * @since 0.9.0
+     */
     public void setResultRowConverter(ResultRowConverter resultRowConverter) {
-        this.resultRowConverter = resultRowConverter;
+        this.resultRowConverter = Assert.requireNonNull(resultRowConverter, "resultRowConverter must not be null");
     }
 
     /**
@@ -207,7 +219,7 @@ public class ProxyConfig {
 
         private BindParameterConverter bindParameterConverter = DEFAULT_BIND_PARAMETER_CONVERTER;
 
-        // TODO: ResultRowConverter
+        private ResultRowConverter resultRowConverter = DEFAULT_RESULT_ROW_CONVERTER;
 
         private Clock clock = DEFAULT_CLOCK;
 
@@ -268,6 +280,19 @@ public class ProxyConfig {
          */
         public Builder bindParameterConverter(BindParameterConverter bindParameterConverter) {
             this.bindParameterConverter = Assert.requireNonNull(bindParameterConverter, "bindParameterConverter must not be null");
+            return this;
+        }
+
+        /**
+         * Set {@link ResultRowConverter}.
+         *
+         * @param resultRowConverter resultRowConverter to be used
+         * @return builder
+         * @throws IllegalArgumentException if {@code resultRowConverter} is {@code null}
+         * @since 0.9.0
+         */
+        public Builder resultRowConverter(ResultRowConverter resultRowConverter) {
+            this.resultRowConverter = Assert.requireNonNull(resultRowConverter, "resultRowConverter must not be null");
             return this;
         }
 

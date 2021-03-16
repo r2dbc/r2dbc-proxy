@@ -17,6 +17,7 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.listener.ResultRowConverter;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockRow;
@@ -26,6 +27,8 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -57,16 +60,16 @@ public class RowCallbackHandlerTest {
         ProxyConfig proxyConfig = ProxyConfig.builder().build();
         QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
 
-        // mock: row.get(10) => 100
+        // mock: row.get(10) => "result"
         // Type needs to be "Object" since "row.get(index)" => "row.get(index, Object.class)"
-        MockRow mockRow = MockRow.builder().identified(10, Object.class, 100).build();
+        MockRow mockRow = MockRow.builder().identified(10, Object.class, "result").build();
         RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
 
         // invoke "row.get(10)"
         Object[] args = new Object[]{10};
         Object result = callback.invoke(mockRow, GET_BY_INDEX_METHOD, args);
 
-        assertThat(result).isEqualTo(100);
+        assertThat(result).isEqualTo("result");
     }
 
     @Test
@@ -74,132 +77,143 @@ public class RowCallbackHandlerTest {
         ProxyConfig proxyConfig = ProxyConfig.builder().build();
         QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
 
-        // mock: row.get(10, String.class) => 100
-        MockRow mockRow = MockRow.builder().identified(10, String.class, 100).build();
+        // mock: row.get(10, String.class) => "result"
+        MockRow mockRow = MockRow.builder().identified(10, String.class, "result").build();
         RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
 
-        // invoke "row.get(10)"
+        // invoke "row.get(10, String.class)"
         Object[] args = new Object[]{10, String.class};
         Object result = callback.invoke(mockRow, GET_BY_INDEX_WITH_CLASS_METHOD, args);
 
-        assertThat(result).isEqualTo(100);
+        assertThat(result).isEqualTo("result");
     }
 
-    ////  SAMPLE usage
-
     @Test
-    void intToInteger() throws Throwable {
+    void getByNameDefaultMethod() throws Throwable {
+        ProxyConfig proxyConfig = ProxyConfig.builder().build();
         QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
 
+        // mock: row.get("foo") => "result"
+        // Type needs to be "Object" since "row.get(name)" => "row.get(name, Object.class)"
+        MockRow mockRow = MockRow.builder().identified("foo", Object.class, "result").build();
+        RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
+
+        // invoke row.get("foo")
+        Object[] args = new Object[]{"foo"};
+        Object result = callback.invoke(mockRow, GET_BY_NAME_METHOD, args);
+
+        assertThat(result).isEqualTo("result");
+    }
+
+    @Test
+    void getByNameWithClass() throws Throwable {
         ProxyConfig proxyConfig = ProxyConfig.builder().build();
-        proxyConfig.setResultRowConverter((proxyRow, args, getOperation) -> {
-            // if "row.get(int, int.class)"
-            if (args.length == 2 && ((Class<?>) args[1]).isPrimitive()) {
-                // instead, call "row.get(int, Integer.class)"
-                return proxyRow.get((int) args[0], Integer.class);
+        QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+
+        // mock: row.get("foo", String.class) => "result"
+        MockRow mockRow = MockRow.builder().identified("foo", String.class, "result").build();
+        RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
+
+        // invoke row.get("foo", String.class)
+        Object[] args = new Object[]{"foo", String.class};
+        Object result = callback.invoke(mockRow, GET_BY_NAME_WITH_CLASS_METHOD, args);
+
+        assertThat(result).isEqualTo("result");
+    }
+
+    @Test
+    void resultRowConverter() throws Throwable {
+        ResultRowConverter converter = mock(ResultRowConverter.class);
+
+        ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();
+        QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        MockRow mockRow = MockRow.empty();
+        Object[] args = new Object[]{"foo", String.class};
+        Method method = GET_BY_NAME_WITH_CLASS_METHOD;
+        RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
+
+        when(converter.onGet(same(mockRow), same(method), same(args), any())).thenReturn("abc");
+
+        Object result = callback.invoke(mockRow, method, args);
+
+        assertThat(result).isEqualTo("abc");
+        verify(converter).onGet(same(mockRow), same(method), same(args), any());
+    }
+
+    @Test
+    void unwrap() throws Throwable {
+        MockRow mockRow = MockRow.empty();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
+
+        Object result = callback.invoke(mockRow, UNWRAP_METHOD, null);
+        assertThat(result).isSameAs(mockRow);
+    }
+
+    @Test
+    void getProxyConfig() throws Throwable {
+        MockRow mockRow = MockRow.empty();
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
+
+        Object result = callback.invoke(mockRow, GET_PROXY_CONFIG_METHOD, null);
+        assertThat(result).isSameAs(proxyConfig);
+    }
+
+    @Test
+    void rowConverterDoNotCallProceed() throws Throwable {
+        ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
+            // do not call "getOperation.proceed()"
+            return "foo";
+        };
+
+        Row mockRow = mock(Row.class);
+
+        ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setResultRowConverter(converter);
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+
+        RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
+
+        Object[] args = new String[]{"name"};
+        Object result = callback.invoke(mockRow, GET_BY_NAME_METHOD, args);
+
+        assertThat(result).isSameAs("foo");
+        verifyNoInteractions(mockRow);
+    }
+
+    @Test
+    void rowConverterCallsAlternativeMethods() throws Throwable {
+        ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
+            if ((args[0] instanceof String) && ("full_name".equals(args[0]))) {
+                String lastName = proxyRow.get("last_name", String.class);
+                String firstName = proxyRow.get("first_name", String.class);
+                return lastName + " " + firstName;
             }
             return getOperation.proceed();
-        });
+        };
 
-        // mock: row.get(10, String.class) => 100
-        Row row = mock(Row.class);
-        when(row.get(1, Integer.class)).thenReturn(100);
+        Row mockRow = mock(Row.class);
+        when(mockRow.get("first_name", String.class)).thenReturn("first");
+        when(mockRow.get("last_name", String.class)).thenReturn("last");
 
-        RowCallbackHandler callback = new RowCallbackHandler(row, queryExecutionInfo, proxyConfig);
+        ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setResultRowConverter(converter);
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
 
-        // invoke "row.get(10, int.class)"
-        Object[] args = new Object[]{1, int.class};
-        Object result = callback.invoke(row, GET_BY_INDEX_WITH_CLASS_METHOD, args);
+        RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
 
-        assertThat(result).isEqualTo(100);
+        Object[] args = new Object[]{"full_name"};
+        Object result = callback.invoke(mockRow, GET_BY_NAME_METHOD, args);
 
-        verify(row, never()).get(1, int.class);
-        verify(row).get(1, Integer.class);
-
-    }
-
-    @Test
-    void toMultipleGets() throws Throwable {
-        QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
-
-        ProxyConfig proxyConfig = ProxyConfig.builder().build();
-        proxyConfig.setResultRowConverter((proxyRow, args, getOperation) -> {
-            if ("fullName".equals(args[0])) {
-                String firstName = proxyRow.get("firstName", String.class);
-                String lastName = proxyRow.get("lastName", String.class);
-                return firstName + " " + lastName;
-            }
-            return getOperation.proceed();   // invoke original method
-        });
-
-        // mock: row.get(10, String.class) => 100
-        Row row = mock(Row.class);
-        when(row.get("firstName", String.class)).thenReturn("first");
-        when(row.get("lastName", String.class)).thenReturn("last");
-
-        RowCallbackHandler callback = new RowCallbackHandler(row, queryExecutionInfo, proxyConfig);
-
-        // invoke "row.get("fullName", String.class)"
-        Object[] args = new Object[]{"fullName", String.class};
-        Object result = callback.invoke(row, GET_BY_NAME_WITH_CLASS_METHOD, args);
-
-        assertThat(result).isEqualTo("first last");
-
-        verify(row, never()).get("fullName", String.class);
-        verify(row).get("firstName", String.class);
-        verify(row).get("lastName", String.class);
-    }
-
-    @Test
-    void ignoreGet() throws Throwable {
-        QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
-
-        ProxyConfig proxyConfig = ProxyConfig.builder().build();
-        proxyConfig.setResultRowConverter((proxyRow, args, getOperation) -> {
-            if ("ignore".equals(args[0])) {
-                return "oops";
-            }
-            return getOperation.proceed();   // invoke original method
-        });
-
-        // mock: row.get(10, String.class) => 100
-        Row row = mock(Row.class);
-        RowCallbackHandler callback = new RowCallbackHandler(row, queryExecutionInfo, proxyConfig);
-
-        // invoke "row.get("fullName", String.class)"
-        Object[] args = new Object[]{"ignore", String.class};
-        Object result = callback.invoke(row, GET_BY_NAME_WITH_CLASS_METHOD, args);
-
-        assertThat(result).isEqualTo("oops");
-
-        verifyNoInteractions(row);
-    }
-
-    @Test
-    void convertResult() throws Throwable {
-        QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
-
-        ProxyConfig proxyConfig = ProxyConfig.builder().build();
-        proxyConfig.setResultRowConverter((proxyRow, args, getOperation) -> {
-            Object result = getOperation.proceed();  // invoke original method
-            if (result == null && args.length == 2 && ((Class<?>) args[1]).isPrimitive()) {
-                return 999;
-            }
-            return result;
-        });
-
-        // mock: row.get(10, String.class) => 100
-        Row row = mock(Row.class);
-        when(row.get("column", int.class)).thenReturn(null);
-        RowCallbackHandler callback = new RowCallbackHandler(row, queryExecutionInfo, proxyConfig);
-
-        // invoke "row.get("column", int.class)"
-        Object[] args = new Object[]{"column", int.class};
-        Object result = callback.invoke(row, GET_BY_NAME_WITH_CLASS_METHOD, args);
-
-        assertThat(result).isEqualTo(999);
-
-        verify(row).get("column", int.class);
+        assertThat(result).isEqualTo("last first");
+        verify(mockRow).get("first_name", String.class);
+        verify(mockRow).get("last_name", String.class);
+        verify(mockRow, never()).get("full_name", String.class);
     }
 
 }
