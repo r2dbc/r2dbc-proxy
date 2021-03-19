@@ -86,6 +86,7 @@
 <li><a href="#overview_proxies">1. Proxies</a></li>
 <li><a href="#overview_listeners">2. Listeners</a></li>
 <li><a href="#overview_formatters">3. Formatters</a></li>
+<li><a href="#overview_converters">4. Converters</a></li>
 </ul>
 </div>
 </div>
@@ -102,7 +103,7 @@ From callers(application or another library), proxies are simply viewed as R2DBC
 This is similar to how connection pooling is viewed from upper layer.</p>
 </div>
 <div class="paragraph">
-<p>This section describes three key concept of the R2DBC Proxy:</p>
+<p>This section describes the key concepts of the R2DBC Proxy:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -115,6 +116,9 @@ This is similar to how connection pooling is viewed from upper layer.</p>
 <li>
 <p><a href="#overview_formatters">Formatters</a></p>
 </li>
+<li>
+<p><a href="#overview_converters">Converters</a></p>
+</li>
 </ul>
 </div>
 </div>
@@ -123,7 +127,7 @@ This is similar to how connection pooling is viewed from upper layer.</p>
 <h2 id="overview_proxies"><a class="anchor" href="#overview_proxies"></a>1. Proxies</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Each SPI object(<code>Connection</code>, <code>Statement</code>, <code>Batch</code>, and <code>Result</code>) created by <code>ProxyConnectionFactory</code>
+<p>Each SPI object(<code>Connection</code>, <code>Statement</code>, <code>Batch</code>, <code>Result</code>, and <code>Row</code>) created by <code>ProxyConnectionFactory</code>
 is wrapped by a proxy.</p>
 </div>
 <div class="paragraph">
@@ -166,10 +170,24 @@ to transform <code>QueryExecutionInfo</code> and <code>MethodExecutionInfo</code
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="overview_converters"><a class="anchor" href="#overview_converters"></a>4. Converters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Converters are the callbacks that could alter the original invocation.</p>
+</div>
+<div class="paragraph">
+<p>Currently, <code>BindParameterConverter</code> and <code>ResultRowConverter</code> are available.
+They represent bind operations(<code>Statement#[bind|bindNull]</code>) and result row get operations(<code>Row#get</code>), respectively.
+The converters can change the result, call alternative methods, or even not invoke the originally
+called method.</p>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-26 19:46:26 UTC
+Last updated 2021-03-19 23:06:16 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

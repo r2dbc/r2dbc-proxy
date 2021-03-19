@@ -84,7 +84,7 @@
 <div class="details">
 <span id="author" class="author">Tadaya Tsuyukubo &lt;tadaya@ttddyy.net&gt;</span><br>
 <span id="revnumber">version 0.9.0.BUILD-SNAPSHOT,</span>
-<span id="revdate">2021-02-26</span>
+<span id="revdate">2021-03-19</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -99,6 +99,7 @@
 <li><a href="#overview_proxies">2.1. Proxies</a></li>
 <li><a href="#overview_listeners">2.2. Listeners</a></li>
 <li><a href="#overview_formatters">2.3. Formatters</a></li>
+<li><a href="#overview_converters">2.4. Converters</a></li>
 </ul>
 </li>
 <li><a href="#getting-started">3. Getting Started</a>
@@ -132,6 +133,7 @@
 </ul>
 </li>
 <li><a href="#components_bindparameterconverter">5.7. BindParameterConverter</a></li>
+<li><a href="#components_resultrowconverter">5.8. ResultRowConverter</a></li>
 </ul>
 </li>
 <li><a href="#use-cases">6. Use cases</a>
@@ -167,6 +169,8 @@
 <li><a href="#use-cases_own-action_implementing-custom-listener">6.7.1. Implementing custom listener</a></li>
 </ul>
 </li>
+<li><a href="#use-cases_support-primitive-and-null-in-result-mapping">6.8. Support Primitive and Null in Result Mapping</a></li>
+<li><a href="#use-cases_call-different-methods-in-result-mapping">6.9. Call different methods in Result Mapping</a></li>
 </ul>
 </li>
 </ul>
@@ -276,7 +280,7 @@ From callers(application or another library), proxies are simply viewed as R2DBC
 This is similar to how connection pooling is viewed from upper layer.</p>
 </div>
 <div class="paragraph">
-<p>This section describes three key concept of the R2DBC Proxy:</p>
+<p>This section describes the key concepts of the R2DBC Proxy:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -289,12 +293,15 @@ This is similar to how connection pooling is viewed from upper layer.</p>
 <li>
 <p><a href="#overview_formatters">Formatters</a></p>
 </li>
+<li>
+<p><a href="#overview_converters">Converters</a></p>
+</li>
 </ul>
 </div>
 <div class="sect2">
 <h3 id="overview_proxies"><a class="anchor" href="#overview_proxies"></a>2.1. Proxies</h3>
 <div class="paragraph">
-<p>Each SPI object(<code>Connection</code>, <code>Statement</code>, <code>Batch</code>, and <code>Result</code>) created by <code>ProxyConnectionFactory</code>
+<p>Each SPI object(<code>Connection</code>, <code>Statement</code>, <code>Batch</code>, <code>Result</code>, and <code>Row</code>) created by <code>ProxyConnectionFactory</code>
 is wrapped by a proxy.</p>
 </div>
 <div class="paragraph">
@@ -330,6 +337,18 @@ requires a transformation to a <code>String</code> in order to be an entry for t
 <div class="paragraph">
 <p><code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> are available out of the box
 to transform <code>QueryExecutionInfo</code> and <code>MethodExecutionInfo</code>, respectively.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="overview_converters"><a class="anchor" href="#overview_converters"></a>2.4. Converters</h3>
+<div class="paragraph">
+<p>Converters are the callbacks that could alter the original invocation.</p>
+</div>
+<div class="paragraph">
+<p>Currently, <code>BindParameterConverter</code> and <code>ResultRowConverter</code> are available.
+They represent bind operations(<code>Statement#[bind|bindNull]</code>) and result row get operations(<code>Row#get</code>), respectively.
+The converters can change the result, call alternative methods, or even not invoke the originally
+called method.</p>
 </div>
 </div>
 </div>
@@ -782,6 +801,29 @@ For example, a converter can transform the bind markers.</p>
 <a href="https://github.com/r2dbc/r2dbc-proxy/issues/26">"gh-26: Proxy mechanism to support converting bind marker"</a> github issue.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="components_resultrowconverter"><a class="anchor" href="#components_resultrowconverter"></a>5.8. ResultRowConverter</h3>
+<div class="paragraph">
+<p><code>ResultRowConverter</code> is a callback interface for result row get(<code>Row#get</code>) operations.</p>
+</div>
+<div class="paragraph">
+<p>The callback is performed <strong>before</strong> calling the actual <code>Row#get</code> operation.
+This converter can alter the actual behavior of the invoked <code>Row#get</code> method.</p>
+</div>
+<div class="paragraph">
+<p>Sample usages:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#use-cases_support-primitive-and-null-in-result-mapping">Support Primitive and Null in Result Mapping</a></p>
+</li>
+<li>
+<p><a href="#use-cases_call-different-methods-in-result-mapping">Call different methods in Result Mapping</a></p>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1103,13 +1145,85 @@ interface.</p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="use-cases_support-primitive-and-null-in-result-mapping"><a class="anchor" href="#use-cases_support-primitive-and-null-in-result-mapping"></a>6.8. Support Primitive and Null in Result Mapping</h3>
+<div class="paragraph">
+<p>To consume query results, <code>Result#map</code> method accepts a mapping function(<code>BiFunction</code>) that takes <code>Row</code> and <code>RowMetadata</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">result.map((row, rowMetadata) -&gt; row.get("name", String.class));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>Row#get</code> method takes a <code>Class</code> in the second argument to represent the returning value type(data type).
+R2DBC spec does not support primitive types for this data type. Only boxed(wrapper) types are supported.</p>
+</div>
+<div class="paragraph">
+<p>By modifying the <code>Row#get</code> behavior, <code>ResultRowConverter</code> can provide support for primitive types.</p>
+</div>
+<div class="paragraph">
+<p>Following converter transforms a primitive to the corresponding wrapper data type.
+(e.g. <code>row.get(0, int.class)</code> to <code>row.get(0, Integer.class)</code>)<br>
+Also, this converter handles <code>null</code> return value.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+    if (args.length == 2 &amp;&amp; ((Class&lt;?&gt;) args[1]).isPrimitive()) {
+        Class&lt;?&gt; boxedType = getWrapperType(args[1]);
+        Object result = proxyRow.get((int) args[0], boxedType);
+        if (result == null) {
+            return getDefaultValue(boxedType);  // null handling
+        }
+        return result;
+    }
+    return getOperation.proceed();
+};
+// implement `getWrapperType()` and `getDefaultValue()` with own strategy</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_call-different-methods-in-result-mapping"><a class="anchor" href="#use-cases_call-different-methods-in-result-mapping"></a>6.9. Call different methods in Result Mapping</h3>
+<div class="paragraph">
+<p>By modifying the <code>Row#get</code> behavior with <code>ResultRowConverter</code>, following converters support column names that do not exist.</p>
+</div>
+<div class="listingblock">
+<div class="title">Support virtual/derived column</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+   if ("full_name".equals(args[0])) {
+       String firstName = proxyRow.get("first_name", String.class);
+       String lastName = proxyRow.get("last_name", String.class);
+       return firstName + " " + lastName;
+   }
+   return getOperation.proceed();   // invoke original method
+);</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Support column name change</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+    if ("column_old".equals(args[0])) {
+        if (args.length == 1) {
+            return proxyRow.get("column_new");
+        }
+        return proxyRow.get("column_new", (Class&lt;?&gt;)args[1]);
+    }
+    return getOperation.proceed();   // invoke original method
+);</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.9.0.BUILD-SNAPSHOT<br>
-Last updated 2021-02-26 19:46:26 UTC
+Last updated 2021-03-19 23:06:16 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

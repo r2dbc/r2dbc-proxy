@@ -96,6 +96,7 @@
 </ul>
 </li>
 <li><a href="#components_bindparameterconverter">7. BindParameterConverter</a></li>
+<li><a href="#components_resultrowconverter">8. ResultRowConverter</a></li>
 </ul>
 </div>
 </div>
@@ -385,10 +386,35 @@ For example, a converter can transform the bind markers.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="components_resultrowconverter"><a class="anchor" href="#components_resultrowconverter"></a>8. ResultRowConverter</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>ResultRowConverter</code> is a callback interface for result row get(<code>Row#get</code>) operations.</p>
+</div>
+<div class="paragraph">
+<p>The callback is performed <strong>before</strong> calling the actual <code>Row#get</code> operation.
+This converter can alter the actual behavior of the invoked <code>Row#get</code> method.</p>
+</div>
+<div class="paragraph">
+<p>Sample usages:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#use-cases_support-primitive-and-null-in-result-mapping">[use-cases_support-primitive-and-null-in-result-mapping]</a></p>
+</li>
+<li>
+<p><a href="#use-cases_call-different-methods-in-result-mapping">[use-cases_call-different-methods-in-result-mapping]</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-26 19:46:26 UTC
+Last updated 2021-03-19 23:06:16 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

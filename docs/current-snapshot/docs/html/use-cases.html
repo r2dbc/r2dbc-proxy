@@ -114,6 +114,8 @@
 <li><a href="#use-cases_own-action_implementing-custom-listener">7.1. Implementing custom listener</a></li>
 </ul>
 </li>
+<li><a href="#use-cases_support-primitive-and-null-in-result-mapping">8. Support Primitive and Null in Result Mapping</a></li>
+<li><a href="#use-cases_call-different-methods-in-result-mapping">9. Call different methods in Result Mapping</a></li>
 </ul>
 </div>
 </div>
@@ -448,10 +450,86 @@ interface.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="use-cases_support-primitive-and-null-in-result-mapping"><a class="anchor" href="#use-cases_support-primitive-and-null-in-result-mapping"></a>8. Support Primitive and Null in Result Mapping</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To consume query results, <code>Result#map</code> method accepts a mapping function(<code>BiFunction</code>) that takes <code>Row</code> and <code>RowMetadata</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">result.map((row, rowMetadata) -&gt; row.get("name", String.class));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>Row#get</code> method takes a <code>Class</code> in the second argument to represent the returning value type(data type).
+R2DBC spec does not support primitive types for this data type. Only boxed(wrapper) types are supported.</p>
+</div>
+<div class="paragraph">
+<p>By modifying the <code>Row#get</code> behavior, <code>ResultRowConverter</code> can provide support for primitive types.</p>
+</div>
+<div class="paragraph">
+<p>Following converter transforms a primitive to the corresponding wrapper data type.
+(e.g. <code>row.get(0, int.class)</code> to <code>row.get(0, Integer.class)</code>)<br>
+Also, this converter handles <code>null</code> return value.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+    if (args.length == 2 &amp;&amp; ((Class&lt;?&gt;) args[1]).isPrimitive()) {
+        Class&lt;?&gt; boxedType = getWrapperType(args[1]);
+        Object result = proxyRow.get((int) args[0], boxedType);
+        if (result == null) {
+            return getDefaultValue(boxedType);  // null handling
+        }
+        return result;
+    }
+    return getOperation.proceed();
+};
+// implement `getWrapperType()` and `getDefaultValue()` with own strategy</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_call-different-methods-in-result-mapping"><a class="anchor" href="#use-cases_call-different-methods-in-result-mapping"></a>9. Call different methods in Result Mapping</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By modifying the <code>Row#get</code> behavior with <code>ResultRowConverter</code>, following converters support column names that do not exist.</p>
+</div>
+<div class="listingblock">
+<div class="title">Support virtual/derived column</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+   if ("full_name".equals(args[0])) {
+       String firstName = proxyRow.get("first_name", String.class);
+       String lastName = proxyRow.get("last_name", String.class);
+       return firstName + " " + lastName;
+   }
+   return getOperation.proceed();   // invoke original method
+);</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Support column name change</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+    if ("column_old".equals(args[0])) {
+        if (args.length == 1) {
+            return proxyRow.get("column_new");
+        }
+        return proxyRow.get("column_new", (Class&lt;?&gt;)args[1]);
+    }
+    return getOperation.proceed();   // invoke original method
+);</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-26 19:46:26 UTC
+Last updated 2021-03-19 23:06:16 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
