@@ -466,10 +466,10 @@ interface.</p>
 R2DBC spec does not support primitive types for this data type. Only boxed(wrapper) types are supported.</p>
 </div>
 <div class="paragraph">
-<p>By modifying the <code>Row#get</code> behavior, <code>ResultRowConverter</code> can provide support for primitive types.</p>
+<p><code>ResultRowConverter</code> can provide support for primitive types by modifying the <code>Row#get</code> behavior.</p>
 </div>
 <div class="paragraph">
-<p>Following converter transforms a primitive to the corresponding wrapper data type.
+<p>The following converter transforms a primitive to a corresponding wrapper data type.
 (e.g. <code>row.get(0, int.class)</code> to <code>row.get(0, Integer.class)</code>)<br>
 Also, this converter handles <code>null</code> return value.</p>
 </div>
@@ -495,7 +495,7 @@ Also, this converter handles <code>null</code> return value.</p>
 <h2 id="use-cases_call-different-methods-in-result-mapping"><a class="anchor" href="#use-cases_call-different-methods-in-result-mapping"></a>9. Call different methods in Result Mapping</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By modifying the <code>Row#get</code> behavior with <code>ResultRowConverter</code>, following converters support column names that do not exist.</p>
+<p>By modifying the <code>Row#get</code> behavior with <code>ResultRowConverter</code>, the following converters support column names that do not exist.</p>
 </div>
 <div class="listingblock">
 <div class="title">Support virtual/derived column</div>
@@ -529,7 +529,7 @@ Also, this converter handles <code>null</code> return value.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-19 23:06:16 UTC
+Last updated 2021-03-19 23:45:43 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
