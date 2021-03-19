@@ -23,6 +23,7 @@ import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Statement;
 
 import java.lang.reflect.Method;
@@ -249,6 +250,14 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
                     this.delegate.beforeMapOnResult(executionInfo);
                 } else {
                     this.delegate.afterMapOnResult(executionInfo);
+                }
+            }
+        } else if (Row.class.isAssignableFrom(methodDeclaringClass)) {
+            if ("get".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeGetOnRow(executionInfo);
+                } else {
+                    this.delegate.afterGetOnRow(executionInfo);
                 }
             }
         }

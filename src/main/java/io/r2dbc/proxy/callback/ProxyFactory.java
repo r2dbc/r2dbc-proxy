@@ -23,6 +23,7 @@ import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Statement;
 
 /**
@@ -87,5 +88,16 @@ public interface ProxyFactory {
      * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
     Result wrapResult(Result result, QueryExecutionInfo executionInfo);
+
+    /**
+     * Create a proxy {@link Row}.
+     *
+     * @param row           original row
+     * @param executionInfo executionInfo
+     * @return proxy row
+     * @throws IllegalArgumentException if {@code row} is {@code null}
+     * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
+     */
+    Row wrapRow(Row row, QueryExecutionInfo executionInfo);
 
 }

@@ -24,6 +24,7 @@ import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
 
@@ -101,6 +102,16 @@ final class JdkProxyFactory implements ProxyFactory {
         CallbackHandler logic = new ResultCallbackHandler(result, queryExecutionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return createProxy(invocationHandler, Result.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
+    }
+
+    @Override
+    public Row wrapRow(Row row, QueryExecutionInfo queryExecutionInfo) {
+        Assert.requireNonNull(row, "row must not be null");
+        Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
+
+        CallbackHandler logic = new RowCallbackHandler(row, queryExecutionInfo, this.proxyConfig);
+        CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
+        return createProxy(invocationHandler, Row.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
     }
 
     @SuppressWarnings("unchecked")

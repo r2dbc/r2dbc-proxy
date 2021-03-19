@@ -8,17 +8,18 @@ R2DBC Proxy is a thin transparent layer.
 From callers(application or another library), proxies are simply viewed as R2DBC SPI objects.
 This is similar to how connection pooling is viewed from upper layer.
 
-This section describes three key concept of the R2DBC Proxy:
+This section describes the key concepts of the R2DBC Proxy:
 
 - <<overview_proxies>>
 - <<overview_listeners>>
 - <<overview_formatters>>
+- <<overview_converters>>
 
 
 [[overview_proxies]]
 == Proxies
 
-Each SPI object(`Connection`, `Statement`, `Batch`, and `Result`) created by `ProxyConnectionFactory`
+Each SPI object(`Connection`, `Statement`, `Batch`, `Result`, and `Row`) created by `ProxyConnectionFactory`
 is wrapped by a proxy.
 
 When a caller invokes a method on the proxy, it triggers corresponding callback methods on the registered listeners.
@@ -49,3 +50,13 @@ Formatters are utility classes that covert `MethodExecutionInfo` and `QueryExecu
 
 `QueryExecutionInfoFormatter` and `MethodExecutionInfoFormatter` are available out of the box
 to transform `QueryExecutionInfo` and `MethodExecutionInfo`, respectively.
+
+[[overview_converters]]
+== Converters
+
+Converters are the callbacks that could alter the original invocation.
+
+Currently, `BindParameterConverter` and `ResultRowConverter` are available.
+They represent bind operations(`Statement#[bind|bindNull]`) and result row get operations(`Row#get`), respectively.
+The converters can change the result, call alternative methods, or even not invoke the originally
+called method.

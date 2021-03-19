@@ -21,11 +21,14 @@ import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Row;
+import io.r2dbc.spi.RowMetadata;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 
 /**
  * Proxy callback handler for {@link Result}.
@@ -60,6 +63,7 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Assert.requireNonNull(proxy, "proxy must not be null");
         Assert.requireNonNull(method, "method must not be null");
@@ -71,6 +75,15 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
             return this.result;
         } else if ("unwrapConnection".equals(methodName)) {  // for ConnectionHolder
             return connectionInfo.getOriginalConnection();
+        }
+
+        if ("map".equals(methodName)) {
+            BiFunction<Row, RowMetadata, ?> mappingFunction = (BiFunction<Row, RowMetadata, ?>)args[0];
+            BiFunction<Row, RowMetadata, ?> newMappingFunction = (row, rowMetadata) -> {
+                Row rowProxy = this.proxyConfig.getProxyFactory().wrapRow(row, this.queryExecutionInfo);
+                return mappingFunction.apply(rowProxy, rowMetadata);
+            };
+            args[0] = newMappingFunction;
         }
 
         Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null);

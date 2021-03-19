@@ -23,6 +23,7 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.IsolationLevel;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.ValidationDepth;
 
@@ -489,6 +490,26 @@ public interface ProxyMethodExecutionListener extends ProxyExecutionListener {
      * @param methodExecutionInfo the current method execution info; never {@code null}.
      */
     default void afterMapOnResult(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    //
+    // For Row
+    //
+
+    /**
+     * Callback that is invoked <em>before</em> {@code Row#get(...)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeGetOnRow(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@code Row#get(...)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterGetOnRow(MethodExecutionInfo methodExecutionInfo) {
     }
 
     //

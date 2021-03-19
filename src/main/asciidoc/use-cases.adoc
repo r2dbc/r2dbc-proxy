@@ -240,3 +240,70 @@ static class MyListener implements ProxyMethodExecutionListener {
 	}
 }
 ----
+
+[[use-cases_support-primitive-and-null-in-result-mapping]]
+== Support Primitive and Null in Result Mapping
+
+To consume query results, `Result#map` method accepts a mapping function(`BiFunction`) that takes `Row` and `RowMetadata`.
+
+[source,java]
+----
+result.map((row, rowMetadata) -> row.get("name", String.class));
+----
+
+The `Row#get` method takes a `Class` in the second argument to represent the returning value type(data type).
+R2DBC spec does not support primitive types for this data type. Only boxed(wrapper) types are supported.
+
+By modifying the `Row#get` behavior, `ResultRowConverter` can provide support for primitive types.
+
+Following converter transforms a primitive to the corresponding wrapper data type.
+(e.g. `row.get(0, int.class)` to `row.get(0, Integer.class)`) +
+Also, this converter handles `null` return value.
+
+[source,java]
+----
+ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
+    if (args.length == 2 && ((Class<?>) args[1]).isPrimitive()) {
+        Class<?> boxedType = getWrapperType(args[1]);
+        Object result = proxyRow.get((int) args[0], boxedType);
+        if (result == null) {
+            return getDefaultValue(boxedType);  // null handling
+        }
+        return result;
+    }
+    return getOperation.proceed();
+};
+// implement `getWrapperType()` and `getDefaultValue()` with own strategy
+----
+
+[[use-cases_call-different-methods-in-result-mapping]]
+== Call different methods in Result Mapping
+
+By modifying the `Row#get` behavior with `ResultRowConverter`, following converters support column names that do not exist.
+
+.Support virtual/derived column
+[source,java]
+----
+ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
+   if ("full_name".equals(args[0])) {
+       String firstName = proxyRow.get("first_name", String.class);
+       String lastName = proxyRow.get("last_name", String.class);
+       return firstName + " " + lastName;
+   }
+   return getOperation.proceed();   // invoke original method
+);
+----
+
+.Support column name change
+[source,java]
+----
+ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
+    if ("column_old".equals(args[0])) {
+        if (args.length == 1) {
+            return proxyRow.get("column_new");
+        }
+        return proxyRow.get("column_new", (Class<?>)args[1]);
+    }
+    return getOperation.proceed();   // invoke original method
+);
+----
