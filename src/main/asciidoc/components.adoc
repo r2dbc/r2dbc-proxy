@@ -238,3 +238,17 @@ For example, a converter can transform the bind markers.
 
 Please see more details on the
 https://github.com/r2dbc/r2dbc-proxy/issues/26["gh-26: Proxy mechanism to support converting bind marker"] github issue.
+
+
+[[components_resultrowconverter]]
+== ResultRowConverter
+
+`ResultRowConverter` is a callback interface for result row get(`Row#get`) operations.
+
+The callback is performed *before* calling the actual `Row#get` operation.
+This converter can alter the actual behavior of the invoked `Row#get` method.
+
+Sample usages:
+
+* <<use-cases_support-primitive-and-null-in-result-mapping>>
+* <<use-cases_call-different-methods-in-result-mapping>>
