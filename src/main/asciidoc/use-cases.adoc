@@ -254,9 +254,9 @@ result.map((row, rowMetadata) -> row.get("name", String.class));
 The `Row#get` method takes a `Class` in the second argument to represent the returning value type(data type).
 R2DBC spec does not support primitive types for this data type. Only boxed(wrapper) types are supported.
 
-By modifying the `Row#get` behavior, `ResultRowConverter` can provide support for primitive types.
+`ResultRowConverter` can provide support for primitive types by modifying the `Row#get` behavior.
 
-Following converter transforms a primitive to the corresponding wrapper data type.
+The following converter transforms a primitive to a corresponding wrapper data type.
 (e.g. `row.get(0, int.class)` to `row.get(0, Integer.class)`) +
 Also, this converter handles `null` return value.
 
@@ -274,12 +274,15 @@ ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
     return getOperation.proceed();
 };
 // implement `getWrapperType()` and `getDefaultValue()` with own strategy
+
+// register to the ProxyConfig
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();
 ----
 
 [[use-cases_call-different-methods-in-result-mapping]]
 == Call different methods in Result Mapping
 
-By modifying the `Row#get` behavior with `ResultRowConverter`, following converters support column names that do not exist.
+By modifying the `Row#get` behavior with `ResultRowConverter`, the following converters support column names that do not exist.
 
 .Support virtual/derived column
 [source,java]

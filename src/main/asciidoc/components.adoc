@@ -248,6 +248,17 @@ https://github.com/r2dbc/r2dbc-proxy/issues/26["gh-26: Proxy mechanism to suppor
 The callback is performed *before* calling the actual `Row#get` operation.
 This converter can alter the actual behavior of the invoked `Row#get` method.
 
+To use the converter, register it to the `ProxyConfig`.
+
+[source,java]
+----
+ResultRowConverter converter = ...
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();
+
+// create a proxy ConnectionFactory
+ConnectionFactory proxy = ProxyConnectionFactory.builder(connectionFactory, proxyConfig).build();
+----
+
 Sample usages:
 
 * <<use-cases_support-primitive-and-null-in-result-mapping>>
