@@ -84,7 +84,7 @@
 <div class="details">
 <span id="author" class="author">Tadaya Tsuyukubo &lt;tadaya@ttddyy.net&gt;</span><br>
 <span id="revnumber">version 0.9.0.BUILD-SNAPSHOT,</span>
-<span id="revdate">2021-03-19</span>
+<span id="revdate">2021-03-20</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -811,6 +811,18 @@ For example, a converter can transform the bind markers.</p>
 This converter can alter the actual behavior of the invoked <code>Row#get</code> method.</p>
 </div>
 <div class="paragraph">
+<p>To use the converter, pass it to the <code>ProxyConfig</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = ...
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();
+
+// create a proxy ConnectionFactory
+ConnectionFactory proxy = ProxyConnectionFactory.builder(connectionFactory, proxyConfig).build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>Sample usages:</p>
 </div>
 <div class="ulist">
@@ -1180,7 +1192,10 @@ Also, this converter handles <code>null</code> return value.</p>
     }
     return getOperation.proceed();
 };
-// implement `getWrapperType()` and `getDefaultValue()` with own strategy</code></pre>
+// implement `getWrapperType()` and `getDefaultValue()` with own strategy
+
+// register to the ProxyConfig
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();</code></pre>
 </div>
 </div>
 </div>
@@ -1223,7 +1238,7 @@ Also, this converter handles <code>null</code> return value.</p>
 <div id="footer">
 <div id="footer-text">
 Version 0.9.0.BUILD-SNAPSHOT<br>
-Last updated 2021-03-19 23:45:43 UTC
+Last updated 2021-03-20 00:19:55 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

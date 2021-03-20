@@ -486,7 +486,10 @@ Also, this converter handles <code>null</code> return value.</p>
     }
     return getOperation.proceed();
 };
-// implement `getWrapperType()` and `getDefaultValue()` with own strategy</code></pre>
+// implement `getWrapperType()` and `getDefaultValue()` with own strategy
+
+// register to the ProxyConfig
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();</code></pre>
 </div>
 </div>
 </div>
@@ -529,7 +532,7 @@ Also, this converter handles <code>null</code> return value.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-19 23:45:43 UTC
+Last updated 2021-03-20 00:19:55 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

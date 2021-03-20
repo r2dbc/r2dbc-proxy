@@ -397,6 +397,18 @@ For example, a converter can transform the bind markers.</p>
 This converter can alter the actual behavior of the invoked <code>Row#get</code> method.</p>
 </div>
 <div class="paragraph">
+<p>To use the converter, pass it to the <code>ProxyConfig</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = ...
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();
+
+// create a proxy ConnectionFactory
+ConnectionFactory proxy = ProxyConnectionFactory.builder(connectionFactory, proxyConfig).build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>Sample usages:</p>
 </div>
 <div class="ulist">
@@ -414,7 +426,7 @@ This converter can alter the actual behavior of the invoked <code>Row#get</code>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-19 23:45:43 UTC
+Last updated 2021-03-20 00:19:55 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
