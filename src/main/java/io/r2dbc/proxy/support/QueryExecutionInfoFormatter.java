@@ -208,10 +208,16 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
         boolean isEnum = type instanceof Enum;
         String typeStr = isEnum ? type.toString() : type.getJavaType().getSimpleName();
 
+        boolean isInParameter = parameter instanceof Parameter.In;
+        boolean isOutParameter = parameter instanceof Parameter.Out;
+        boolean isInOutParameter = isInParameter && isOutParameter;
+
         sb.append("(");
-        if (parameter instanceof Parameter.In) {
+        if (isInOutParameter) {
+            sb.append("inout,");
+        } else if (isInParameter) {
             sb.append("in,");
-        } else if (parameter instanceof Parameter.Out) {
+        } else if (isOutParameter) {
             sb.append("out,");
         }
         sb.append(typeStr);

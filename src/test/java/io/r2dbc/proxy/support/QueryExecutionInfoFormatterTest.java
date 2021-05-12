@@ -635,7 +635,9 @@ public class QueryExecutionInfoFormatterTest {
             Blob blob = MockBlob.empty();
             Clob clob = MockClob.empty();
             return Stream.of(
+                //
                 // in parameters
+                //
                 arguments(Parameters.in(R2dbcType.BOOLEAN), "Bindings:[(null(in,BOOLEAN))]"),
                 arguments(Parameters.in(String.class), "Bindings:[(null(in,String))]"),
                 arguments(Parameters.in("FOO"), "Bindings:[(FOO(in,String))]"),
@@ -655,26 +657,42 @@ public class QueryExecutionInfoFormatterTest {
                 arguments(Parameters.in(new ClassCustomType(), "abc"), "Bindings:[(abc(in,CustomJavaType))]"),
                 arguments(Parameters.in(EnumCustomType.ENUM_CUSTOM_FOO, "abc"), "Bindings:[(abc(in,ENUM_CUSTOM_FOO))]"),
 
+                //
                 // out parameters
+                //
                 arguments(Parameters.out(R2dbcType.BOOLEAN), "Bindings:[(null(out,BOOLEAN))]"),
                 arguments(Parameters.out(String.class), "Bindings:[(null(out,String))]"),
-                arguments(Parameters.out("FOO"), "Bindings:[(FOO(out,String))]"),
-                arguments(Parameters.out(R2dbcType.INTEGER, 10), "Bindings:[(10(out,INTEGER))]"),
-                arguments(Parameters.out(R2dbcType.DOUBLE, null), "Bindings:[(null(out,DOUBLE))]"),
                 // clob/blob
                 arguments(Parameters.out(Clob.class), "Bindings:[(null(out,Clob))]"),
-                arguments(Parameters.out(clob), "Bindings:[(<clob>(out,MockClob))]"),
-                arguments(Parameters.out(R2dbcType.CLOB, clob), "Bindings:[(<clob>(out,CLOB))]"),
                 arguments(Parameters.out(Blob.class), "Bindings:[(null(out,Blob))]"),
-                arguments(Parameters.out(blob), "Bindings:[(<blob>(out,MockBlob))]"),
-                arguments(Parameters.out(R2dbcType.BLOB, blob), "Bindings:[(<blob>(out,BLOB))]"),
                 // custom type
                 arguments(Parameters.out(new ClassCustomType()), "Bindings:[(null(out,CustomJavaType))]"),
                 arguments(Parameters.out(EnumCustomType.ENUM_CUSTOM_FOO), "Bindings:[(null(out,ENUM_CUSTOM_FOO))]"),
                 arguments(Parameters.out(ClassCustomType.class), "Bindings:[(null(out,ClassCustomType))]"),
-                arguments(Parameters.out(new ClassCustomType(), "abc"), "Bindings:[(abc(out,CustomJavaType))]"),
-                arguments(Parameters.out(EnumCustomType.ENUM_CUSTOM_FOO, "abc"), "Bindings:[(abc(out,ENUM_CUSTOM_FOO))]")
 
+                //
+                // inout parameters
+                //
+                arguments(Parameters.inOut("FOO"), "Bindings:[(FOO(inout,String))]"),
+                arguments(Parameters.inOut(String.class), "Bindings:[(null(inout,String))]"),
+                arguments(Parameters.inOut(R2dbcType.INTEGER), "Bindings:[(null(inout,INTEGER))]"),
+                arguments(Parameters.inOut(R2dbcType.INTEGER, 10), "Bindings:[(10(inout,INTEGER))]"),
+                arguments(Parameters.inOut(R2dbcType.DOUBLE, null), "Bindings:[(null(inout,DOUBLE))]"),
+                // clob/blob
+                arguments(Parameters.inOut(Clob.class), "Bindings:[(null(inout,Clob))]"),
+                arguments(Parameters.inOut(clob), "Bindings:[(<clob>(inout,MockClob))]"),
+                arguments(Parameters.inOut(R2dbcType.CLOB, clob), "Bindings:[(<clob>(inout,CLOB))]"),
+                arguments(Parameters.inOut(R2dbcType.CLOB, null), "Bindings:[(null(inout,CLOB))]"),
+                arguments(Parameters.inOut(Blob.class), "Bindings:[(null(inout,Blob))]"),
+                arguments(Parameters.inOut(blob), "Bindings:[(<blob>(inout,MockBlob))]"),
+                arguments(Parameters.inOut(R2dbcType.BLOB, blob), "Bindings:[(<blob>(inout,BLOB))]"),
+                arguments(Parameters.inOut(R2dbcType.BLOB, null), "Bindings:[(null(inout,BLOB))]"),
+                // custom type
+                arguments(Parameters.inOut(new ClassCustomType()), "Bindings:[(null(inout,CustomJavaType))]"),
+                arguments(Parameters.inOut(EnumCustomType.ENUM_CUSTOM_FOO), "Bindings:[(null(inout,ENUM_CUSTOM_FOO))]"),
+                arguments(Parameters.inOut(ClassCustomType.class), "Bindings:[(null(inout,ClassCustomType))]"),
+                arguments(Parameters.inOut(new ClassCustomType(), "abc"), "Bindings:[(abc(inout,CustomJavaType))]"),
+                arguments(Parameters.inOut(EnumCustomType.ENUM_CUSTOM_FOO, "abc"), "Bindings:[(abc(inout,ENUM_CUSTOM_FOO))]")
             );
         }
     }
