@@ -1,6 +1,11 @@
 R2DBC Proxy Changelog
 =============================
 
+0.8.6.RELEASE
+------------------
+* Upgrade to Reactor Dysprosium SR20 #91
+* Upgrade to R2DBC SPI 0.8.5.RELEASE #92
+
 0.8.5.RELEASE
 ------------------
 * Upgrade to Reactor Dysprosium SR17 #84
