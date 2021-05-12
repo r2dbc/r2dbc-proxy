@@ -107,11 +107,11 @@ public class ProxyConnectionFactoryProviderTest {
         assertThat(unwrapped).isSameAs(connectionFactory);
 
         ConnectionFactoryOptions receivedOptions = receivedOptionsHolder.get();
-        String receivedDriver = receivedOptions.getValue(DRIVER);
-        String receivedProtocol = receivedOptions.getValue(PROTOCOL);
+        Object receivedDriver = receivedOptions.getValue(DRIVER);
+        Object receivedProtocol = receivedOptions.getValue(PROTOCOL);
 
         assertThat(receivedDriver).isEqualTo("foo");
-        assertThat(receivedProtocol).isEmpty();
+        assertThat(receivedProtocol).asString().isEmpty();
     }
 
     @Test
@@ -130,8 +130,8 @@ public class ProxyConnectionFactoryProviderTest {
             .build());
 
         ConnectionFactoryOptions receivedOptions = receivedOptionsHolder.get();
-        String receivedDriver = receivedOptions.getValue(DRIVER);
-        String receivedProtocol = receivedOptions.getValue(PROTOCOL);
+        Object receivedDriver = receivedOptions.getValue(DRIVER);
+        Object receivedProtocol = receivedOptions.getValue(PROTOCOL);
 
         assertThat(receivedDriver).isEqualTo("foo");
         assertThat(receivedProtocol).isEqualTo("bar:baz");

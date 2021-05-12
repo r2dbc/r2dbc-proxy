@@ -84,7 +84,11 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
         //   | DRIVER   | proxy        | postgres   |
         //   | PROTOCOL | postgres     | <empty>    |
 
-        String protocol = connectionFactoryOptions.getRequiredValue(ConnectionFactoryOptions.PROTOCOL);
+        Object protocolValue = connectionFactoryOptions.getRequiredValue(ConnectionFactoryOptions.PROTOCOL);
+        if (!(protocolValue instanceof String)) {
+            throw new IllegalArgumentException(format("Protocol %s is not String.", protocolValue));
+        }
+        String protocol = (String) protocolValue;
         if (protocol.trim().length() == 0) {
             throw new IllegalArgumentException(format("Protocol %s is not valid.", protocol));
         }
@@ -159,7 +163,7 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
     public boolean supports(ConnectionFactoryOptions connectionFactoryOptions) {
         Assert.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 
-        String driver = connectionFactoryOptions.getValue(ConnectionFactoryOptions.DRIVER);
+        Object driver = connectionFactoryOptions.getValue(ConnectionFactoryOptions.DRIVER);
         return PROXY_DRIVER.equals(driver);
     }
 
