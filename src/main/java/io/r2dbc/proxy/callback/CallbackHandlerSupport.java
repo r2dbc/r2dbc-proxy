@@ -213,15 +213,16 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         Assert.requireNonNull(publisher, "flux must not be null");
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 
+        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(new StopWatch(this.proxyConfig.getClock()));
         ProxyFactory proxyFactory = this.proxyConfig.getProxyFactory();
         Function<? super Publisher<Result>, ? extends Publisher<Result>> transformer =
             Operators.liftPublisher((pub, subscriber) ->
-                new QueryInvocationSubscriber(subscriber, executionInfo, proxyConfig));
+                new QueryInvocationSubscriber(subscriber, executionInfo, proxyConfig, queriesExecutionCounter));
 
         return Flux.from(publisher)
             .cast(Result.class)
             .transform(transformer)
-            .map(queryResult -> proxyFactory.wrapResult(queryResult, executionInfo));
+            .map(queryResult -> proxyFactory.wrapResult(queryResult, executionInfo, queriesExecutionCounter));
     }
 
     /**

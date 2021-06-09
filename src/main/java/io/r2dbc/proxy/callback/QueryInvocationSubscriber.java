@@ -40,29 +40,28 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
 
     private final ProxyExecutionListener listener;
 
-    private final StopWatch stopWatch;
+    private final QueriesExecutionCounter queriesExecutionCounter;
 
     private Subscription subscription;
 
-    public QueryInvocationSubscriber(CoreSubscriber<? super Result> delegate, MutableQueryExecutionInfo executionInfo, ProxyConfig proxyConfig) {
+    public QueryInvocationSubscriber(CoreSubscriber<? super Result> delegate, MutableQueryExecutionInfo executionInfo, ProxyConfig proxyConfig, QueriesExecutionCounter queriesExecutionCounter) {
         this.delegate = delegate;
         this.executionInfo = executionInfo;
         this.listener = proxyConfig.getListeners();
-        this.stopWatch = new StopWatch(proxyConfig.getClock());
+        this.queriesExecutionCounter = queriesExecutionCounter;
     }
 
     @Override
     public void onSubscribe(Subscription s) {
         this.subscription = s;
+        this.queriesExecutionCounter.queryStarted();
         beforeQuery();
         this.delegate.onSubscribe(this);
     }
 
     @Override
     public void onNext(Result result) {
-        // When at least one element is emitted, consider query execution is success, even when
-        // the publisher is canceled. see https://github.com/r2dbc/r2dbc-proxy/issues/55
-        this.executionInfo.setSuccess(true);
+        this.queriesExecutionCounter.addGeneratedResult();
         this.delegate.onNext(result);
     }
 
@@ -76,8 +75,12 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
 
     @Override
     public void onComplete() {
-        this.executionInfo.setSuccess(true);
-        afterQuery();
+        this.queriesExecutionCounter.allResultHasBeenGenerated();
+        if (this.queriesExecutionCounter.isQueryEnded()) {
+            this.executionInfo.setSuccess(true);
+            afterQuery();
+        }
+
         this.delegate.onComplete();
     }
 
@@ -89,7 +92,10 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
     @Override
     public void cancel() {
         // do not determine success/failure by cancel
-        afterQuery();
+        this.queriesExecutionCounter.allResultHasBeenGenerated();
+        if (this.queriesExecutionCounter.isQueryEnded()) {
+            afterQuery();
+        }
         this.subscription.cancel();
     }
 
@@ -137,13 +143,11 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
         this.executionInfo.setCurrentMappedResult(null);
         this.executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
 
-        this.stopWatch.start();
-
         this.listener.beforeQuery(this.executionInfo);
     }
 
     private void afterQuery() {
-        this.executionInfo.setExecuteDuration(this.stopWatch.getElapsedDuration());
+        this.executionInfo.setExecuteDuration(this.queriesExecutionCounter.getElapsedDuration());
         this.executionInfo.setThreadName(Thread.currentThread().getName());
         this.executionInfo.setThreadId(Thread.currentThread().getId());
         this.executionInfo.setCurrentMappedResult(null);
