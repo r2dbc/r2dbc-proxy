@@ -86,6 +86,6 @@ public interface ProxyFactory {
      * @throws IllegalArgumentException if {@code result} is {@code null}
      * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
-    Result wrapResult(Result result, QueryExecutionInfo executionInfo);
+    Result wrapResult(Result result, QueryExecutionInfo executionInfo, QueriesExecutionCounter queriesExecutionCounter);
 
 }

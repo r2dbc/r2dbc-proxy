@@ -76,7 +76,7 @@ public class JdkProxyFactoryTest {
         ConnectionInfo connectionInfo = MockConnectionInfo.empty();
         StatementInfo statementInfo = MockStatementInfo.empty();
         QueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();  // need to be mutable
-
+        QueriesExecutionCounter queriesExecutionCounter = mock(QueriesExecutionCounter.class);
         Object wrapped;
 
         wrapped = this.proxyFactory.wrapConnectionFactory(connectionFactory);
@@ -103,7 +103,7 @@ public class JdkProxyFactoryTest {
         assertThat(wrapped).isInstanceOf(ConnectionHolder.class);
         assertThat(wrapped).isInstanceOf(ProxyConfigHolder.class);
 
-        wrapped = this.proxyFactory.wrapResult(result, queryExecutionInfo);
+        wrapped = this.proxyFactory.wrapResult(result, queryExecutionInfo, queriesExecutionCounter);
         assertThat(Proxy.isProxyClass(wrapped.getClass())).isTrue();
         assertThat(wrapped).isInstanceOf(Wrapped.class);
         assertThat(wrapped).isInstanceOf(ConnectionHolder.class);

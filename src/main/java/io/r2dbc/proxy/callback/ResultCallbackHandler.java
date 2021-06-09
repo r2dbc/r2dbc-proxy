@@ -38,6 +38,8 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
     private final MutableQueryExecutionInfo queryExecutionInfo;
 
+    private final QueriesExecutionCounter queriesExecutionCounter;
+
     /**
      * Callback handler logic for {@link Result}.
      *
@@ -47,16 +49,20 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
      * @param result             query result
      * @param queryExecutionInfo query execution info
      * @param proxyConfig        proxy config
+     * @param queriesExecutionCounter queries execution counter
      * @throws IllegalArgumentException if {@code result} is {@code null}
      * @throws IllegalArgumentException if {@code queryExecutionInfo} is {@code null}
      * @throws IllegalArgumentException if {@code proxyConfig} is {@code null}
+     * @throws IllegalArgumentException if {@code queriesExecutionCounter} is {@code null}
      * @throws IllegalArgumentException if {@code queryExecutionInfo} is not an instance of {@link MutableQueryExecutionInfo}
      */
-    public ResultCallbackHandler(Result result, QueryExecutionInfo queryExecutionInfo, ProxyConfig proxyConfig) {
+    public ResultCallbackHandler(Result result, QueryExecutionInfo queryExecutionInfo, ProxyConfig proxyConfig, QueriesExecutionCounter queriesExecutionCounter) {
         super(proxyConfig);
         this.result = Assert.requireNonNull(result, "result must not be null");
         Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
         this.queryExecutionInfo = Assert.requireType(queryExecutionInfo, MutableQueryExecutionInfo.class, "queryExecutionInfo must be MutableQueryExecutionInfo");
+        Assert.requireNonNull(queriesExecutionCounter, "queriesExecutionCounter must not be null");
+        this.queriesExecutionCounter = queriesExecutionCounter;
     }
 
     @Override
@@ -75,14 +81,11 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
         Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null);
 
-        if ("map".equals(methodName)) {
-
+        if ("map".equals(methodName) || "getRowsUpdated".equals(methodName)) {
             AtomicInteger resultCount = new AtomicInteger(0);
 
-            // add logic to call "listener#eachQueryResult()"
             return Flux.from((Publisher<?>) invocationResult)
                 .doOnEach(signal -> {
-
                     boolean proceed = signal.isOnNext() || signal.isOnError();
                     if (!proceed) {
                         return;
@@ -93,16 +96,17 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
                     if (signal.isOnNext()) {
                         Object mappedResult = signal.get();
 
+                        this.queryExecutionInfo.setSuccess(true);
                         this.queryExecutionInfo.setCurrentResultCount(count);
                         this.queryExecutionInfo.setCurrentMappedResult(mappedResult);
                         this.queryExecutionInfo.setThrowable(null);
                     } else {
                         // onError
                         Throwable thrown = signal.getThrowable();
+                        this.queryExecutionInfo.setSuccess(false);
                         this.queryExecutionInfo.setCurrentResultCount(count);
                         this.queryExecutionInfo.setCurrentMappedResult(null);
                         this.queryExecutionInfo.setThrowable(thrown);
-
                     }
 
                     this.queryExecutionInfo.setProxyEventType(ProxyEventType.EACH_QUERY_RESULT);
@@ -114,13 +118,25 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
                     // callback
                     this.proxyConfig.getListeners().eachQueryResult(this.queryExecutionInfo);
+                })
+                .switchIfEmpty(Flux.defer(() -> {
+                    this.queryExecutionInfo.setSuccess(true);
+                    return Flux.empty();
+                }))
+                .doOnTerminate(() -> {
+                    this.queriesExecutionCounter.resultProcessed();
+                    if (this.queriesExecutionCounter.isQueryEnded()) {
+                        this.queryExecutionInfo.setExecuteDuration(this.queriesExecutionCounter.getElapsedDuration());
+                        this.queryExecutionInfo.setThreadName(Thread.currentThread().getName());
+                        this.queryExecutionInfo.setThreadId(Thread.currentThread().getId());
+                        this.queryExecutionInfo.setCurrentMappedResult(null);
+                        this.queryExecutionInfo.setProxyEventType(ProxyEventType.AFTER_QUERY);
 
+                        this.proxyConfig.getListeners().afterQuery(this.queryExecutionInfo);
+                    }
                 });
-
         }
 
         return invocationResult;
-
     }
-
 }
