@@ -54,8 +54,12 @@ public class ProxyMethodExecutionListenerAdapterTest {
     @ProxyClassesSource
     void methodInvocations(Class<?> clazz) {
         String className = clazz.getSimpleName();
-        Method[] declaredMethods = clazz.getDeclaredMethods();
+        Method[] declaredMethods = clazz.getMethods();
         for (Method methodToInvoke : declaredMethods) {
+            if (methodToInvoke.isSynthetic()) {
+                continue;
+            }
+
             String methodName = methodToInvoke.getName();
 
             // beforeXxxOnYyy : Xxx is a capitalized method-name and Yyy is a capitalized class-name
@@ -64,6 +68,7 @@ public class ProxyMethodExecutionListenerAdapterTest {
 
             // mock executing method
             MethodExecutionInfo methodExecutionInfo = MockMethodExecutionInfo.builder()
+                .target(mock(clazz))
                 .method(methodToInvoke)
                 .build();
 
@@ -170,6 +175,7 @@ public class ProxyMethodExecutionListenerAdapterTest {
         assertThat(getMetadataMethod).isNotEqualTo(getMetadataMethodFromInterface);
 
         MethodExecutionInfo methodExecutionInfo = MockMethodExecutionInfo.builder()
+            .target(mock(MyConnectionFactory.class))
             .method(getMetadataMethod)
             .build();
 

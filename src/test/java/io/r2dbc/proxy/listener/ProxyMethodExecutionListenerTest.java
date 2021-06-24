@@ -36,10 +36,11 @@ public class ProxyMethodExecutionListenerTest {
     @ParameterizedTest
     @ProxyClassesSource
     void verifyMethodNames(Class<?> clazz) {
-
         String className = clazz.getSimpleName();
 
-        Set<String> expected = Stream.of(clazz.getDeclaredMethods())
+        // to cover methods defined on the parent class (e.g. Row#get), use "Class#getMethods"
+        Set<String> expected = Stream.of(clazz.getMethods())
+            .filter((method) -> !method.isSynthetic())
             .map(Method::getName)
             .flatMap(methodName -> {
                 // beforeXxxOnYyy / afterXxxOnYyy

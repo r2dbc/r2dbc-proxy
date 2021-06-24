@@ -74,9 +74,9 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
     private void invokeMethodCallback(MethodExecutionInfo executionInfo, boolean isBefore) {
         Method method = executionInfo.getMethod();
         String methodName = method.getName();
-        Class<?> methodDeclaringClass = method.getDeclaringClass();
+        Object target = executionInfo.getTarget();
 
-        if (ConnectionFactory.class.isAssignableFrom(methodDeclaringClass)) {
+        if (target instanceof ConnectionFactory) {
             // ConnectionFactory methods
             if ("create".equals(methodName)) {
                 if (isBefore) {
@@ -91,7 +91,7 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
                     this.delegate.afterGetMetadataOnConnectionFactory(executionInfo);
                 }
             }
-        } else if (Connection.class.isAssignableFrom(methodDeclaringClass)) {
+        } else if (target instanceof Connection) {
             // Connection methods
             if ("beginTransaction".equals(methodName)) {
                 if (isBefore) {
@@ -184,7 +184,7 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
                     this.delegate.afterGetMetadataOnConnection(executionInfo);
                 }
             }
-        } else if (Batch.class.isAssignableFrom(methodDeclaringClass)) {
+        } else if (target instanceof Batch) {
             // Batch methods
             if ("add".equals(methodName)) {
                 if (isBefore) {
@@ -199,7 +199,7 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
                     this.delegate.afterExecuteOnBatch(executionInfo);
                 }
             }
-        } else if (Statement.class.isAssignableFrom(methodDeclaringClass)) {
+        } else if (target instanceof Statement) {
             // Statement methods
             if ("add".equals(methodName)) {
                 if (isBefore) {
@@ -238,7 +238,7 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
                     this.delegate.afterReturnGeneratedValuesOnStatement(executionInfo);
                 }
             }
-        } else if (Result.class.isAssignableFrom(methodDeclaringClass)) {
+        } else if (target instanceof Result) {
             if ("getRowsUpdated".equals(methodName)) {
                 if (isBefore) {
                     this.delegate.beforeGetRowsUpdatedOnResult(executionInfo);
@@ -252,12 +252,18 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
                     this.delegate.afterMapOnResult(executionInfo);
                 }
             }
-        } else if (Row.class.isAssignableFrom(methodDeclaringClass)) {
+        } else if (target instanceof Row) {
             if ("get".equals(methodName)) {
                 if (isBefore) {
                     this.delegate.beforeGetOnRow(executionInfo);
                 } else {
                     this.delegate.afterGetOnRow(executionInfo);
+                }
+            } else if ("getMetadata".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeGetMetadataOnRow(executionInfo);
+                } else {
+                    this.delegate.afterGetMetadataOnRow(executionInfo);
                 }
             }
         }

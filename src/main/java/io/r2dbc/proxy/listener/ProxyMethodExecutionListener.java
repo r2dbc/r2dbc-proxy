@@ -512,6 +512,22 @@ public interface ProxyMethodExecutionListener extends ProxyExecutionListener {
     default void afterGetOnRow(MethodExecutionInfo methodExecutionInfo) {
     }
 
+    /**
+     * Callback that is invoked <em>before</em> {@code Row#getMetadata(...)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeGetMetadataOnRow(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@code Row#getMetadata(...)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterGetMetadataOnRow(MethodExecutionInfo methodExecutionInfo) {
+    }
+
     //
     // For query execution
     //

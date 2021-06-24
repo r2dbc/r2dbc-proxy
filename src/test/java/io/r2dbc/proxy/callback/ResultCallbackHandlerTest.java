@@ -124,6 +124,7 @@ public class ResultCallbackHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void mapWithPublisherException() throws Throwable {
         LastExecutionAwareListener listener = new LastExecutionAwareListener();
 
@@ -136,7 +137,7 @@ public class ResultCallbackHandlerTest {
         TestPublisher<Object> publisher = TestPublisher.create().error(exception);
 
         Result mockResult = mock(Result.class);
-        when(mockResult.map(any())).thenReturn(publisher);
+        when(mockResult.map(any(BiFunction.class))).thenReturn(publisher);
 
         ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
