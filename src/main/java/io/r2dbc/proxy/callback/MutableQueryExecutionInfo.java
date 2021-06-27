@@ -23,6 +23,7 @@ import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.core.ValueStore;
+import io.r2dbc.spi.Result;
 import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
@@ -209,5 +210,4 @@ final class MutableQueryExecutionInfo implements QueryExecutionInfo {
     public Object getCurrentMappedResult() {
         return currentMappedResult;
     }
-
 }
