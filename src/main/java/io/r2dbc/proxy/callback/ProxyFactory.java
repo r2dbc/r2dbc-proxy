@@ -17,8 +17,8 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
-import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
+import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
@@ -80,12 +80,14 @@ public interface ProxyFactory {
     /**
      * Create a proxy {@link Result}.
      *
-     * @param result        original result
-     * @param executionInfo executionInfo
+     * @param result                  original result
+     * @param executionInfo           executionInfo
+     * @param queriesExecutionContext queries execution context
      * @return proxy result
      * @throws IllegalArgumentException if {@code result} is {@code null}
      * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
+     * @throws IllegalArgumentException if {@code queriesExecutionContext} is {@code null}
      */
-    Result wrapResult(Result result, QueryExecutionInfo executionInfo, QueriesExecutionCounter queriesExecutionCounter);
+    Result wrapResult(Result result, QueryExecutionInfo executionInfo, QueriesExecutionContext queriesExecutionContext);
 
 }

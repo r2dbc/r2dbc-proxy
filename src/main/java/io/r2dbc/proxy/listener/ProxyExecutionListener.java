@@ -21,8 +21,6 @@ import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Statement;
 
-import java.util.function.BiFunction;
-
 /**
  * Listener interface that is called when proxy is invoked.
  *
@@ -83,7 +81,7 @@ public interface ProxyExecutionListener {
     /**
      * Called on processing each query {@link io.r2dbc.spi.Result}.
      * <p>
-     * While processing query results with {@link io.r2dbc.spi.Result#map(BiFunction)}, this callback
+     * While processing query results {@link io.r2dbc.spi.Result}, this callback
      * is called per result.
      * <p>
      * {@link QueryExecutionInfo#getCurrentMappedResult()} contains the mapped result.

@@ -42,7 +42,6 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tadaya Tsuyukubo
  */
-
 class AfterQueryCallbackTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AfterQueryCallbackTest.class);
@@ -165,15 +164,14 @@ class AfterQueryCallbackTest {
         verifyListener(false, 0);
 
         // process the "getRowsUpdated" result
-        // "listener#eachQueryResult" won't be called for "getRowsUpdated"
         this.resultPublisherForGetRowsUpdated.next(100);
-        verifyListener(false, 0);
+        verifyListener(false, 1);
 
         this.executePublisher.complete();
-        verifyListener(false, 0);
+        verifyListener(false, 1);
 
         this.resultPublisherForGetRowsUpdated.complete();
-        verifyListener(true, 0);
+        verifyListener(true, 1);
     }
 
     @SuppressWarnings("unchecked")
@@ -219,7 +217,6 @@ class AfterQueryCallbackTest {
     }
 
     private void verifyListener(boolean isAfterQueryCalled, int eachQueryResultCount) {
-        assertThat(this.listener.isBeforeQueryCalled()).as("isBeforeQueryCalled").isTrue();
         assertThat(this.listener.isAfterQueryCalled()).as("isAfterQueryCalled").isEqualTo(isAfterQueryCalled);
         assertThat(this.listener.getEachQueryResultCount()).as("eachQueryResultCount").isEqualTo(eachQueryResultCount);
     }

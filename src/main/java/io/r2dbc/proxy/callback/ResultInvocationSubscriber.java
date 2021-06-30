@@ -26,15 +26,20 @@ import reactor.core.Fuseable;
 import reactor.core.Scannable;
 import reactor.util.annotation.Nullable;
 
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+
 /**
- * Custom subscriber/subscription to invoke query callback.
+ * Custom subscriber/subscription to on {@code Result#[map|getRowsUpdated]}..
  *
  * @author Tadaya Tsuyukubo
  * @see CallbackHandlerSupport#interceptQueryExecution(Publisher, MutableQueryExecutionInfo)
  */
-class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription, Scannable, Fuseable.QueueSubscription<Result> {
+class ResultInvocationSubscriber implements CoreSubscriber<Object>, Subscription, Scannable, Fuseable.QueueSubscription<Object> {
 
-    private final CoreSubscriber<? super Result> delegate;
+    private static final AtomicIntegerFieldUpdater<ResultInvocationSubscriber> RESULT_COUNT_INCREMENTER =
+        AtomicIntegerFieldUpdater.newUpdater(ResultInvocationSubscriber.class, "resultCount");
+
+    private final CoreSubscriber<Object> delegate;
 
     private final MutableQueryExecutionInfo executionInfo;
 
@@ -42,11 +47,14 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
 
     private final QueriesExecutionContext queriesExecutionContext;
 
+    /**
+     * Accessed via {@link #RESULT_COUNT_INCREMENTER}.
+     */
+    private volatile int resultCount;
+
     private Subscription subscription;
 
-    private boolean resultProduced;
-
-    public QueryInvocationSubscriber(CoreSubscriber<? super Result> delegate, MutableQueryExecutionInfo executionInfo, ProxyConfig proxyConfig, QueriesExecutionContext queriesExecutionContext) {
+    public ResultInvocationSubscriber(CoreSubscriber<Object> delegate, MutableQueryExecutionInfo executionInfo, ProxyConfig proxyConfig, QueriesExecutionContext queriesExecutionContext) {
         this.delegate = delegate;
         this.executionInfo = executionInfo;
         this.listener = proxyConfig.getListeners();
@@ -56,25 +64,20 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
     @Override
     public void onSubscribe(Subscription s) {
         this.subscription = s;
-        beforeQuery();
         this.delegate.onSubscribe(this);
     }
 
     @Override
-    public void onNext(Result result) {
-        this.queriesExecutionContext.incrementProducedCount();
-        this.resultProduced = true;
-        this.executionInfo.setSuccess(true);
-        this.delegate.onNext(result);
+    public void onNext(Object mappedResult) {
+        eachQueryResult(mappedResult, null);
+        this.delegate.onNext(mappedResult);
     }
 
     @Override
     public void onError(Throwable t) {
-        this.executionInfo.setThrowable(t);
-        this.executionInfo.setSuccess(false);
+        eachQueryResult(null, t);
 
-        // mark this publisher produced all Results
-        this.queriesExecutionContext.markAllProduced();
+        this.queriesExecutionContext.incrementConsumedCount();
         if (this.queriesExecutionContext.isQueryFinished()) {
             afterQuery();
         }
@@ -84,10 +87,8 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
 
     @Override
     public void onComplete() {
-        // mark this publisher produced all Results
-        this.queriesExecutionContext.markAllProduced();
+        this.queriesExecutionContext.incrementConsumedCount();
         if (this.queriesExecutionContext.isQueryFinished()) {
-            this.executionInfo.setSuccess(true);
             afterQuery();
         }
 
@@ -102,15 +103,11 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
     @Override
     public void cancel() {
         // do not determine success/failure by cancel
-        this.queriesExecutionContext.markAllProduced();
+        this.queriesExecutionContext.incrementConsumedCount();
         if (this.queriesExecutionContext.isQueryFinished()) {
-            // When at least one element is emitted, consider query execution is success, even when
-            // the publisher is canceled. see https://github.com/r2dbc/r2dbc-proxy/issues/55
-            if (this.resultProduced) {
-                this.executionInfo.setSuccess(true);
-            }
             afterQuery();
         }
+
         this.subscription.cancel();
     }
 
@@ -152,17 +149,6 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
 
     }
 
-    private void beforeQuery() {
-        this.executionInfo.setThreadName(Thread.currentThread().getName());
-        this.executionInfo.setThreadId(Thread.currentThread().getId());
-        this.executionInfo.setCurrentMappedResult(null);
-        this.executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
-
-        this.queriesExecutionContext.startStopwatch();
-
-        this.listener.beforeQuery(this.executionInfo);
-    }
-
     private void afterQuery() {
         this.executionInfo.setExecuteDuration(this.queriesExecutionContext.getElapsedDuration());
         this.executionInfo.setThreadName(Thread.currentThread().getName());
@@ -173,4 +159,21 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
         this.listener.afterQuery(this.executionInfo);
     }
 
+    private void eachQueryResult(@Nullable Object mappedResult, @Nullable Throwable throwable) {
+        this.executionInfo.setProxyEventType(ProxyEventType.EACH_QUERY_RESULT);
+        this.executionInfo.setThreadName(Thread.currentThread().getName());
+        this.executionInfo.setThreadId(Thread.currentThread().getId());
+
+        this.executionInfo.setCurrentResultCount(RESULT_COUNT_INCREMENTER.incrementAndGet(this));
+        this.executionInfo.setCurrentMappedResult(mappedResult);
+        if (throwable != null) {
+            this.executionInfo.setThrowable(throwable);
+            this.executionInfo.setSuccess(false);
+        } else {
+            this.executionInfo.setThrowable(null);
+            this.executionInfo.setSuccess(true);
+        }
+
+        this.listener.eachQueryResult(this.executionInfo);
+    }
 }

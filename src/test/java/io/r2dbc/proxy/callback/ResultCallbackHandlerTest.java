@@ -33,6 +33,7 @@ import reactor.test.StepVerifier;
 import reactor.test.publisher.TestPublisher;
 
 import java.lang.reflect.Method;
+import java.time.Clock;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
@@ -66,10 +67,10 @@ public class ResultCallbackHandlerTest {
         Row row2 = MockRow.builder().identified(0, String.class, "bar").build();
         Row row3 = MockRow.builder().identified(0, String.class, "baz").build();
         Result mockResult = MockResult.builder().row(row1, row2, row3).rowMetadata(MockRowMetadata.empty()).build();
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
-        queriesExecutionCounter.addGeneratedResult();
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
+        queriesExecutionContext.incrementProducedCount();
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         // map function to return the String value
         BiFunction<Row, RowMetadata, String> mapBiFunction = (row, rowMetadata) -> row.get(0, String.class);
@@ -96,7 +97,7 @@ public class ResultCallbackHandlerTest {
                 assertThat(queryExecutionInfo.getThreadId()).isEqualTo(threadId);
                 assertThat(queryExecutionInfo.getThreadName()).isEqualTo(threadName);
                 assertThat(queryExecutionInfo.getThrowable()).isNull();
-                assertThat(queriesExecutionCounter.areAllResultProcessed()).isFalse();
+                assertThat(queriesExecutionContext.isAllConsumed()).isFalse();
             })
             .assertNext(obj -> {  // second
                 assertThat(obj).isEqualTo("bar");
@@ -109,7 +110,7 @@ public class ResultCallbackHandlerTest {
                 assertThat(queryExecutionInfo.getThreadId()).isEqualTo(threadId);
                 assertThat(queryExecutionInfo.getThreadName()).isEqualTo(threadName);
                 assertThat(queryExecutionInfo.getThrowable()).isNull();
-                assertThat(queriesExecutionCounter.areAllResultProcessed()).isFalse();
+                assertThat(queriesExecutionContext.isAllConsumed()).isFalse();
             })
             .assertNext(obj -> {  // third
                 assertThat(obj).isEqualTo("baz");
@@ -122,11 +123,11 @@ public class ResultCallbackHandlerTest {
                 assertThat(queryExecutionInfo.getThreadId()).isEqualTo(threadId);
                 assertThat(queryExecutionInfo.getThreadName()).isEqualTo(threadName);
                 assertThat(queryExecutionInfo.getThrowable()).isNull();
-                assertThat(queriesExecutionCounter.areAllResultProcessed()).isFalse();
+                assertThat(queriesExecutionContext.isAllConsumed()).isFalse();
             })
             .verifyComplete();
 
-        assertThat(queriesExecutionCounter.areAllResultProcessed()).isTrue();
+        assertThat(queriesExecutionContext.isAllConsumed()).isTrue();
         assertThat(queryExecutionInfo.getProxyEventType()).isEqualTo(ProxyEventType.EACH_QUERY_RESULT).as("alert query has not be called");
     }
 
@@ -145,9 +146,9 @@ public class ResultCallbackHandlerTest {
         Result mockResult = mock(Result.class);
         when(mockResult.map(any())).thenReturn(publisher);
 
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{null};
@@ -159,7 +160,7 @@ public class ResultCallbackHandlerTest {
         long threadId = Thread.currentThread().getId();
         String threadName = Thread.currentThread().getName();
 
-        queriesExecutionCounter.addGeneratedResult();
+        queriesExecutionContext.incrementProducedCount();
         StepVerifier.create((Publisher<?>) result)
             .expectSubscription()
             .consumeErrorWith(thrown -> {
@@ -192,9 +193,9 @@ public class ResultCallbackHandlerTest {
             return null;
         };
 
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{mapBiFunction};
@@ -223,11 +224,11 @@ public class ResultCallbackHandlerTest {
         Row row3 = MockRow.builder().identified(0, String.class, "baz").build();
         Result mockResult = MockResult.builder().row(row1, row2, row3).rowMetadata(MockRowMetadata.empty()).build();
 
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
-        queriesExecutionCounter.addGeneratedResult();
-        queriesExecutionCounter.allResultHasBeenGenerated();
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
+        queriesExecutionContext.incrementProducedCount();
+        queriesExecutionContext.markAllProduced();
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         // map function to return the String value
         BiFunction<Row, RowMetadata, String> mapBiFunction = (row, rowMetadata) -> row.get(0, String.class);
@@ -254,7 +255,7 @@ public class ResultCallbackHandlerTest {
                 assertThat(queryExecutionInfo.getThreadId()).isEqualTo(threadId);
                 assertThat(queryExecutionInfo.getThreadName()).isEqualTo(threadName);
                 assertThat(queryExecutionInfo.getThrowable()).isNull();
-                assertThat(queriesExecutionCounter.areAllResultProcessed()).isFalse();
+                assertThat(queriesExecutionContext.isAllConsumed()).isFalse();
             })
             .assertNext(obj -> {  // second
                 assertThat(obj).isEqualTo("bar");
@@ -267,7 +268,7 @@ public class ResultCallbackHandlerTest {
                 assertThat(queryExecutionInfo.getThreadId()).isEqualTo(threadId);
                 assertThat(queryExecutionInfo.getThreadName()).isEqualTo(threadName);
                 assertThat(queryExecutionInfo.getThrowable()).isNull();
-                assertThat(queriesExecutionCounter.areAllResultProcessed()).isFalse();
+                assertThat(queriesExecutionContext.isAllConsumed()).isFalse();
             })
             .assertNext(obj -> {  // third
                 assertThat(obj).isEqualTo("baz");
@@ -280,11 +281,11 @@ public class ResultCallbackHandlerTest {
                 assertThat(queryExecutionInfo.getThreadId()).isEqualTo(threadId);
                 assertThat(queryExecutionInfo.getThreadName()).isEqualTo(threadName);
                 assertThat(queryExecutionInfo.getThrowable()).isNull();
-                assertThat(queriesExecutionCounter.areAllResultProcessed()).isFalse();
+                assertThat(queriesExecutionContext.isAllConsumed()).isFalse();
             })
             .verifyComplete();
 
-        assertThat(queriesExecutionCounter.areAllResultProcessed()).isTrue();
+        assertThat(queriesExecutionContext.isAllConsumed()).isTrue();
         assertThat(queryExecutionInfo.getProxyEventType()).isEqualTo(ProxyEventType.AFTER_QUERY);
         assertThat(queryExecutionInfo.getCurrentMappedResult()).isEqualTo(null);
         assertThat(queryExecutionInfo.getCurrentMappedResult()).isEqualTo(null);
@@ -308,9 +309,9 @@ public class ResultCallbackHandlerTest {
         Result mockResult = mock(Result.class);
         when(mockResult.map(any())).thenReturn(publisher);
 
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{null};
@@ -322,8 +323,8 @@ public class ResultCallbackHandlerTest {
         long threadId = Thread.currentThread().getId();
         String threadName = Thread.currentThread().getName();
 
-        queriesExecutionCounter.addGeneratedResult();
-        queriesExecutionCounter.allResultHasBeenGenerated();
+        queriesExecutionContext.incrementProducedCount();
+        queriesExecutionContext.markAllProduced();
 
         StepVerifier.create((Publisher<?>) result)
             .expectSubscription()
@@ -351,9 +352,9 @@ public class ResultCallbackHandlerTest {
         // return empty result
         Result mockResult = MockResult.builder().build();
 
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
-        queriesExecutionCounter.addGeneratedResult();
-        queriesExecutionCounter.allResultHasBeenGenerated();
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
+        queriesExecutionContext.incrementProducedCount();
+        queriesExecutionContext.markAllProduced();
 
         AtomicBoolean isCalled = new AtomicBoolean();
         BiFunction<Row, RowMetadata, String> mapBiFunction = (row, rowMetadata) -> {
@@ -361,7 +362,7 @@ public class ResultCallbackHandlerTest {
             return null;
         };
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{mapBiFunction};
@@ -405,15 +406,15 @@ public class ResultCallbackHandlerTest {
             throw exception;
         };
 
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
         Object[] args = new Object[]{mapBiFunction};
         Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
-        queriesExecutionCounter.addGeneratedResult();
+        queriesExecutionContext.incrementProducedCount();
 
         assertThat(result)
             .isInstanceOf(Publisher.class);
@@ -433,7 +434,7 @@ public class ResultCallbackHandlerTest {
         // verify callback
         assertThat(listener.getEachQueryResultExecutionInfo()).isSameAs(queryExecutionInfo).as(
             "listener should be called even consuming throws exception");
-        assertThat(queriesExecutionCounter.areAllResultProcessed()).isTrue().as("there are only one result processing, so after .map all result are processed");
+        assertThat(queriesExecutionContext.isAllConsumed()).isTrue().as("there are only one result processing, so after .map all result are processed");
         assertThat(queryExecutionInfo.getProxyEventType()).isEqualTo(ProxyEventType.EACH_QUERY_RESULT);
         assertThat(queryExecutionInfo.getCurrentResultCount()).isEqualTo(1);
         assertThat(queryExecutionInfo.getCurrentMappedResult()).isNull();
@@ -448,9 +449,9 @@ public class ResultCallbackHandlerTest {
         Result mockResult = MockResult.empty();
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         Object result = callback.invoke(mockResult, UNWRAP_METHOD, null);
         assertThat(result).isSameAs(mockResult);
@@ -461,9 +462,9 @@ public class ResultCallbackHandlerTest {
         Result mockResult = MockResult.empty();
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = new ProxyConfig();
-        QueriesExecutionCounter queriesExecutionCounter = new QueriesExecutionCounter(mock(StopWatch.class));
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
 
-        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionCounter);
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
 
         Object result = callback.invoke(mockResult, GET_PROXY_CONFIG_METHOD, null);
         assertThat(result).isSameAs(proxyConfig);
