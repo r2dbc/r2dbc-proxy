@@ -47,6 +47,8 @@ class ResultInvocationSubscriber implements CoreSubscriber<Object>, Subscription
 
     private final QueriesExecutionContext queriesExecutionContext;
 
+    private final AfterQueryCallbackInvoker afterQueryCallbackInvoker;
+
     /**
      * Accessed via {@link #RESULT_COUNT_INCREMENTER}.
      */
@@ -59,6 +61,7 @@ class ResultInvocationSubscriber implements CoreSubscriber<Object>, Subscription
         this.executionInfo = executionInfo;
         this.listener = proxyConfig.getListeners();
         this.queriesExecutionContext = queriesExecutionContext;
+        this.afterQueryCallbackInvoker = new AfterQueryCallbackInvoker(this.executionInfo, this.queriesExecutionContext, this.listener);
     }
 
     @Override
@@ -150,13 +153,7 @@ class ResultInvocationSubscriber implements CoreSubscriber<Object>, Subscription
     }
 
     private void afterQuery() {
-        this.executionInfo.setExecuteDuration(this.queriesExecutionContext.getElapsedDuration());
-        this.executionInfo.setThreadName(Thread.currentThread().getName());
-        this.executionInfo.setThreadId(Thread.currentThread().getId());
-        this.executionInfo.setCurrentMappedResult(null);
-        this.executionInfo.setProxyEventType(ProxyEventType.AFTER_QUERY);
-
-        this.listener.afterQuery(this.executionInfo);
+        this.afterQueryCallbackInvoker.afterQuery();
     }
 
     private void eachQueryResult(@Nullable Object mappedResult, @Nullable Throwable throwable) {
