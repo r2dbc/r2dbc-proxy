@@ -100,7 +100,7 @@ public class CallbackHandlerSupportTest {
         // when it creates a proxy for Result
         Result mockResultProxy = MockResult.empty();
         when(proxyFactory.wrapResult(any(), any(), any())).thenAnswer((args)-> {
-            ((QueriesExecutionCounter) args.getArgument(2)).resultProcessed();
+            ((QueriesExecutionContext) args.getArgument(2)).incrementConsumedCount();
             return mockResultProxy;
         });
 
@@ -213,8 +213,11 @@ public class CallbackHandlerSupportTest {
 
         Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(resultPublisher, executionInfo);
 
+
+
         // Cancels immediately
-        StepVerifier.create(result)
+        StepVerifier.create(result.log())
+            .expectSubscription()
             .thenCancel()
             .verify();
 
@@ -241,7 +244,7 @@ public class CallbackHandlerSupportTest {
         // when it creates a proxy for Result
         Result mockResultProxy = mock(Result.class);
         when(proxyFactory.wrapResult(any(), any(), any())).thenAnswer((args)-> {
-            ((QueriesExecutionCounter) args.getArgument(2)).resultProcessed();
+            ((QueriesExecutionContext) args.getArgument(2)).incrementConsumedCount();
             return mockResultProxy;
         });
 
@@ -319,7 +322,8 @@ public class CallbackHandlerSupportTest {
         when(this.proxyConfig.getListeners()).thenReturn(compositeListener);
 
         // produce multiple results
-        Flux<Result> publisher = Flux.<Result>empty()
+        Flux<Result> publisher = Flux.empty()
+            .ofType(Result.class)
             .doOnRequest(subscription -> {
                 // this will be called AFTER listener.beforeQuery() but BEFORE emitting query result from this publisher.
                 // verify BEFORE_QUERY

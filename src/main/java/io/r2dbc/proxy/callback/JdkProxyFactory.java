@@ -95,11 +95,12 @@ final class JdkProxyFactory implements ProxyFactory {
     }
 
     @Override
-    public Result wrapResult(Result result, QueryExecutionInfo queryExecutionInfo, QueriesExecutionCounter queriesExecutionCounter) {
+    public Result wrapResult(Result result, QueryExecutionInfo queryExecutionInfo, QueriesExecutionContext queriesExecutionContext) {
         Assert.requireNonNull(result, "result must not be null");
         Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
+        Assert.requireNonNull(queriesExecutionContext, "queriesExecutionContext must not be null");
 
-        CallbackHandler logic = new ResultCallbackHandler(result, queryExecutionInfo, this.proxyConfig, queriesExecutionCounter);
+        CallbackHandler logic = new ResultCallbackHandler(result, queryExecutionInfo, this.proxyConfig, queriesExecutionContext);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
         return createProxy(invocationHandler, Result.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
     }
