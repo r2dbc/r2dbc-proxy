@@ -77,7 +77,9 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
             return connectionInfo.getOriginalConnection();
         }
 
-        if ("map".equals(methodName)) {
+        boolean isMapRowMethod =  "map".equals(methodName) && args[0] instanceof BiFunction;
+
+        if (isMapRowMethod) {
             BiFunction<Row, RowMetadata, ?> mappingFunction = (BiFunction<Row, RowMetadata, ?>)args[0];
             BiFunction<Row, RowMetadata, ?> newMappingFunction = (row, rowMetadata) -> {
                 Row rowProxy = this.proxyConfig.getProxyFactory().wrapRow(row, this.queryExecutionInfo);
@@ -88,7 +90,7 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
         Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null);
 
-        if ("map".equals(methodName)) {
+        if (isMapRowMethod) {
 
             AtomicInteger resultCount = new AtomicInteger(0);
 

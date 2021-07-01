@@ -24,7 +24,6 @@ import io.r2dbc.spi.RowMetadata;
 import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockResult;
 import io.r2dbc.spi.test.MockRow;
-import io.r2dbc.spi.test.MockRowMetadata;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.util.ReflectionUtils;
@@ -65,7 +64,7 @@ public class ResultCallbackHandlerTest {
         Row row1 = MockRow.builder().identified(0, String.class, "foo").build();
         Row row2 = MockRow.builder().identified(0, String.class, "bar").build();
         Row row3 = MockRow.builder().identified(0, String.class, "baz").build();
-        Result mockResult = MockResult.builder().row(row1, row2, row3).rowMetadata(MockRowMetadata.empty()).build();
+        Result mockResult = MockResult.builder().row(row1, row2, row3).build();
 
         ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
@@ -131,7 +130,6 @@ public class ResultCallbackHandlerTest {
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         ProxyConfig proxyConfig = ProxyConfig.builder().listener(listener).build();
 
-
         // return a publisher that throws exception at execution
         Exception exception = new RuntimeException("map exception");
         TestPublisher<Object> publisher = TestPublisher.create().error(exception);
@@ -141,8 +139,9 @@ public class ResultCallbackHandlerTest {
 
         ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig);
 
-        // since "mockResult.map()" is mocked, args can be anything as long as num of args matches to signature.
-        Object[] args = new Object[]{null};
+        // the arg type is checked in handler, so need an instance with BiFunction type
+        BiFunction<Row, RowMetadata, Object> biFunction = mock(BiFunction.class);
+        Object[] args = new Object[]{biFunction};
         Object result = callback.invoke(mockResult, MAP_METHOD, args);
 
         assertThat(result).isInstanceOf(Publisher.class);
@@ -220,7 +219,7 @@ public class ResultCallbackHandlerTest {
         Row row1 = MockRow.builder().identified(0, String.class, "foo").build();
         Row row2 = MockRow.builder().identified(0, String.class, "bar").build();
         Row row3 = MockRow.builder().identified(0, String.class, "baz").build();
-        Result mockResult = MockResult.builder().row(row1, row2, row3).rowMetadata(MockRowMetadata.empty()).build();
+        Result mockResult = MockResult.builder().row(row1, row2, row3).build();
 
         // map function to throw exception
         BiFunction<Row, RowMetadata, String> mapBiFunction = (row, rowMetadata) -> {

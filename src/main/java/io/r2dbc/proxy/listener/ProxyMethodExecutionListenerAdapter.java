@@ -251,6 +251,18 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
                 } else {
                     this.delegate.afterMapOnResult(executionInfo);
                 }
+            } else if ("filter".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeFilterOnResult(executionInfo);
+                } else {
+                    this.delegate.afterFilterOnResult(executionInfo);
+                }
+            } else if ("flatMap".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeFlatMapOnResult(executionInfo);
+                } else {
+                    this.delegate.afterFlatMapOnResult(executionInfo);
+                }
             }
         } else if (target instanceof Row) {
             if ("get".equals(methodName)) {

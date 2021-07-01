@@ -28,6 +28,8 @@ import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.ValidationDepth;
 
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Listener interface called back when corresponding method on proxy is invoked.
@@ -477,7 +479,7 @@ public interface ProxyMethodExecutionListener extends ProxyExecutionListener {
     }
 
     /**
-     * Callback that is invoked <em>before</em> {@link Result#map(BiFunction)} is called.
+     * Callback that is invoked <em>before</em> {@link Result#map(BiFunction)} or {@link Result#map(Function)} is called.
      *
      * @param methodExecutionInfo the current method execution info; never {@code null}.
      */
@@ -485,11 +487,43 @@ public interface ProxyMethodExecutionListener extends ProxyExecutionListener {
     }
 
     /**
-     * Callback that is invoked <em>after</em> {@link Result#map(BiFunction)} is called.
+     * Callback that is invoked <em>after</em> {@link Result#map(BiFunction)} or {@link Result#map(Function)} is called.
      *
      * @param methodExecutionInfo the current method execution info; never {@code null}.
      */
     default void afterMapOnResult(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>before</em> {@link Result#filter(Predicate)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeFilterOnResult(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Result#filter(Predicate)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterFilterOnResult(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>before</em> {@link Result#flatMap(Function)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeFlatMapOnResult(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Result#flatMap(Function)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterFlatMapOnResult(MethodExecutionInfo methodExecutionInfo) {
     }
 
     //
