@@ -99,7 +99,10 @@ public class CallbackHandlerSupportTest {
 
         // when it creates a proxy for Result
         Result mockResultProxy = MockResult.empty();
-        when(proxyFactory.wrapResult(any(), any())).thenReturn(mockResultProxy);
+        when(proxyFactory.wrapResult(any(), any(), any())).thenAnswer((args)-> {
+            ((QueriesExecutionContext) args.getArgument(2)).incrementConsumedCount();
+            return mockResultProxy;
+        });
 
         // produce single result
         Result mockResult = MockResult.empty();
@@ -111,6 +114,7 @@ public class CallbackHandlerSupportTest {
         StepVerifier.create(result)
             .expectSubscription()
             .consumeNextWith(c -> {
+                //executionInfo.resultProcessed(c);
                 // verify produced result is the proxy result
                 assertThat(c).isSameAs(mockResultProxy);
             })
@@ -143,7 +147,7 @@ public class CallbackHandlerSupportTest {
 
         // verify the call to create a proxy result
         ArgumentCaptor<Result> resultCaptor = ArgumentCaptor.forClass(Result.class);
-        verify(proxyFactory).wrapResult(resultCaptor.capture(), eq(executionInfo));
+        verify(proxyFactory).wrapResult(resultCaptor.capture(), eq(executionInfo), any());
 
         Result captureResult = resultCaptor.getValue();
         assertThat(captureResult).isSameAs(mockResult);
@@ -209,8 +213,11 @@ public class CallbackHandlerSupportTest {
 
         Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(resultPublisher, executionInfo);
 
+
+
         // Cancels immediately
-        StepVerifier.create(result)
+        StepVerifier.create(result.log())
+            .expectSubscription()
             .thenCancel()
             .verify();
 
@@ -236,7 +243,10 @@ public class CallbackHandlerSupportTest {
 
         // when it creates a proxy for Result
         Result mockResultProxy = mock(Result.class);
-        when(proxyFactory.wrapResult(any(), any())).thenReturn(mockResultProxy);
+        when(proxyFactory.wrapResult(any(), any(), any())).thenAnswer((args)-> {
+            ((QueriesExecutionContext) args.getArgument(2)).incrementConsumedCount();
+            return mockResultProxy;
+        });
 
         // produce multiple results
         Result mockResult1 = mock(Result.class);
@@ -267,7 +277,6 @@ public class CallbackHandlerSupportTest {
             })
             .assertNext(c -> {
                 assertThat(c).as("third result").isSameAs(mockResultProxy);
-
             })
             .expectComplete()
             .verify();
@@ -277,7 +286,6 @@ public class CallbackHandlerSupportTest {
         assertThat(listener.getAfterMethodExecutionInfo()).isNull();
         assertThat(listener.getBeforeQueryExecutionInfo()).isSameAs(executionInfo);
         assertThat(listener.getAfterQueryExecutionInfo()).isSameAs(executionInfo);
-
         assertThat(executionInfo.getProxyEventType()).isEqualTo(ProxyEventType.AFTER_QUERY);
 
         String threadName = Thread.currentThread().getName();
@@ -298,7 +306,7 @@ public class CallbackHandlerSupportTest {
 
         // verify the call to create proxy result
         ArgumentCaptor<Result> resultCaptor = ArgumentCaptor.forClass(Result.class);
-        verify(proxyFactory, times(3)).wrapResult(resultCaptor.capture(), eq(executionInfo));
+        verify(proxyFactory, times(3)).wrapResult(resultCaptor.capture(), eq(executionInfo), any());
 
         List<Result> captured = resultCaptor.getAllValues();
         assertThat(captured).hasSize(3).containsExactly(mockResult1, mockResult2, mockResult3);
@@ -314,7 +322,8 @@ public class CallbackHandlerSupportTest {
         when(this.proxyConfig.getListeners()).thenReturn(compositeListener);
 
         // produce multiple results
-        Flux<Result> publisher = Flux.<Result>empty()
+        Flux<Result> publisher = Flux.empty()
+            .ofType(Result.class)
             .doOnRequest(subscription -> {
                 // this will be called AFTER listener.beforeQuery() but BEFORE emitting query result from this publisher.
                 // verify BEFORE_QUERY

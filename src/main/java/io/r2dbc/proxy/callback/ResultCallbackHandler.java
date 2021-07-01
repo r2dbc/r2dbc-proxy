@@ -17,7 +17,6 @@
 package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
-import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
@@ -25,10 +24,11 @@ import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Operators;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * Proxy callback handler for {@link Result}.
@@ -41,25 +41,31 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
     private final MutableQueryExecutionInfo queryExecutionInfo;
 
+    private final QueriesExecutionContext queriesExecutionContext;
+
     /**
      * Callback handler logic for {@link Result}.
      *
      * This constructor purposely uses {@link QueryExecutionInfo} interface for arguments instead of {@link MutableQueryExecutionInfo} implementation.
      * This way, creator of this callback handler ({@link ProxyFactory}) does not depend on {@link MutableQueryExecutionInfo} implementation.
      *
-     * @param result             query result
-     * @param queryExecutionInfo query execution info
-     * @param proxyConfig        proxy config
+     * @param result                  query result
+     * @param queryExecutionInfo      query execution info
+     * @param proxyConfig             proxy config
+     * @param queriesExecutionContext queries execution counter
      * @throws IllegalArgumentException if {@code result} is {@code null}
      * @throws IllegalArgumentException if {@code queryExecutionInfo} is {@code null}
      * @throws IllegalArgumentException if {@code proxyConfig} is {@code null}
+     * @throws IllegalArgumentException if {@code queriesExecutionCounter} is {@code null}
      * @throws IllegalArgumentException if {@code queryExecutionInfo} is not an instance of {@link MutableQueryExecutionInfo}
      */
-    public ResultCallbackHandler(Result result, QueryExecutionInfo queryExecutionInfo, ProxyConfig proxyConfig) {
+    public ResultCallbackHandler(Result result, QueryExecutionInfo queryExecutionInfo, ProxyConfig proxyConfig, QueriesExecutionContext queriesExecutionContext) {
         super(proxyConfig);
         this.result = Assert.requireNonNull(result, "result must not be null");
         Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
         this.queryExecutionInfo = Assert.requireType(queryExecutionInfo, MutableQueryExecutionInfo.class, "queryExecutionInfo must be MutableQueryExecutionInfo");
+        Assert.requireNonNull(queriesExecutionContext, "queriesExecutionContext must not be null");
+        this.queriesExecutionContext = queriesExecutionContext;
     }
 
     @Override
@@ -90,52 +96,13 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
         Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null);
 
-        if (isMapRowMethod) {
-
-            AtomicInteger resultCount = new AtomicInteger(0);
-
-            // add logic to call "listener#eachQueryResult()"
-            return Flux.from((Publisher<?>) invocationResult)
-                .doOnEach(signal -> {
-
-                    boolean proceed = signal.isOnNext() || signal.isOnError();
-                    if (!proceed) {
-                        return;
-                    }
-
-                    int count = resultCount.incrementAndGet();
-
-                    if (signal.isOnNext()) {
-                        Object mappedResult = signal.get();
-
-                        this.queryExecutionInfo.setCurrentResultCount(count);
-                        this.queryExecutionInfo.setCurrentMappedResult(mappedResult);
-                        this.queryExecutionInfo.setThrowable(null);
-                    } else {
-                        // onError
-                        Throwable thrown = signal.getThrowable();
-                        this.queryExecutionInfo.setCurrentResultCount(count);
-                        this.queryExecutionInfo.setCurrentMappedResult(null);
-                        this.queryExecutionInfo.setThrowable(thrown);
-
-                    }
-
-                    this.queryExecutionInfo.setProxyEventType(ProxyEventType.EACH_QUERY_RESULT);
-
-                    String threadName = Thread.currentThread().getName();
-                    long threadId = Thread.currentThread().getId();
-                    this.queryExecutionInfo.setThreadName(threadName);
-                    this.queryExecutionInfo.setThreadId(threadId);
-
-                    // callback
-                    this.proxyConfig.getListeners().eachQueryResult(this.queryExecutionInfo);
-
-                });
-
+        if (isMapRowMethod || "getRowsUpdated".equals(methodName)) {
+            Function<? super Publisher<Object>, ? extends Publisher<Object>> transformer =
+                Operators.liftPublisher((pub, subscriber) ->
+                    new ResultInvocationSubscriber(subscriber, this.queryExecutionInfo, this.proxyConfig, this.queriesExecutionContext));
+            return Flux.from((Publisher<Object>) invocationResult).transform(transformer);
         }
 
         return invocationResult;
-
     }
-
 }
