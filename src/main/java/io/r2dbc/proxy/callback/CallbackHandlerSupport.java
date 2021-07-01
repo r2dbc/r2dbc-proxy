@@ -31,9 +31,6 @@ import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -213,15 +210,16 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         Assert.requireNonNull(publisher, "flux must not be null");
         Assert.requireNonNull(executionInfo, "executionInfo must not be null");
 
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(this.proxyConfig.getClock());
         ProxyFactory proxyFactory = this.proxyConfig.getProxyFactory();
         Function<? super Publisher<Result>, ? extends Publisher<Result>> transformer =
             Operators.liftPublisher((pub, subscriber) ->
-                new QueryInvocationSubscriber(subscriber, executionInfo, proxyConfig));
+                new QueryInvocationSubscriber(subscriber, executionInfo, proxyConfig, queriesExecutionContext));
 
         return Flux.from(publisher)
             .cast(Result.class)
             .transform(transformer)
-            .map(queryResult -> proxyFactory.wrapResult(queryResult, executionInfo));
+            .map(queryResult -> proxyFactory.wrapResult(queryResult, executionInfo, queriesExecutionContext));
     }
 
     /**

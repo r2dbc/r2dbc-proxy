@@ -26,9 +26,11 @@ import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.proxy.test.MockStatementInfo;
+import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockResult;
+import io.r2dbc.spi.test.MockRow;
 import io.r2dbc.spi.test.MockStatement;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
@@ -280,6 +282,7 @@ public class StatementCallbackHandlerTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void executeThenCancel() throws Throwable {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
@@ -291,9 +294,10 @@ public class StatementCallbackHandlerTest {
         Statement statement = MockStatement.builder().result(MockResult.empty()).build();
         StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
 
-        Object result = callback.invoke(statement, EXECUTE_METHOD, new Object[]{});
+        Flux<Result> result = Flux.from((Publisher<Result>) callback.invoke(statement, EXECUTE_METHOD, new Object[]{}))
+            .flatMap(r -> Flux.from(r.map((row, metadata) -> row)).then(Mono.just(r)));
 
-        StepVerifier.create((Publisher<?>) result)
+        StepVerifier.create(result)
             .expectSubscription()
             .expectNextCount(1)
             .thenCancel()// cancel after consuming one result
@@ -305,7 +309,6 @@ public class StatementCallbackHandlerTest {
         assertThat(afterQueryInfo.isSuccess())
             .as("Consuming at least one result is considered to query execution success")
             .isTrue();
-
     }
 
     @Test
@@ -335,6 +338,7 @@ public class StatementCallbackHandlerTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void executeThenNext() throws Throwable {
         LastExecutionAwareListener testListener = new LastExecutionAwareListener();
@@ -349,11 +353,42 @@ public class StatementCallbackHandlerTest {
         Object result = callback.invoke(statement, EXECUTE_METHOD, new Object[]{});
 
         // Flux.next() cancels upstream publisher
-        Mono<?> mono = ((Flux<?>) result).next();
+        Mono<?> mono = ((Flux<Result>) result).next();
 
         StepVerifier.create(mono)
             .expectSubscription()
             .expectNextCount(1)
+            .verifyComplete();
+
+        QueryExecutionInfo afterQueryInfo = testListener.getAfterQueryExecutionInfo();
+
+        assertThat(afterQueryInfo)
+            .as("Consuming one result without call .map or .getRowUpdated don't execute the query, so afterQuery is not called")
+            .isNull();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void executeThenNextWithMapCallOnResult() throws Throwable {
+        LastExecutionAwareListener testListener = new LastExecutionAwareListener();
+
+        ConnectionInfo connectionInfo = mock(ConnectionInfo.class);
+        StatementInfo statementInfo = MockStatementInfo.builder().updatedQuery("QUERY").build();
+        ProxyConfig proxyConfig = ProxyConfig.builder().listener(testListener).build();
+
+        Statement statement = MockStatement.builder().result(MockResult.empty()).build();
+        StatementCallbackHandler callback = new StatementCallbackHandler(statement, statementInfo, connectionInfo, proxyConfig);
+
+        Object result = callback.invoke(statement, EXECUTE_METHOD, new Object[]{});
+
+        // Flux.next() cancels upstream publisher
+        Mono<?> mono = ((Flux<Result>) result)
+            .flatMap(r -> r.map((row, it) -> row))
+            .next();
+
+        StepVerifier.create(mono)
+            .expectSubscription()
+            .expectNextCount(0).as("nothing on the flux since the result is empty. r.map return an empty publisher")
             .verifyComplete();
 
         QueryExecutionInfo afterQueryInfo = testListener.getAfterQueryExecutionInfo();

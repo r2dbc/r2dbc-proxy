@@ -56,10 +56,11 @@ public class ProxyUtilsTest {
 
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
         queryExecutionInfo.setConnectionInfo(connectionInfo);
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(proxyConfig.getClock());
 
         Batch proxyBatch = proxyConfig.getProxyFactory().wrapBatch(originalBatch, connectionInfo);
         Statement proxyStatement = proxyConfig.getProxyFactory().wrapStatement(originalStatement, statementInfo, connectionInfo);
-        Result proxyResult = proxyConfig.getProxyFactory().wrapResult(originalResult, queryExecutionInfo);
+        Result proxyResult = proxyConfig.getProxyFactory().wrapResult(originalResult, queryExecutionInfo, queriesExecutionContext);
 
         Optional<Connection> result;
 
