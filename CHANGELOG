@@ -1,6 +1,10 @@
 R2DBC Proxy Changelog
 =============================
 
+0.8.7.RELEASE
+------------------
+* Fix "afterQuery" callback order #94
+
 0.8.6.RELEASE
 ------------------
 * Upgrade to Reactor Dysprosium SR20 #91
