@@ -152,7 +152,7 @@ public class ProxyConnectionFactoryProvider implements ConnectionFactoryProvider
     private void registerProxyListenerClass(Class<?> proxyListenerClass, ProxyConnectionFactory.Builder builder) {
         Object proxyListenerInstance;
         try {
-            proxyListenerInstance = proxyListenerClass.newInstance();
+            proxyListenerInstance = proxyListenerClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new IllegalArgumentException(format("Could not instantiate %s", proxyListenerClass), e);
         }
