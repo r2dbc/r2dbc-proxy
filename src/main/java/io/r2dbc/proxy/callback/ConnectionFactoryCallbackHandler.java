@@ -40,7 +40,6 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
         this.connectionFactory = Assert.requireNonNull(connectionFactory, "connectionFactory must not be null");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Assert.requireNonNull(proxy, "proxy must not be null");
@@ -76,6 +75,7 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
             // Then, instead, use "doOnSuccess()" chained to this mono to call the "afterMethod" callback.
             // This way, "after-method" is performed before "resource-closure"
             return Mono.from(result)
+                .cast(Object.class)
                 .transform(Operators.liftPublisher((publisher, subscriber) ->
                     new ConnectionFactoryCreateMethodInvocationSubscriber(subscriber, executionInfo, proxyConfig)))
                 .map(resultObj -> {
