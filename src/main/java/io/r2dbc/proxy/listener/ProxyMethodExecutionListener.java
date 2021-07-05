@@ -23,10 +23,10 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.IsolationLevel;
 import io.r2dbc.spi.Result;
-import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.ValidationDepth;
 
+import java.time.Duration;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -320,6 +320,38 @@ public interface ProxyMethodExecutionListener extends ProxyExecutionListener {
      * @param methodExecutionInfo the current method execution info; never {@code null}.
      */
     default void afterGetMetadataOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>before</em> {@link Connection#setLockWaitTimeout(Duration)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeSetLockWaitTimeoutOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Connection#setLockWaitTimeout(Duration)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterSetLockWaitTimeoutOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>before</em> {@link Connection#setStatementTimeout(Duration)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void beforeSetStatementTimeoutOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    }
+
+    /**
+     * Callback that is invoked <em>after</em> {@link Connection#setStatementTimeout(Duration)} is called.
+     *
+     * @param methodExecutionInfo the current method execution info; never {@code null}.
+     */
+    default void afterSetStatementTimeoutOnConnection(MethodExecutionInfo methodExecutionInfo) {
     }
 
     //

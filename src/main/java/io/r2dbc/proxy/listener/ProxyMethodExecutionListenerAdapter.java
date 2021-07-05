@@ -183,6 +183,18 @@ public class ProxyMethodExecutionListenerAdapter implements ProxyExecutionListen
                 } else {
                     this.delegate.afterGetMetadataOnConnection(executionInfo);
                 }
+            } else if ("setLockWaitTimeout".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeSetLockWaitTimeoutOnConnection(executionInfo);
+                } else {
+                    this.delegate.afterSetLockWaitTimeoutOnConnection(executionInfo);
+                }
+            } else if ("setStatementTimeout".equals(methodName)) {
+                if (isBefore) {
+                    this.delegate.beforeSetStatementTimeoutOnConnection(executionInfo);
+                } else {
+                    this.delegate.afterSetStatementTimeoutOnConnection(executionInfo);
+                }
             }
         } else if (target instanceof Batch) {
             // Batch methods
