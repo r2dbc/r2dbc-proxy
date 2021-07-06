@@ -1,0 +1,31 @@
+[
+  [
+    "io.r2dbc.spi.ConnectionFactory",
+    "io.r2dbc.spi.Wrapped",
+    "io.r2dbc.proxy.callback.ProxyConfigHolder"
+  ],
+  [
+    "io.r2dbc.spi.Connection",
+    "io.r2dbc.spi.Wrapped",
+    "io.r2dbc.proxy.callback.ConnectionHolder",
+    "io.r2dbc.proxy.callback.ProxyConfigHolder"
+  ],
+  [
+    "io.r2dbc.spi.Batch",
+    "io.r2dbc.spi.Wrapped",
+    "io.r2dbc.proxy.callback.ConnectionHolder",
+    "io.r2dbc.proxy.callback.ProxyConfigHolder"
+  ],
+  [
+    "io.r2dbc.spi.Statement",
+    "io.r2dbc.spi.Wrapped",
+    "io.r2dbc.proxy.callback.ConnectionHolder",
+    "io.r2dbc.proxy.callback.ProxyConfigHolder"
+  ],
+  [
+    "io.r2dbc.spi.Result",
+    "io.r2dbc.spi.Wrapped",
+    "io.r2dbc.proxy.callback.ConnectionHolder",
+    "io.r2dbc.proxy.callback.ProxyConfigHolder"
+  ]
+]
