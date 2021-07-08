@@ -31,3 +31,17 @@ If you'd rather like the latest snapshots of the upcoming major version, use the
   <url>https://oss.sonatype.org/content/repositories/snapshots</url>
 </repository>
 ----
+
+[[getting-started_native-image]]
+== Native Image Support
+
+R2DBC Proxy supports https://www.graalvm.org/reference-manual/native-image/[GraalVM native-image].
+The proxy creation uses the JDK dynamic proxy by default.
+They need a configuration in the native image environment.
+
+R2DBC proxy jar ships with the following configuration files:
+
+* `META-INF/native-image/io.r2dbc/r2dbc-proxy/native-image.properties`
+* `META-INF/native-image/io.r2dbc/r2dbc-proxy/proxy-config.json`
+
+The native image build automatically detects these https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file[embedded configuration files] and sets up the dynamic proxy usage for R2DBC Proxy.
