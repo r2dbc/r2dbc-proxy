@@ -84,6 +84,7 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#getting-started_dependencies">1. Dependencies</a></li>
+<li><a href="#getting-started_native-image">2. Native Image Support</a></li>
 </ul>
 </div>
 </div>
@@ -123,10 +124,36 @@
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="getting-started_native-image"><a class="anchor" href="#getting-started_native-image"></a>2. Native Image Support</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>R2DBC Proxy supports <a href="https://www.graalvm.org/reference-manual/native-image/">GraalVM native-image</a>.
+The proxy creation uses the JDK dynamic proxy by default.
+They need a configuration in the native image environment.</p>
+</div>
+<div class="paragraph">
+<p>R2DBC proxy jar ships with the following configuration files:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>META-INF/native-image/io.r2dbc/r2dbc-proxy/native-image.properties</code></p>
+</li>
+<li>
+<p><code>META-INF/native-image/io.r2dbc/r2dbc-proxy/proxy-config.json</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The native image build automatically detects these <a href="https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file">embedded configuration files</a> and sets up the dynamic proxy usage for R2DBC Proxy.</p>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-07-05 22:58:28 UTC
+Last updated 2021-07-08 00:32:07 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

@@ -84,7 +84,7 @@
 <div class="details">
 <span id="author" class="author">Tadaya Tsuyukubo &lt;tadaya@ttddyy.net&gt;</span><br>
 <span id="revnumber">version 0.9.0.BUILD-SNAPSHOT,</span>
-<span id="revdate">2021-07-05</span>
+<span id="revdate">2021-07-08</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -105,6 +105,7 @@
 <li><a href="#getting-started">3. Getting Started</a>
 <ul class="sectlevel2">
 <li><a href="#getting-started_dependencies">3.1. Dependencies</a></li>
+<li><a href="#getting-started_native-image">3.2. Native Image Support</a></li>
 </ul>
 </li>
 <li><a href="#setup">4. Setup</a>
@@ -387,6 +388,30 @@ called method.</p>
   &lt;url&gt;https://oss.sonatype.org/content/repositories/snapshots&lt;/url&gt;
 &lt;/repository&gt;</code></pre>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="getting-started_native-image"><a class="anchor" href="#getting-started_native-image"></a>3.2. Native Image Support</h3>
+<div class="paragraph">
+<p>R2DBC Proxy supports <a href="https://www.graalvm.org/reference-manual/native-image/">GraalVM native-image</a>.
+The proxy creation uses the JDK dynamic proxy by default.
+They need a configuration in the native image environment.</p>
+</div>
+<div class="paragraph">
+<p>R2DBC proxy jar ships with the following configuration files:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>META-INF/native-image/io.r2dbc/r2dbc-proxy/native-image.properties</code></p>
+</li>
+<li>
+<p><code>META-INF/native-image/io.r2dbc/r2dbc-proxy/proxy-config.json</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The native image build automatically detects these <a href="https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file">embedded configuration files</a> and sets up the dynamic proxy usage for R2DBC Proxy.</p>
 </div>
 </div>
 </div>
@@ -1238,7 +1263,7 @@ ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).bu
 <div id="footer">
 <div id="footer-text">
 Version 0.9.0.BUILD-SNAPSHOT<br>
-Last updated 2021-07-05 22:58:28 UTC
+Last updated 2021-07-08 00:32:07 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
