@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Setup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- Generate a nice TOC -->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>
+<!-- We do not need the tocify CSS because the asciidoc CSS already provides most of what we neeed -->
+
+<style>
+.tocify-subheader {
+		font-style: normal;
+		font-size: 95%;
+}
+.tocify ul {
+		margin: 0;
+}
+.tocify-focus {
+		background-color: #D3D3D3;
+}
+.tocify-focus > a {
+		color: black;
+}
+</style>
+
+<script type="text/javascript">
+		$(function () {
+				// Add a new container for the tocify toc into the existing toc so we can re-use its
+				// styling
+				$("#toc").append("<div id='generated-toc'></div>");
+				$("#generated-toc").tocify({
+						extendPage: true,
+						context: "#content",
+						highlightOnScroll: true,
+						hideEffect: "slideUp",
+						// Use the IDs that asciidoc already provides so that TOC links and intra-document
+						// links are the same. Anything else might confuse users when they create bookmarks.
+						hashGenerator: function(text, element) {
+								return $(element).attr("id");
+						},
+						// Smooth scrolling doesn't work properly if we use the asciidoc IDs
+						smoothScroll: false,
+						// Set to 'none' to use the tocify classes
+						theme: "none",
+						// Handle book (may contain h1) and article (only h2 deeper)
+						selectors: $( "#content" ).has( "h1" ).size() > 0 ? "h1,h2,h3,h4,h5" : "h2,h3,h4,h5",
+						ignoreSelector: ".discrete"
+				});
+				// Switch between static asciidoc toc and dynamic tocify toc based on browser size
+				// This is set to match the media selectors in the asciidoc CSS
+				// Without this, we keep the dynamic toc even if it is moved from the side to preamble
+				// position which will cause odd scrolling behavior
+				var handleTocOnResize = function() {
+						if ($(document).width() < 768) {
+								$("#generated-toc").hide();
+								$(".sectlevel0").show();
+								$(".sectlevel1").show();
+						}
+						else {
+								$("#generated-toc").show();
+								$(".sectlevel0").hide();
+								$(".sectlevel1").hide();
+						}
+				}
+				$(window).resize(handleTocOnResize);
+				handleTocOnResize();
+				// Hide level 4
+				$("ul.tocify-subheader[data-tag='4']").hide();
+		});
+</script>
+</head>
+<body id="setup" class="book toc2 toc-left">
+<div id="header">
+<h1>Setup</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#setup_connection-factory-discovery">1. Connection Factory Discovery</a>
+<ul class="sectlevel2">
+<li><a href="#setup_connection-factory-discovery_url-based">1.1. URL-based</a></li>
+<li><a href="#setup_connection-factory-discovery_programmatic">1.2. Programmatic</a></li>
+</ul>
+</li>
+<li><a href="#setup_programmatic-proxy-construction">2. Programmatic Proxy Construction</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>To obtain a proxy <code>ConnectionFactory</code>, R2DBC Proxy provides two mechanisms:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#setup_connection-factory-discovery">Connection Factory Discovery</a></p>
+</li>
+<li>
+<p><a href="#setup_programmatic-proxy-construction">Programmatic Proxy Construction</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setup_connection-factory-discovery"><a class="anchor" href="#setup_connection-factory-discovery"></a>1. Connection Factory Discovery</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>R2DBC specifies two types of connection factory discovery, <a href="#setup_connection-factory-discovery_url-based">URL-based</a> and
+<a href="#setup_connection-factory-discovery_programmatic">Programmatic</a>.
+R2DBC Proxy supports both with <code>proxy</code> as the driver identifier.</p>
+</div>
+<div class="sect2">
+<h3 id="setup_connection-factory-discovery_url-based"><a class="anchor" href="#setup_connection-factory-discovery_url-based"></a>1.1. URL-based</h3>
+<div class="paragraph">
+<p>When a connection URL contains <code>proxy</code> in its driver segment, <code>ConnectionFactories</code>
+delegates the <code>protocol</code> segment(required) to the another connection
+discovery.(pass-through) Then, it wraps the returned <code>ConnectionFactory</code> with a proxy.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">r2dbc:proxy:&lt;my-driver&gt;://&lt;host&gt;:&lt;port&gt;/&lt;database&gt;[?proxyListener=&lt;fqdn&gt;]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Examples</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs"># with driver
+r2dbc:proxy:postgresql://localhost:5432/myDB?proxyListener=com.example.MyListener
+
+# with pooling
+r2dbc:proxy:pool:postgresql://localhost:5432/myDB?proxyListener=com.example.MyListener&amp;maxIdleTime=PT60S</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="setup_connection-factory-discovery_programmatic"><a class="anchor" href="#setup_connection-factory-discovery_programmatic"></a>1.2. Programmatic</h3>
+<div class="paragraph">
+<p>Another variant of the <code>ConnectionFactory</code> discovery is a programmatic creation of the <code>ConnectionFactoryOptions</code>.</p>
+</div>
+<div class="paragraph">
+<p>Same as URL based discovery, when the DRIVER Option is <code>proxy</code>, it delegates PROTOCOL Option(required)
+to another connection factory discovery request. The result of delegated discovery
+request is wrapped by a proxy.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder()
+   .option(ConnectionFactoryOptions.DRIVER, "proxy")
+   .option(ConnectionFactoryOptions.PROTOCOL, "postgresql")
+   .option(ConnectionFactoryOptions.HOST, "localhost")
+   .option(ConnectionFactoryOptions.PORT, 5432)
+   .option(ConnectionFactoryOptions.DATABASE, "myDB")
+   .option(ProxyConnectionFactoryProvider.PROXY_LISTENERS, myListener)
+   .build());
+
+Mono&lt;Connection&gt; connection = connectionFactory.create();</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Supported Connection Factory Discovery options</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>driver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Must be <code>proxy</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>protocol</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegating connection factory driver</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>proxyListener</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma separated list of fully qualified proxy listener class names  <em>(Optional)</em></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>When programmatically construct <code>ConnectionFactoryOptions</code>, in addition to the "comma separated listener class FQDN",
+<code>proxyListener</code> option allows following values:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Proxy listener class (java <code>Class</code> object)</p>
+</li>
+<li>
+<p>Proxy listener instance</p>
+</li>
+<li>
+<p><code>Collection</code> of above</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setup_programmatic-proxy-construction"><a class="anchor" href="#setup_programmatic-proxy-construction"></a>2. Programmatic Proxy Construction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>ProxyConnectionFactory</code> provides a builder to construct a proxy <code>ConnectionFactory</code>.
+The builder has methods to register concrete and adhoc listeners.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory original = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
+    .onAfterQuery(queryInfo -&gt;
+        ...  // after query callback logic
+    )
+    .onBeforeMethod(methodInfo -&gt;
+        ...  // before method callback logic
+    )
+    .listener(...)  // add listener
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2021-07-30 18:54:51 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

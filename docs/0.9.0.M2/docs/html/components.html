@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Components</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- Generate a nice TOC -->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>
+<!-- We do not need the tocify CSS because the asciidoc CSS already provides most of what we neeed -->
+
+<style>
+.tocify-subheader {
+		font-style: normal;
+		font-size: 95%;
+}
+.tocify ul {
+		margin: 0;
+}
+.tocify-focus {
+		background-color: #D3D3D3;
+}
+.tocify-focus > a {
+		color: black;
+}
+</style>
+
+<script type="text/javascript">
+		$(function () {
+				// Add a new container for the tocify toc into the existing toc so we can re-use its
+				// styling
+				$("#toc").append("<div id='generated-toc'></div>");
+				$("#generated-toc").tocify({
+						extendPage: true,
+						context: "#content",
+						highlightOnScroll: true,
+						hideEffect: "slideUp",
+						// Use the IDs that asciidoc already provides so that TOC links and intra-document
+						// links are the same. Anything else might confuse users when they create bookmarks.
+						hashGenerator: function(text, element) {
+								return $(element).attr("id");
+						},
+						// Smooth scrolling doesn't work properly if we use the asciidoc IDs
+						smoothScroll: false,
+						// Set to 'none' to use the tocify classes
+						theme: "none",
+						// Handle book (may contain h1) and article (only h2 deeper)
+						selectors: $( "#content" ).has( "h1" ).size() > 0 ? "h1,h2,h3,h4,h5" : "h2,h3,h4,h5",
+						ignoreSelector: ".discrete"
+				});
+				// Switch between static asciidoc toc and dynamic tocify toc based on browser size
+				// This is set to match the media selectors in the asciidoc CSS
+				// Without this, we keep the dynamic toc even if it is moved from the side to preamble
+				// position which will cause odd scrolling behavior
+				var handleTocOnResize = function() {
+						if ($(document).width() < 768) {
+								$("#generated-toc").hide();
+								$(".sectlevel0").show();
+								$(".sectlevel1").show();
+						}
+						else {
+								$("#generated-toc").show();
+								$(".sectlevel0").hide();
+								$(".sectlevel1").hide();
+						}
+				}
+				$(window).resize(handleTocOnResize);
+				handleTocOnResize();
+				// Hide level 4
+				$("ul.tocify-subheader[data-tag='4']").hide();
+		});
+</script>
+</head>
+<body id="components" class="book toc2 toc-left">
+<div id="header">
+<h1>Components</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#components_proxyconnectionfactory">1. ProxyConnectionFactory</a></li>
+<li><a href="#components_proxyconfig">2. ProxyConfig</a></li>
+<li><a href="#components_proxyfactory">3. ProxyFactory</a></li>
+<li><a href="#components_proxyexecutionlistener">4. ProxyExecutionListener</a></li>
+<li><a href="#components_proxymethodexecutionlistener">5. ProxyMethodExecutionListener</a></li>
+<li><a href="#components_formatters">6. Formatters</a>
+<ul class="sectlevel2">
+<li><a href="#components_formatters_queryexecutioninfoformatter">6.1. QueryExecutionInfoFormatter</a></li>
+<li><a href="#components_formatters_methodexecutioninfoformatter">6.2. MethodExecutionInfoFormatter</a></li>
+<li><a href="#components_formatters_customizing-formatter">6.3. Customizing Formatter</a></li>
+</ul>
+</li>
+<li><a href="#components_bindparameterconverter">7. BindParameterConverter</a></li>
+<li><a href="#components_resultrowconverter">8. ResultRowConverter</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section explains the main components of R2DBC Proxy.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components_proxyconnectionfactory"><a class="anchor" href="#components_proxyconnectionfactory"></a>1. ProxyConnectionFactory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is the entry point to create a <code>ConnectionFactory</code> proxy.</p>
+</div>
+<div class="paragraph">
+<p>The <code>ProxyConnectionFactory#builder</code> static method creates a <code>Builder</code> instance, which provides
+methods to register listeners, configures the proxy, and generates a proxy <code>ConnectionFactory</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory original = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
+    .onAfterQuery(queryInfo -&gt;
+        ...  // after query callback logic
+    )
+    .onBeforeMethod(methodInfo -&gt;
+        ...  // before method callback logic
+    )
+    .listener(...)  // add listener
+    .build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, the connection factory discovery can create a proxy when driver name is the <code>proxy</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components_proxyconfig"><a class="anchor" href="#components_proxyconfig"></a>2. ProxyConfig</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Central configuration object for creating proxies.</p>
+</div>
+<div class="paragraph">
+<p>A <code>ProxyConfig</code> instance holds the proxy related configurations, such as <code>ProxyExecutionListener</code>, <code>ProxyFactory</code>, or <code>BindParameterConverter</code>.
+Any proxy objects created by a proxy <code>ConnectionFactory</code> share the same <code>ProxyConfig</code> instance.</p>
+</div>
+<div class="paragraph">
+<p><code>ProxyConnectionFactory.Builder</code> automatically creates a <code>ProxyConfig</code> internally.
+It also takes a custom <code>ProxyConfig</code> in case you need a customization.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ProxyConfig proxyConfig = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original, proxyConfig)
+    ...
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components_proxyfactory"><a class="anchor" href="#components_proxyfactory"></a>3. ProxyFactory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Strategy interface to create each proxy.</p>
+</div>
+<div class="paragraph">
+<p>The default proxy factory implementation(<code>JdkProxyFactory</code>) uses JDK dynamic proxy for creating proxy objects.</p>
+</div>
+<div class="paragraph">
+<p>Providing a custom <code>ProxyFactory</code> allows different proxy mechanism for constructing proxies. For example,
+<a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/java-agent-example/common/src/main/java/io/r2dbc/examples/agent/ByteBuddyProxyFactory.java">here is a sample code to
+ use ByteBuddy for proxy creation</a>.</p>
+</div>
+<div class="paragraph">
+<p>When you have a custom <code>ProxyFactory</code> implementation, <code>ProxyConfig</code> has a method to register it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ProxyFactory myProxyFactory = ...
+
+ProxyConfig proxyConfig = ProxyConfig.builder()
+    .proxyFactoryFactory(() -&gt; myProxyFactory)  // add ProxyFactory supplier
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components_proxyexecutionlistener"><a class="anchor" href="#components_proxyexecutionlistener"></a>4. ProxyExecutionListener</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>ProxyExecutionListener</code> is the root listener interface which defines callbacks
+for method invocation, query execution, and query result processing.</p>
+</div>
+<div class="listingblock">
+<div class="title">Method defined on ProxyExecutionListener</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// invoked before any method on proxy is called
+void beforeMethod(MethodExecutionInfo executionInfo);
+
+// invoked after any method on proxy is called
+void afterMethod(MethodExecutionInfo executionInfo);
+
+// invoked before query gets executed
+void beforeQuery(QueryExecutionInfo execInfo);
+
+// invoked after query is executed
+void afterQuery(QueryExecutionInfo execInfo);
+
+// invoked on processing(subscribing) each query result
+void eachQueryResult(QueryExecutionInfo execInfo);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Anytime a caller invokes a method on a proxy, it triggers method callbacks,<code>beforeMethod()</code> and <code>afterMethod()</code>.
+They receive a <code>QueryExecutionInfo</code> parameter which contains the contextual information about the invoked method.</p>
+</div>
+<div class="paragraph">
+<p>The query execution methods, <code>Batch#execute()</code> and <code>Statement#execute()</code>, trigger query callbacks, <code>beforeQuery()</code>
+and <code>afterQuery()</code>. (Specifically, it is called when returned result-publisher is subscribed.)
+They receive <code>QueryExecutionInfo</code> parameter which holds the executing query information such as the query strings,
+bound parameter values, duration of the query execution, etc.</p>
+</div>
+<div class="paragraph">
+<p>While processing a <code>Result</code> object, <code>eachQueryResult()</code> receives a callback on each mapped query result at the
+subscription of <code>Result#map()</code>.</p>
+</div>
+<div class="paragraph">
+<p>When a user has a custom <code>ProxyExecutionListener</code> implementation,
+<code>ProxyConnectionFactory.Builder</code> has a method to register the listener.
+In addition, the builder provides methods to directly register adhoc listeners.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory original = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
+    .onAfterQuery(queryInfo -&gt;
+        ...  // after query callback logic
+    )
+    .onBeforeMethod(methodInfo -&gt;
+        ...  // before method callback logic
+    )
+    .listener(...)  // add listener
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components_proxymethodexecutionlistener"><a class="anchor" href="#components_proxymethodexecutionlistener"></a>5. ProxyMethodExecutionListener</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>ProxyMethodExecutionListener</code> is an extension of <code>ProxyExecutionListener</code>.
+In addition to the methods defined in <code>ProxyExecutionListener</code>, <code>ProxyMethodExecutionListener</code> has explicit
+before/after methods for all methods defined on <code>ConnectionFactory</code>, <code>Connection</code>, <code>Batch</code>,
+<code>Statement</code>, and <code>Result</code>.</p>
+</div>
+<div class="paragraph">
+<p>Method names are based on the rule: <em>"[before|after]&lt;method-name&gt;On&lt;class-name&gt;"</em>.</p>
+</div>
+<div class="paragraph">
+<p>For example, if you want to perform an action at the creation or close of a connection:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">public class ConnectionStartToEndListener implements ProxyMethodExecutionListener {
+
+  @Override
+  public void beforeCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+    // called before ConnectionFactory#create()
+  }
+
+  @Override
+  public void afterCloseOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    // called after  Connection#close()
+  }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components_formatters"><a class="anchor" href="#components_formatters"></a>6. Formatters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One of the typical usages of the proxy listener is logging a contextual information.
+For example, when a query runs, logs the query string, parameters, success/failure result,
+query execution time, thread, etc.</p>
+</div>
+<div class="paragraph">
+<p>Each callback method on <code>ProxyExecutionListener</code> receives contextual information - <code>QueryExecutionInfo</code> and <code>MethodExecutionInfo</code>.
+To perform logging, you need to transform <code>[Method|Query]ExecutionInfo</code> to the logging entries in a format of the <code>String</code>.</p>
+</div>
+<div class="paragraph">
+<p>Formatter classes fill this gap. <code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> are available out of the box.
+They provide user-friendly conversion methods, which transform selectively or all data in
+the <code>[Method|Query]ExecutionInfo</code> to a <code>String</code> with a default or customized format.</p>
+</div>
+<div class="sect2">
+<h3 id="components_formatters_queryexecutioninfoformatter"><a class="anchor" href="#components_formatters_queryexecutioninfoformatter"></a>6.1. QueryExecutionInfoFormatter</h3>
+<div class="paragraph">
+<p>This class converts <code>QueryExecutionInfo</code> to <code>String</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// convert all info
+QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
+String str = formatter.format(queryExecutionInfo);
+
+// convert it
+String str = formatter.format(queryExecutionInfo);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_formatters_methodexecutioninfoformatter"><a class="anchor" href="#components_formatters_methodexecutioninfoformatter"></a>6.2. MethodExecutionInfoFormatter</h3>
+<div class="paragraph">
+<p>This class  converts <code>MethodExecutionInfo</code> to <code>String</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
+
+// register as adhoc listener
+ProxyConnectionFactoryBuilder.create(connectionFactory)
+  .onAfterMethod(execInfo -&gt;
+     System.out.println(formatter.format(execInfo)))  // convert &amp; print out to sysout
+  .build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_formatters_customizing-formatter"><a class="anchor" href="#components_formatters_customizing-formatter"></a>6.3. Customizing Formatter</h3>
+<div class="paragraph">
+<p><code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> hold a list of consumers internally and loop
+through them to populate the output <code>StringBuilder</code>.</p>
+</div>
+<div class="paragraph">
+<p>Each consumer simply converts a portion of the <code>[Query|Method]ExecutionInfo</code> to <code>StringBuilder</code>.
+Formatting is customizable by toggling builtin converters and registering new consumers.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// customize conversion
+QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
+formatter.addConsumer((execInfo, sb) -&gt; {
+  sb.append("MY-QUERY-EXECUTION="); // add prefix
+};
+formatter.newLine();  // new line
+formatter.showSuccess();
+formatter.addConsumer((execInfo, sb)  -&gt; {
+    // custom conversion
+    sb.append("MY-ID=" + executionInfo.getConnectionInfo().getConnectionId());
+});
+formatter.showQuery();
+
+// convert it
+String str = formatter.format(queryExecutionInfo);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components_bindparameterconverter"><a class="anchor" href="#components_bindparameterconverter"></a>7. BindParameterConverter</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>BindParameterConverter</code> is a callback interface for bind parameter related operations - <code>Statement#bind</code> and <code>Statement#bindNull</code>.</p>
+</div>
+<div class="paragraph">
+<p>The callback is performed <strong>before</strong> calling the actual bind parameter operations.
+This converter can change the actual behavior of the bind parameter operations.
+For example, a converter can transform the bind markers.</p>
+</div>
+<div class="paragraph">
+<p>Please see more details on the
+<a href="https://github.com/r2dbc/r2dbc-proxy/issues/26">"gh-26: Proxy mechanism to support converting bind marker"</a> github issue.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components_resultrowconverter"><a class="anchor" href="#components_resultrowconverter"></a>8. ResultRowConverter</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>ResultRowConverter</code> is a callback interface for result row get(<code>Row#get</code>) operations.</p>
+</div>
+<div class="paragraph">
+<p>The callback is performed <strong>before</strong> calling the actual <code>Row#get</code> operation.
+This converter can alter the actual behavior of the invoked <code>Row#get</code> method.</p>
+</div>
+<div class="paragraph">
+<p>To use the converter, register it to the <code>ProxyConfig</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = ...
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();
+
+// create a proxy ConnectionFactory
+ConnectionFactory proxy = ProxyConnectionFactory.builder(connectionFactory, proxyConfig).build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sample usages:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#use-cases_support-primitive-and-null-in-result-mapping">[use-cases_support-primitive-and-null-in-result-mapping]</a></p>
+</li>
+<li>
+<p><a href="#use-cases_call-different-methods-in-result-mapping">[use-cases_call-different-methods-in-result-mapping]</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2021-07-30 18:54:51 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
