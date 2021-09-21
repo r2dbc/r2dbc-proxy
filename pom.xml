@@ -36,7 +36,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>0.8.6.RELEASE</r2dbc-spi.version>
-        <reactor.version>Dysprosium-SR20</reactor.version>
+        <reactor.version>Dysprosium-SR23</reactor.version>
         <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
         <mockito.version>3.5.15</mockito.version>
     </properties>

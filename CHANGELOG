@@ -3,6 +3,7 @@ R2DBC Proxy Changelog
 
 0.8.8.RELEASE
 ------------------
+* Upgrade to Reactor Dysprosium SR23 #105
 * Upgrade to R2DBC SPI 0.8.6.RELEASE #104
 * Native image support #100
 
