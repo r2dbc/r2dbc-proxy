@@ -48,8 +48,7 @@ final class ChangeLogReportGenerator {
 
         HttpEntity<String> response = webClient //
             .get().uri(URI_TEMPLATE, MILESTONE_ID) //
-            .exchange() //
-            .flatMap(clientResponse -> clientResponse.toEntity(String.class)) //
+            .exchangeToMono(clientResponse -> clientResponse.toEntity(String.class)) //
             .block(Duration.ofSeconds(10));
 
         boolean keepChecking = true;
@@ -67,8 +66,7 @@ final class ChangeLogReportGenerator {
 
                 response = webClient //
                     .get().uri(links.getRequiredLink(IanaLinkRelations.NEXT).expand().getHref()) //
-                    .exchange() //
-                    .flatMap(clientResponse -> clientResponse.toEntity(String.class)) //
+                    .exchangeToMono(clientResponse -> clientResponse.toEntity(String.class)) //
                     .block(Duration.ofSeconds(10));
 
             } else {
