@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Getting Started</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- Generate a nice TOC -->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>
+<!-- We do not need the tocify CSS because the asciidoc CSS already provides most of what we neeed -->
+
+<style>
+.tocify-subheader {
+		font-style: normal;
+		font-size: 95%;
+}
+.tocify ul {
+		margin: 0;
+}
+.tocify-focus {
+		background-color: #D3D3D3;
+}
+.tocify-focus > a {
+		color: black;
+}
+</style>
+
+<script type="text/javascript">
+		$(function () {
+				// Add a new container for the tocify toc into the existing toc so we can re-use its
+				// styling
+				$("#toc").append("<div id='generated-toc'></div>");
+				$("#generated-toc").tocify({
+						extendPage: true,
+						context: "#content",
+						highlightOnScroll: true,
+						hideEffect: "slideUp",
+						// Use the IDs that asciidoc already provides so that TOC links and intra-document
+						// links are the same. Anything else might confuse users when they create bookmarks.
+						hashGenerator: function(text, element) {
+								return $(element).attr("id");
+						},
+						// Smooth scrolling doesn't work properly if we use the asciidoc IDs
+						smoothScroll: false,
+						// Set to 'none' to use the tocify classes
+						theme: "none",
+						// Handle book (may contain h1) and article (only h2 deeper)
+						selectors: $( "#content" ).has( "h1" ).size() > 0 ? "h1,h2,h3,h4,h5" : "h2,h3,h4,h5",
+						ignoreSelector: ".discrete"
+				});
+				// Switch between static asciidoc toc and dynamic tocify toc based on browser size
+				// This is set to match the media selectors in the asciidoc CSS
+				// Without this, we keep the dynamic toc even if it is moved from the side to preamble
+				// position which will cause odd scrolling behavior
+				var handleTocOnResize = function() {
+						if ($(document).width() < 768) {
+								$("#generated-toc").hide();
+								$(".sectlevel0").show();
+								$(".sectlevel1").show();
+						}
+						else {
+								$("#generated-toc").show();
+								$(".sectlevel0").hide();
+								$(".sectlevel1").hide();
+						}
+				}
+				$(window).resize(handleTocOnResize);
+				handleTocOnResize();
+				// Hide level 4
+				$("ul.tocify-subheader[data-tag='4']").hide();
+		});
+</script>
+</head>
+<body id="getting-started" class="book toc2 toc-left">
+<div id="header">
+<h1>Getting Started</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#getting-started_dependencies">1. Dependencies</a></li>
+<li><a href="#getting-started_native-image">2. Native Image Support</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getting-started_dependencies"><a class="anchor" href="#getting-started_dependencies"></a>1. Dependencies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Artifacts are available on <a href="https://search.maven.org/search?q=r2dbc-proxy">Maven Central</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="xml" class="language-xml hljs">&lt;dependency&gt;
+  &lt;groupId&gt;io.r2dbc&lt;/groupId&gt;
+  &lt;artifactId&gt;r2dbc-proxy&lt;/artifactId&gt;
+  &lt;version&gt;${version}&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you&#8217;d rather like the latest snapshots of the upcoming major version, use the Maven snapshot repository and declare the appropriate dependency version.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="xml" class="language-xml hljs">&lt;dependency&gt;
+  &lt;groupId&gt;io.r2dbc&lt;/groupId&gt;
+  &lt;artifactId&gt;r2dbc-proxy&lt;/artifactId&gt;
+  &lt;version&gt;${version}.BUILD-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;repository&gt;
+  &lt;id&gt;sonatype-nexus-snapshots&lt;/id&gt;
+  &lt;name&gt;Sonatype OSS Snapshot Repository&lt;/name&gt;
+  &lt;url&gt;https://oss.sonatype.org/content/repositories/snapshots&lt;/url&gt;
+&lt;/repository&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started_native-image"><a class="anchor" href="#getting-started_native-image"></a>2. Native Image Support</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>R2DBC Proxy supports <a href="https://www.graalvm.org/reference-manual/native-image/">GraalVM native-image</a>.
+The proxy creation uses the JDK dynamic proxy by default.
+They need a configuration in the native image environment.</p>
+</div>
+<div class="paragraph">
+<p>R2DBC proxy jar ships with the following configuration files:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>META-INF/native-image/io.r2dbc/r2dbc-proxy/native-image.properties</code></p>
+</li>
+<li>
+<p><code>META-INF/native-image/io.r2dbc/r2dbc-proxy/proxy-config.json</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The native image build automatically detects these <a href="https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file">embedded configuration files</a> and sets up the dynamic proxy usage for R2DBC Proxy.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2022-01-07 01:33:36 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

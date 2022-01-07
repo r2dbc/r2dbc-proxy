@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Introduction</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- Generate a nice TOC -->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>
+<!-- We do not need the tocify CSS because the asciidoc CSS already provides most of what we neeed -->
+
+<style>
+.tocify-subheader {
+		font-style: normal;
+		font-size: 95%;
+}
+.tocify ul {
+		margin: 0;
+}
+.tocify-focus {
+		background-color: #D3D3D3;
+}
+.tocify-focus > a {
+		color: black;
+}
+</style>
+
+<script type="text/javascript">
+		$(function () {
+				// Add a new container for the tocify toc into the existing toc so we can re-use its
+				// styling
+				$("#toc").append("<div id='generated-toc'></div>");
+				$("#generated-toc").tocify({
+						extendPage: true,
+						context: "#content",
+						highlightOnScroll: true,
+						hideEffect: "slideUp",
+						// Use the IDs that asciidoc already provides so that TOC links and intra-document
+						// links are the same. Anything else might confuse users when they create bookmarks.
+						hashGenerator: function(text, element) {
+								return $(element).attr("id");
+						},
+						// Smooth scrolling doesn't work properly if we use the asciidoc IDs
+						smoothScroll: false,
+						// Set to 'none' to use the tocify classes
+						theme: "none",
+						// Handle book (may contain h1) and article (only h2 deeper)
+						selectors: $( "#content" ).has( "h1" ).size() > 0 ? "h1,h2,h3,h4,h5" : "h2,h3,h4,h5",
+						ignoreSelector: ".discrete"
+				});
+				// Switch between static asciidoc toc and dynamic tocify toc based on browser size
+				// This is set to match the media selectors in the asciidoc CSS
+				// Without this, we keep the dynamic toc even if it is moved from the side to preamble
+				// position which will cause odd scrolling behavior
+				var handleTocOnResize = function() {
+						if ($(document).width() < 768) {
+								$("#generated-toc").hide();
+								$(".sectlevel0").show();
+								$(".sectlevel1").show();
+						}
+						else {
+								$("#generated-toc").show();
+								$(".sectlevel0").hide();
+								$(".sectlevel1").hide();
+						}
+				}
+				$(window).resize(handleTocOnResize);
+				handleTocOnResize();
+				// Hide level 4
+				$("ul.tocify-subheader[data-tag='4']").hide();
+		});
+</script>
+</head>
+<body id="introduction" class="book toc2 toc-left">
+<div id="header">
+<h1>Introduction</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#introduction_project-metadata">1. Project Metadata</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>R2DBC Proxy is a proxy framework providing callbacks for query executions,
+method invocations, and parameter bindings.</p>
+</div>
+<div class="paragraph">
+<p>The proxy holds proxy listeners.
+When a caller(application or upper layer library) interacts with the proxy, the registered
+proxy listeners receive callbacks.</p>
+</div>
+<div class="paragraph">
+<p>Followings are the sample usages of the proxy listeners:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging on each query execution</p>
+</li>
+<li>
+<p>Detect slow queries</p>
+</li>
+<li>
+<p>Method tracing</p>
+</li>
+<li>
+<p>Metrics</p>
+</li>
+<li>
+<p>Distributed tracing</p>
+</li>
+<li>
+<p>Assertion and verification</p>
+</li>
+<li>
+<p>Own action</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The proxy is a thin transparent layer which suits to implement cross-cutting concerns, agnostic to
+the underlying implementation such as drivers; yet, it is viewed as R2DBC SPI from the above layer.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/r2dbc-proxy-diagram.png" alt="R2DBC Proxy diagram">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="introduction_project-metadata"><a class="anchor" href="#introduction_project-metadata"></a>1. Project Metadata</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Version control: <a href="https://github.com/r2dbc/r2dbc-proxy" class="bare">https://github.com/r2dbc/r2dbc-proxy</a></p>
+</li>
+<li>
+<p>Issue tracker: <a href="https://github.com/r2dbc/r2dbc-proxy/issues" class="bare">https://github.com/r2dbc/r2dbc-proxy/issues</a></p>
+</li>
+<li>
+<p>Release repository: <a href="https://repo1.maven.org/maven2" class="bare">https://repo1.maven.org/maven2</a></p>
+</li>
+<li>
+<p>Snapshot repository: <a href="https://oss.sonatype.org/content/repositories/snapshots" class="bare">https://oss.sonatype.org/content/repositories/snapshots</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2022-01-07 01:33:36 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
