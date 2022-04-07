@@ -25,6 +25,7 @@ import reactor.core.CoreSubscriber;
 import reactor.core.Fuseable;
 import reactor.core.Scannable;
 import reactor.util.annotation.Nullable;
+import reactor.util.context.Context;
 
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
@@ -62,6 +63,11 @@ class ResultInvocationSubscriber implements CoreSubscriber<Object>, Subscription
         this.listener = proxyConfig.getListeners();
         this.queriesExecutionContext = queriesExecutionContext;
         this.afterQueryCallbackInvoker = new AfterQueryCallbackInvoker(this.executionInfo, this.queriesExecutionContext, this.listener);
+    }
+
+    @Override
+    public Context currentContext() {
+        return this.delegate.currentContext();
     }
 
     @Override

@@ -24,6 +24,7 @@ import reactor.core.CoreSubscriber;
 import reactor.core.Fuseable;
 import reactor.core.Scannable;
 import reactor.util.annotation.Nullable;
+import reactor.util.context.Context;
 
 import java.util.function.Consumer;
 
@@ -56,6 +57,11 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
         this.listener = proxyConfig.getListeners();
         this.stopWatch = new StopWatch(proxyConfig.getClock());
         this.onComplete = onComplete;
+    }
+
+    @Override
+    public Context currentContext() {
+        return this.delegate.currentContext();
     }
 
     @Override

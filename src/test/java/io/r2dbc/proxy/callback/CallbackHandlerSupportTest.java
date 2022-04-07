@@ -36,7 +36,9 @@ import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.StepVerifierOptions;
 import reactor.test.publisher.TestPublisher;
+import reactor.util.context.Context;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
@@ -368,6 +370,35 @@ public class CallbackHandlerSupportTest {
 
     }
 
+    @Test
+    void interceptQueryExecutionVerifyContext() {
+        MutableQueryExecutionInfo executionInfo = new MutableQueryExecutionInfo();
+        ProxyFactory proxyFactory = mock(ProxyFactory.class);
+
+        when(this.proxyConfig.getListeners()).thenReturn(new CompositeProxyExecutionListener());
+        when(this.proxyConfig.getProxyFactory()).thenReturn(proxyFactory);
+
+        // when it creates a proxy for Result
+        Result mockResultProxy = MockResult.empty();
+        when(proxyFactory.wrapResult(any(), any(), any())).thenReturn(mockResultProxy);
+
+        // produce single result
+        Result mockResult = MockResult.empty();
+        Mono<Result> resultPublisher = Mono.just(mockResult);
+
+        Flux<Result> result = this.callbackHandlerSupport.interceptQueryExecution(resultPublisher, executionInfo).cast(Result.class);
+
+        // verifies result flux
+        StepVerifier.create(result, StepVerifierOptions.create().withInitialContext(Context.of("foo", "FOO")))
+            .expectSubscription()
+            .expectAccessibleContext()
+            .contains("foo", "FOO")
+            .then()
+            .expectNext(mockResultProxy)
+            .expectComplete()
+            .verify();
+    }
+
 
     @SuppressWarnings("unchecked")
     @Test
@@ -622,6 +653,40 @@ public class CallbackHandlerSupportTest {
         assertThat(afterMethodExecution.getProxyEventType()).isEqualTo(ProxyEventType.AFTER_METHOD);
 
         assertThat(afterMethodExecution.getThrown()).isSameAs(exception);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void proceedExecutionWithPublisherVerifyContext() throws Throwable {
+
+        // target method returns Publisher
+        Method executeMethod = ReflectionUtils.findMethod(Batch.class, "execute");
+        Batch target = mock(Batch.class);
+        Object[] args = new Object[]{};
+        CompositeProxyExecutionListener listener = new CompositeProxyExecutionListener();
+        ConnectionInfo connectionInfo = MockConnectionInfo.empty();
+        when(this.proxyConfig.getListeners()).thenReturn(listener);
+
+        // produce single result in order to trigger StepVerifier#consumeNextWith.
+        Result mockResult = MockResult.empty();
+        Mono<Result> publisher = Mono.just(mockResult);
+
+        doReturn(publisher).when(target).execute();
+
+        Object result = this.callbackHandlerSupport.proceedExecution(executeMethod, target, args, listener, connectionInfo, null);
+
+        // verify method on target is invoked
+        verify(target).execute();
+
+        StepVerifier.create((Publisher<Result>)result, StepVerifierOptions.create().withInitialContext(Context.of("foo", "FOO")))
+            .expectSubscription()
+            .expectAccessibleContext()
+            .contains("foo", "FOO")
+            .then()
+            .expectNext(mockResult)
+            .expectComplete()
+            .verify();
+
     }
 
     @Test

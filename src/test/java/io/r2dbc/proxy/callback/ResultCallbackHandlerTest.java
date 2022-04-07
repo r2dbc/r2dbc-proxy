@@ -29,7 +29,9 @@ import org.reactivestreams.Publisher;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
+import reactor.test.StepVerifierOptions;
 import reactor.test.publisher.TestPublisher;
+import reactor.util.context.Context;
 
 import java.lang.reflect.Method;
 import java.time.Clock;
@@ -441,6 +443,38 @@ public class ResultCallbackHandlerTest {
         assertThat(queryExecutionInfo.getThreadId()).isEqualTo(threadId);
         assertThat(queryExecutionInfo.getThreadName()).isEqualTo(threadName);
 
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void mapVerifyContext() throws Throwable {
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        ProxyConfig proxyConfig = ProxyConfig.builder().build();
+        Row row1 = MockRow.builder().identified(0, String.class, "foo").build();
+        Row row2 = MockRow.builder().identified(0, String.class, "bar").build();
+        Row row3 = MockRow.builder().identified(0, String.class, "baz").build();
+        Result mockResult = MockResult.builder().row(row1, row2, row3).build();
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
+
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
+
+        // map function to return the String value
+        BiFunction<Row, RowMetadata, String> mapBiFunction = (row, rowMetadata) -> row.get(0, String.class);
+
+        Object[] args = new Object[]{mapBiFunction};
+        Object result = callback.invoke(mockResult, MAP_METHOD, args);
+
+        assertThat(result).isInstanceOf(Publisher.class);
+
+        StepVerifier.create((Publisher<String>) result, StepVerifierOptions.create().withInitialContext(Context.of("foo", "FOO")))
+            .expectSubscription()
+            .expectAccessibleContext()
+            .contains("foo", "FOO")
+            .then()
+            .expectNext("foo")
+            .expectNext("bar")
+            .expectNext("baz")
+            .verifyComplete();
     }
 
     @Test
