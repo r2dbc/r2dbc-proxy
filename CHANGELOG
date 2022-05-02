@@ -1,6 +1,13 @@
 R2DBC Proxy Changelog
 =============================
 
+0.9.1.RELEASE
+------------------
+* Upgrade reactor to 2020.0.18 #115
+* Upgrade r2dbc-spi to 0.9.1.RELEASE #114
+* Propagate context in custom subscribers #113
+
+
 0.9.0.RELEASE
 ------------------
 * Upgrade r2dbc-spi to 0.9.0.RELEASE #108
