@@ -94,7 +94,7 @@ class AfterQueryCallbackTest {
     TestPublisher<String> resultPublisherForMap;
 
     // publisher for the return of "Result#getRowsUpdated"
-    TestPublisher<Integer> resultPublisherForGetRowsUpdated;
+    TestPublisher<Long> resultPublisherForGetRowsUpdated;
 
     // a mock that returns above test-publishers for #map and #getRowsUpdated methods.
     Result resultMock;
@@ -156,7 +156,7 @@ class AfterQueryCallbackTest {
         // - "Statement#execute" publisher completes
         // - "Result#getRowsUpdated" publisher completes
 
-        Flux<Integer> flux = prepareFluxWithResultGetRowsUpdated();
+        Flux<Long> flux = prepareFluxWithResultGetRowsUpdated();
         flux.subscribe();
 
         // received a result
@@ -164,7 +164,7 @@ class AfterQueryCallbackTest {
         verifyListener(false, 0);
 
         // process the "getRowsUpdated" result
-        this.resultPublisherForGetRowsUpdated.next(100);
+        this.resultPublisherForGetRowsUpdated.next(100L);
         verifyListener(false, 1);
 
         this.executePublisher.complete();
@@ -175,7 +175,7 @@ class AfterQueryCallbackTest {
     }
 
     @SuppressWarnings("unchecked")
-    private Flux<Integer> prepareFluxWithResultGetRowsUpdated() {
+    private Flux<Long> prepareFluxWithResultGetRowsUpdated() {
         Statement mockStatement = mock(Statement.class);
         when((Publisher<Result>) mockStatement.execute()).thenReturn(this.executePublisher);
 
@@ -184,9 +184,7 @@ class AfterQueryCallbackTest {
         Statement proxyStatement = proxyFactory.wrapStatement(mockStatement, statementInfo, new DefaultConnectionInfo());
 
         // perform "Statement#execute" and "Result#map"
-        Flux<Integer> flux = Flux.from(proxyStatement.execute()).flatMap(result -> {
-            return result.getRowsUpdated();
-        });
+        Flux<Long> flux = Flux.from(proxyStatement.execute()).flatMap(Result::getRowsUpdated);
 
         return flux;
     }
