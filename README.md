@@ -10,7 +10,7 @@ This project contains the proxy framework of the [R2DBC SPI][r]. R2DBC is a [Rea
 This project is governed by the [R2DBC Code of Conduct](https://github.com/r2dbc/.github/blob/main/CODE_OF_CONDUCT.adoc). By participating, you are expected to uphold this code of conduct. Please report unacceptable behavior to [info@r2dbc.io](mailto:info@r2dbc.io).
 
 
-### Maven configuration
+## Maven configuration
 
 Artifacts can be found on [Maven Central](https://search.maven.org/search?q=r2dbc-proxy):
 
@@ -38,10 +38,19 @@ If you'd rather like the latest snapshots of the upcoming major version, use our
 </repository>
 ```
 
+## R2DBC SPI versions
+
+| R2DBC Proxy | R2DBC SPI
+| ----------- | ----------
+|     `1.0.x` | `1.0.x`
+|     `0.9.x` | `0.9.x`
+|     `0.8.x` | `0.8.x`
+
+
 ## Documentation
 
 - Current release
-  - Reference Doc. (TBD until `0.9.0` release, please refer to the [snapshot][reference-snapshot])
+  - [Reference Doc.][reference-current]
   - [API Doc.][javadoc-current]
   - [Changelog][changelog-current]
 - Snapshot
