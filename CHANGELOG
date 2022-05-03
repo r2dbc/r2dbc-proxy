@@ -1,6 +1,11 @@
 R2DBC Proxy Changelog
 =============================
 
+1.0.0.RELEASE
+------------------
+* Upgrade r2dbc-spi to 1.0.0.RELEASE #117
+
+
 0.9.1.RELEASE
 ------------------
 * Upgrade reactor to 2020.0.18 #115
