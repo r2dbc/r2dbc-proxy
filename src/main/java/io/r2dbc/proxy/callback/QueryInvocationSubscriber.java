@@ -170,6 +170,7 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
         this.executionInfo.setThreadId(Thread.currentThread().getId());
         this.executionInfo.setCurrentMappedResult(null);
         this.executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
+        currentContext().stream().forEach(entry -> this.executionInfo.getValueStore().put(entry.getKey(), entry.getValue()));
 
         this.queriesExecutionContext.startStopwatch();
 

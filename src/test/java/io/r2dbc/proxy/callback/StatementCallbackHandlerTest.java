@@ -384,7 +384,8 @@ public class StatementCallbackHandlerTest {
         // Flux.next() cancels upstream publisher
         Mono<?> mono = ((Flux<Result>) result)
             .flatMap(r -> r.map((row, it) -> row))
-            .next();
+            .next()
+            .contextWrite(context -> context.put("foo.bar", "baz"));
 
         StepVerifier.create(mono)
             .expectSubscription()
@@ -397,6 +398,7 @@ public class StatementCallbackHandlerTest {
         assertThat(afterQueryInfo.isSuccess())
             .as("Consuming at least one result is considered to query execution success")
             .isTrue();
+        assertThat(afterQueryInfo.getValueStore().get("foo.bar")).isEqualTo("baz");
     }
 
     @Test
