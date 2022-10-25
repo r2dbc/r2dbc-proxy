@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * {@link ContextView} implementation that delegates to the given {@link ContextView} in constructor.
  *
  * @author Tadaya Tsuyukubo
- * @since 1.1.0
+ * @since 1.0.1
  */
 public class DelegatingContextView implements ContextView {
 
