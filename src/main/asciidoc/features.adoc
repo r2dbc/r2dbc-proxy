@@ -1,0 +1,16 @@
+[[features]]
+= Features
+
+== Accessing reactor context values
+
+In listener callbacks, the `ValueSource` object contains a reactor's `ContextView` object under `ContextView.class` key.
+This provides a readonly access to the reactor context.
+
+[source,java]
+----
+@Override
+public void beforeQuery(QueryExecutionInfo execInfo) {
+    ContextView contextView = execInfo.getValueStore().get(ContextView.class, ContextView.class);
+    // ...
+}
+----
