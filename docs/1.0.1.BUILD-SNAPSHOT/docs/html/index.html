@@ -84,7 +84,7 @@
 <div class="details">
 <span id="author" class="author">Tadaya Tsuyukubo &lt;tadaya@ttddyy.net&gt;</span><br>
 <span id="revnumber">version 1.0.1.BUILD-SNAPSHOT,</span>
-<span id="revdate">2022-05-03</span>
+<span id="revdate">2022-10-25</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -172,6 +172,11 @@
 </li>
 <li><a href="#use-cases_support-primitive-and-null-in-result-mapping">6.8. Support Primitive and Null in Result Mapping</a></li>
 <li><a href="#use-cases_call-different-methods-in-result-mapping">6.9. Call different methods in Result Mapping</a></li>
+</ul>
+</li>
+<li><a href="#features">7. Features</a>
+<ul class="sectlevel2">
+<li><a href="#">7.1. Accessing reactor context values</a></li>
 </ul>
 </li>
 </ul>
@@ -1259,11 +1264,32 @@ ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).bu
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="features"><a class="anchor" href="#features"></a>7. Features</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3>7.1. Accessing reactor context values</h3>
+<div class="paragraph">
+<p>In listener callbacks, the <code>ValueSource</code> object contains a reactor&#8217;s <code>ContextView</code> object under <code>ContextView.class</code> key.
+This provides a readonly access to the reactor context.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">@Override
+public void beforeQuery(QueryExecutionInfo execInfo) {
+    ContextView contextView = execInfo.getValueStore().get(ContextView.class, ContextView.class);
+    // ...
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 1.0.1.BUILD-SNAPSHOT<br>
-Last updated 2022-05-03 19:40:12 UTC
+Last updated 2022-10-25 19:09:38 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
