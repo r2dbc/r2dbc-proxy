@@ -30,7 +30,6 @@ import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockResult;
-import io.r2dbc.spi.test.MockRow;
 import io.r2dbc.spi.test.MockStatement;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
@@ -38,6 +37,7 @@ import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.util.context.ContextView;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -398,7 +398,12 @@ public class StatementCallbackHandlerTest {
         assertThat(afterQueryInfo.isSuccess())
             .as("Consuming at least one result is considered to query execution success")
             .isTrue();
-        assertThat(afterQueryInfo.getValueStore().get("foo.bar")).isEqualTo("baz");
+
+        Object contextView = afterQueryInfo.getValueStore().get(ContextView.class);
+        assertThat(contextView).isNotNull().isInstanceOfSatisfying(ContextView.class, (view) -> {
+            assertThat(view.hasKey("foo.bar")).isTrue();
+            assertThat((String) view.get("foo.bar")).isEqualTo("baz");
+        });
     }
 
     @Test

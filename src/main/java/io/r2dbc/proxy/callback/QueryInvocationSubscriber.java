@@ -26,6 +26,7 @@ import reactor.core.Fuseable;
 import reactor.core.Scannable;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Custom subscriber/subscription to invoke query callback.
@@ -170,7 +171,8 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
         this.executionInfo.setThreadId(Thread.currentThread().getId());
         this.executionInfo.setCurrentMappedResult(null);
         this.executionInfo.setProxyEventType(ProxyEventType.BEFORE_QUERY);
-        currentContext().stream().forEach(entry -> this.executionInfo.getValueStore().put(entry.getKey(), entry.getValue()));
+        // register reactor context as read only
+        this.executionInfo.getValueStore().put(ContextView.class, new DelegatingContextView(currentContext()));
 
         this.queriesExecutionContext.startStopwatch();
 

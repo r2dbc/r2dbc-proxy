@@ -25,6 +25,7 @@ import reactor.core.Fuseable;
 import reactor.core.Scannable;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 import java.util.function.Consumer;
 
@@ -147,6 +148,9 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
         this.executionInfo.setThreadName(Thread.currentThread().getName());
         this.executionInfo.setThreadId(Thread.currentThread().getId());
         this.executionInfo.setProxyEventType(ProxyEventType.BEFORE_METHOD);
+
+        // register reactor context as read only
+        this.executionInfo.getValueStore().put(ContextView.class, new DelegatingContextView(currentContext()));
 
         this.stopWatch.start();
 
