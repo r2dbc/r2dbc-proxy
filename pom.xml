@@ -41,6 +41,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>1.0.0.RELEASE</r2dbc-spi.version>
         <reactor.version>2020.0.18</reactor.version>
+        <micrometer.version>1.10.0</micrometer.version>
         <spring-boot.version>2.6.7</spring-boot.version>
         <mockito.version>4.0.0</mockito.version>
     </properties>
@@ -75,6 +76,13 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-bom</artifactId>
+                <version>${micrometer.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>${junit.version}</version>
@@ -99,6 +107,13 @@
             <artifactId>jsr305</artifactId>
             <version>${jsr305.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Optional  -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-observation</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Test Dependencies -->
