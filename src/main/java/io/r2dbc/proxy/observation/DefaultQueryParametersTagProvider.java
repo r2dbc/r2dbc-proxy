@@ -22,6 +22,8 @@ import io.r2dbc.proxy.support.QueryExecutionInfoFormatter;
 import java.util.List;
 
 /**
+ * Default implementation for {@link QueryParametersTagProvider}.
+ *
  * @author Tadaya Tsuyukubo
  */
 public class DefaultQueryParametersTagProvider implements QueryParametersTagProvider {
@@ -29,20 +31,20 @@ public class DefaultQueryParametersTagProvider implements QueryParametersTagProv
     private final QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
 
     public String getTagValue(List<Bindings> bindingsList) {
+        if (bindingsList.isEmpty()) {
+            return "()";
+        }
         StringBuilder sb = new StringBuilder();
-
-        sb.append("(");
         for (Bindings bindings : bindingsList) {
+            sb.append("(");
             if (!bindings.getIndexBindings().isEmpty()) {
                 this.formatter.onIndexBindings.accept(bindings.getIndexBindings(), sb);
-                sb.append(",");
             } else if (!bindings.getNamedBindings().isEmpty()) {
                 this.formatter.onNamedBindings.accept(bindings.getNamedBindings(), sb);
-                sb.append(",");
             }
+            sb.append("),");
         }
         chompIfEndWith(sb, ',');
-        sb.append(")");
         return sb.toString();
     }
 
