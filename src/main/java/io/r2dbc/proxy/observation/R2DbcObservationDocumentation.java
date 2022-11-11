@@ -108,6 +108,16 @@ public enum R2DbcObservationDocumentation implements ObservationDocumentation {
             }
         },
 
+        /**
+         * Query parameter values.
+         */
+        QUERY_PARAMETERS {
+            @Override
+            public String asString() {
+                return "r2dbc.params[%s]";
+            }
+        }
+
     }
 
 }

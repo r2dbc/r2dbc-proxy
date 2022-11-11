@@ -45,6 +45,16 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
 
     private final String url;
 
+    /**
+     * Whether to tag query parameter values.
+     */
+    private boolean includeParameterValues;
+
+    /**
+     * Build tag value for query parameters.
+     */
+    private QueryParametersTagProvider queryParametersTagProvider = new DefaultQueryParametersTagProvider();
+
     public ObservationProxyExecutionListener(ObservationRegistry observationRegistry,
                                              ConnectionFactory connectionFactory, String url) {
         this.observationRegistry = observationRegistry;
@@ -94,13 +104,15 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
             observation.highCardinalityKeyValue(
                 String.format(R2DbcObservationDocumentation.HighCardinalityKeys.QUERY.name(), i),
                 queryInfo.getQuery());
-            // TODO: query params
+            if (this.includeParameterValues) {
+                String params = this.queryParametersTagProvider.getTagValue(queryInfo.getBindingsList());
+                observation.highCardinalityKeyValue(
+                    String.format(R2DbcObservationDocumentation.HighCardinalityKeys.QUERY_PARAMETERS.name(), i),
+                    params);
+            }
             i = i + 1;
         }
-
     }
-
-
 
 
     @Override
@@ -127,6 +139,14 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
             }
             observation.event(R2DbcObservationDocumentation.Events.QUERY_RESULT);
         }
+    }
+
+    public void setIncludeParameterValues(boolean includeParameterValues) {
+        this.includeParameterValues = includeParameterValues;
+    }
+
+    public void setQueryParametersTagProvider(QueryParametersTagProvider queryParametersTagProvider) {
+        this.queryParametersTagProvider = queryParametersTagProvider;
     }
 
 }
