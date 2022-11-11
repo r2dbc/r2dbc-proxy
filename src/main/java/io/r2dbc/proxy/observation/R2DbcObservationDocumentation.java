@@ -18,6 +18,7 @@ package io.r2dbc.proxy.observation;
 
 import io.micrometer.common.docs.KeyName;
 import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationConvention;
 import io.micrometer.observation.docs.ObservationDocumentation;
 
 /**
@@ -28,8 +29,8 @@ public enum R2DbcObservationDocumentation implements ObservationDocumentation {
 
     R2DBC_QUERY_OBSERVATION {
         @Override
-        public String getName() {
-            return "r2dbc.query";
+        public Class<? extends ObservationConvention<? extends Observation.Context>> getDefaultConvention() {
+            return R2dbcObservationConvention.class;
         }
 
         @Override

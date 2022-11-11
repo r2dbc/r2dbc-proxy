@@ -21,13 +21,12 @@ import io.micrometer.common.util.internal.logging.InternalLoggerFactory;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
-import io.micrometer.observation.transport.Kind;
-import io.micrometer.observation.transport.SenderContext;
 import io.r2dbc.proxy.callback.DelegatingContextView;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.spi.ConnectionFactory;
+import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
@@ -55,6 +54,11 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
      */
     private QueryParametersTagProvider queryParametersTagProvider = new DefaultQueryParametersTagProvider();
 
+    private R2dbcObservationConvention r2dbcObservationConvention = new R2dbcObservationConvention() {
+
+    };
+
+
     public ObservationProxyExecutionListener(ObservationRegistry observationRegistry,
                                              ConnectionFactory connectionFactory, String url) {
         this.observationRegistry = observationRegistry;
@@ -72,43 +76,39 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
             .getOrDefault(ObservationThreadLocalAccessor.KEY, this.observationRegistry.getCurrentObservation());
         if (parentObservation == null) {
             if (log.isDebugEnabled()) {
-                log.debug("Parent observation not present, won't do any instrumentation");
+                log.debug("Parent observation not present.");
             }
-            return;
         }
         String name = this.connectionFactory.getMetadata().getName();
         Observation observation = clientObservation(parentObservation, executionInfo, name);
         if (log.isDebugEnabled()) {
             log.debug("Created a new child observation before query [" + observation + "]");
         }
-        tagQueries(executionInfo, observation);
+        tagQueries(executionInfo, (R2dbcContext) observation.getContext());
         executionInfo.getValueStore().put(Observation.class, observation);
     }
 
-    Observation clientObservation(Observation parentObservation, QueryExecutionInfo executionInfo, String name) {
+    Observation clientObservation(@Nullable Observation parentObservation, QueryExecutionInfo executionInfo, String name) {
         // @formatter:off
-        SenderContext<?> context = new SenderContext<>((carrier, key, value) -> { }, Kind.CLIENT);
+        R2dbcContext context = new R2dbcContext();
         context.setRemoteServiceName(name);
         context.setRemoteServiceAddress(this.url);
+        context.setConnectionName(name);
+        context.setThreadName(executionInfo.getThreadName());
         Observation observation = R2DbcObservationDocumentation.R2DBC_QUERY_OBSERVATION.observation(this.observationRegistry, () -> context)
-            .parentObservation(parentObservation)
-            .lowCardinalityKeyValue(R2DbcObservationDocumentation.LowCardinalityKeys.CONNECTION.withValue(name))
-            .lowCardinalityKeyValue(R2DbcObservationDocumentation.LowCardinalityKeys.THREAD.withValue(executionInfo.getThreadName()));
+            .observationConvention(this.r2dbcObservationConvention)
+            .parentObservation(parentObservation);
         // @formatter:on
         return observation.start();
     }
 
-    private void tagQueries(QueryExecutionInfo executionInfo, Observation observation) {
+    private void tagQueries(QueryExecutionInfo executionInfo, R2dbcContext context) {
         int i = 0;
         for (QueryInfo queryInfo : executionInfo.getQueries()) {
-            observation.highCardinalityKeyValue(
-                String.format(R2DbcObservationDocumentation.HighCardinalityKeys.QUERY.name(), i),
-                queryInfo.getQuery());
+            context.getQueries().add(queryInfo.getQuery());
             if (this.includeParameterValues) {
                 String params = this.queryParametersTagProvider.getTagValue(queryInfo.getBindingsList());
-                observation.highCardinalityKeyValue(
-                    String.format(R2DbcObservationDocumentation.HighCardinalityKeys.QUERY_PARAMETERS.name(), i),
-                    params);
+                context.getParams().add(params);
             }
             i = i + 1;
         }
@@ -149,4 +149,7 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
         this.queryParametersTagProvider = queryParametersTagProvider;
     }
 
+    public void setR2dbcObservationConvention(R2dbcObservationConvention r2dbcObservationConvention) {
+        this.r2dbcObservationConvention = r2dbcObservationConvention;
+    }
 }
