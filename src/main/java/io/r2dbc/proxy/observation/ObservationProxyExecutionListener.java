@@ -26,13 +26,20 @@ import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.ConnectionFactoryOptions;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
+ * Create Micrometer Observations.
+ *
  * @author Marcin Grzejszczak
  * @author Tadaya Tsuyukubo
+ * @since 1.0.1
  */
 public class ObservationProxyExecutionListener implements ProxyExecutionListener {
 
@@ -42,7 +49,8 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
 
     private final ObservationRegistry observationRegistry;
 
-    private final String url;
+    @Nullable
+    private final String remoteServiceAddress;
 
     /**
      * Whether to tag query parameter values.
@@ -60,10 +68,23 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
 
 
     public ObservationProxyExecutionListener(ObservationRegistry observationRegistry,
-                                             ConnectionFactory connectionFactory, String url) {
+                                             ConnectionFactory connectionFactory, String connectionUrl) {
         this.observationRegistry = observationRegistry;
         this.connectionFactory = connectionFactory;
-        this.url = url;
+        this.remoteServiceAddress = parseR2dbcConnectionUrl(connectionUrl);
+    }
+
+    @Nullable
+    private String parseR2dbcConnectionUrl(String connectionUrl) {
+        String host = (String) ConnectionFactoryOptions.parse(connectionUrl).getValue(ConnectionFactoryOptions.HOST);
+        Integer portNumber = (Integer) ConnectionFactoryOptions.parse(connectionUrl).getValue(ConnectionFactoryOptions.PORT);
+        int port = portNumber != null ? portNumber : -1;
+        try {
+            URI uri = new URI(null, null, host, port, null, null, null);
+            return uri.toString();
+        } catch (URISyntaxException ex) {
+            return null;
+        }
     }
 
     @Override
@@ -88,17 +109,15 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
         executionInfo.getValueStore().put(Observation.class, observation);
     }
 
-    Observation clientObservation(@Nullable Observation parentObservation, QueryExecutionInfo executionInfo, String name) {
-        // @formatter:off
+    private Observation clientObservation(@Nullable Observation parentObservation, QueryExecutionInfo executionInfo, String name) {
         R2dbcContext context = new R2dbcContext();
         context.setRemoteServiceName(name);
-        context.setRemoteServiceAddress(this.url);
+        context.setRemoteServiceAddress(this.remoteServiceAddress);
         context.setConnectionName(name);
         context.setThreadName(executionInfo.getThreadName());
         Observation observation = R2DbcObservationDocumentation.R2DBC_QUERY_OBSERVATION.observation(this.observationRegistry, () -> context)
             .observationConvention(this.r2dbcObservationConvention)
             .parentObservation(parentObservation);
-        // @formatter:on
         return observation.start();
     }
 
