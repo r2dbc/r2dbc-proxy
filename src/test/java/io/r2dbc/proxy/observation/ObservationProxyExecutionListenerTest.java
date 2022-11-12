@@ -16,11 +16,17 @@
 
 package io.r2dbc.proxy.observation;
 
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.TraceContext;
+import io.micrometer.tracing.handler.DefaultTracingObservationHandler;
 import io.micrometer.tracing.handler.PropagatingSenderTracingObservationHandler;
+import io.micrometer.tracing.handler.TracingObservationHandler;
 import io.micrometer.tracing.propagation.Propagator;
+import io.micrometer.tracing.test.simple.SimpleSpan;
 import io.micrometer.tracing.test.simple.SimpleTracer;
 import io.micrometer.tracing.test.simple.TracingAssertions;
 import io.r2dbc.proxy.core.Bindings;
@@ -32,7 +38,10 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -80,22 +89,11 @@ class ObservationProxyExecutionListenerTest {
     void query() {
         this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<R2dbcQueryContext>(this.tracer, NOOP_PROPAGATOR));
 
-        ConnectionFactoryMetadata metadata = mock(ConnectionFactoryMetadata.class);
-        when(metadata.getName()).thenReturn("my-db");
-        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
-        when(connectionFactory.getMetadata()).thenReturn(metadata);
+        ConnectionFactory connectionFactory = createMockConnectionFactory();
         String url = "r2dbc:postgresql://192.168.1.1:5432/sample";
+        QueryExecutionInfo queryExecutionInfo = createQueryExecutionInfo();
 
         ObservationProxyExecutionListener listener = new ObservationProxyExecutionListener(this.registry, connectionFactory, url);
-
-        Bindings bindings = new Bindings();
-        bindings.addIndexBinding(Bindings.indexBinding(0, BoundValue.value("foo")));
-        bindings.addIndexBinding(Bindings.indexBinding(1, BoundValue.value(100)));
-        QueryInfo queryInfo = new QueryInfo("SELECT 1");
-        queryInfo.getBindingsList().add(bindings);
-
-        QueryExecutionInfo queryExecutionInfo = MockQueryExecutionInfo.builder().threadName("my-thread").queries(Arrays.asList(queryInfo)).build();
-
         listener.beforeQuery(queryExecutionInfo);
         assertThat(this.tracer.currentSpan()).as("r2dbc does not open scope").isNull();
         listener.afterQuery(queryExecutionInfo);
@@ -116,22 +114,12 @@ class ObservationProxyExecutionListenerTest {
     void queryWithIncludeParameterValues() {
         this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<R2dbcQueryContext>(this.tracer, NOOP_PROPAGATOR));
 
-        ConnectionFactoryMetadata metadata = mock(ConnectionFactoryMetadata.class);
-        when(metadata.getName()).thenReturn("my-db");
-        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
-        when(connectionFactory.getMetadata()).thenReturn(metadata);
+        ConnectionFactory connectionFactory = createMockConnectionFactory();
         String url = "r2dbc:postgresql://192.168.1.1:5432/sample";
+        QueryExecutionInfo queryExecutionInfo = createQueryExecutionInfo();
 
         ObservationProxyExecutionListener listener = new ObservationProxyExecutionListener(this.registry, connectionFactory, url);
         listener.setIncludeParameterValues(true);
-
-        Bindings bindings = new Bindings();
-        bindings.addIndexBinding(Bindings.indexBinding(0, BoundValue.value("foo")));
-        bindings.addIndexBinding(Bindings.indexBinding(1, BoundValue.value(100)));
-        QueryInfo queryInfo = new QueryInfo("SELECT 1");
-        queryInfo.getBindingsList().add(bindings);
-
-        QueryExecutionInfo queryExecutionInfo = MockQueryExecutionInfo.builder().threadName("my-thread").queries(Arrays.asList(queryInfo)).build();
 
         listener.beforeQuery(queryExecutionInfo);
         listener.afterQuery(queryExecutionInfo);
@@ -139,4 +127,48 @@ class ObservationProxyExecutionListenerTest {
         TracingAssertions.assertThat(this.tracer).onlySpan().hasTag("r2dbc.params[0]", "(foo,100)");
     }
 
+    @Test
+    void queryWithParentObservation() {
+        // for parent observation to create a span, need to register DefaultTracingObservationHandler
+        List<TracingObservationHandler<?>> handlers = new ArrayList<>();
+        handlers.add(new PropagatingSenderTracingObservationHandler<R2dbcQueryContext>(this.tracer, NOOP_PROPAGATOR));
+        handlers.add(new DefaultTracingObservationHandler(this.tracer));
+        this.registry.observationConfig().observationHandler(new ObservationHandler.FirstMatchingCompositeObservationHandler(handlers));
+
+        ConnectionFactory connectionFactory = createMockConnectionFactory();
+        String url = "r2dbc:postgresql://192.168.1.1:5432/sample";
+        QueryExecutionInfo queryExecutionInfo = createQueryExecutionInfo();
+
+        Observation parentObservation = Observation.start("parent", this.registry);
+        Context context = Context.of(ObservationThreadLocalAccessor.KEY, parentObservation);
+        queryExecutionInfo.getValueStore().put(ContextView.class, context);
+
+        ObservationProxyExecutionListener listener = new ObservationProxyExecutionListener(this.registry, connectionFactory, url);
+
+        listener.beforeQuery(queryExecutionInfo);
+        listener.afterQuery(queryExecutionInfo);
+
+        parentObservation.stop();
+
+        TracingAssertions.assertThat(this.tracer).reportedSpans().hasSize(2)
+            .extracting(SimpleSpan::getName).containsExactly("parent", "query");
+    }
+
+    private ConnectionFactory createMockConnectionFactory() {
+        ConnectionFactoryMetadata metadata = mock(ConnectionFactoryMetadata.class);
+        when(metadata.getName()).thenReturn("my-db");
+        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+        when(connectionFactory.getMetadata()).thenReturn(metadata);
+        return connectionFactory;
+    }
+
+    private QueryExecutionInfo createQueryExecutionInfo() {
+        Bindings bindings = new Bindings();
+        bindings.addIndexBinding(Bindings.indexBinding(0, BoundValue.value("foo")));
+        bindings.addIndexBinding(Bindings.indexBinding(1, BoundValue.value(100)));
+        QueryInfo queryInfo = new QueryInfo("SELECT 1");
+        queryInfo.getBindingsList().add(bindings);
+
+        return MockQueryExecutionInfo.builder().threadName("my-thread").queries(Arrays.asList(queryInfo)).build();
+    }
 }
