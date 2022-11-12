@@ -93,7 +93,7 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
             return;
         }
         Observation parentObservation = executionInfo.getValueStore()
-            .getOrDefault(ContextView.class, new DelegatingContextView(Context.empty()))
+            .getOrDefault(ContextView.class, (ContextView) new DelegatingContextView(Context.empty()))
             .getOrDefault(ObservationThreadLocalAccessor.KEY, this.observationRegistry.getCurrentObservation());
         if (parentObservation == null) {
             if (log.isDebugEnabled()) {
