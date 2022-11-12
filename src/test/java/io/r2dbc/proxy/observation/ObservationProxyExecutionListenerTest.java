@@ -78,7 +78,7 @@ class ObservationProxyExecutionListenerTest {
 
     @Test
     void query() {
-        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<R2dbcContext>(this.tracer, NOOP_PROPAGATOR));
+        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<R2dbcQueryContext>(this.tracer, NOOP_PROPAGATOR));
 
         ConnectionFactoryMetadata metadata = mock(ConnectionFactoryMetadata.class);
         when(metadata.getName()).thenReturn("my-db");
@@ -114,7 +114,7 @@ class ObservationProxyExecutionListenerTest {
 
     @Test
     void queryWithIncludeParameterValues() {
-        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<R2dbcContext>(this.tracer, NOOP_PROPAGATOR));
+        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<R2dbcQueryContext>(this.tracer, NOOP_PROPAGATOR));
 
         ConnectionFactoryMetadata metadata = mock(ConnectionFactoryMetadata.class);
         when(metadata.getName()).thenReturn("my-db");

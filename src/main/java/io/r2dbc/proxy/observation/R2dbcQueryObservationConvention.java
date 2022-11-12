@@ -27,11 +27,11 @@ import java.util.Set;
 /**
  * @author Tadaya Tsuyukubo
  */
-public interface R2dbcObservationConvention extends ObservationConvention<R2dbcContext> {
+public interface R2dbcQueryObservationConvention extends ObservationConvention<R2dbcQueryContext> {
 
     @Override
     default boolean supportsContext(Observation.Context context) {
-        return context instanceof R2dbcContext;
+        return context instanceof R2dbcQueryContext;
     }
 
     @Override
@@ -40,7 +40,7 @@ public interface R2dbcObservationConvention extends ObservationConvention<R2dbcC
     }
 
     @Override
-    default KeyValues getLowCardinalityKeyValues(R2dbcContext context) {
+    default KeyValues getLowCardinalityKeyValues(R2dbcQueryContext context) {
         Set<KeyValue> keyValues = new HashSet<>();
         keyValues.add(KeyValue.of(R2DbcObservationDocumentation.LowCardinalityKeys.CONNECTION, context.getConnectionName()));
         keyValues.add(KeyValue.of(R2DbcObservationDocumentation.LowCardinalityKeys.THREAD, context.getThreadName()));
@@ -48,7 +48,7 @@ public interface R2dbcObservationConvention extends ObservationConvention<R2dbcC
     }
 
     @Override
-    default KeyValues getHighCardinalityKeyValues(R2dbcContext context) {
+    default KeyValues getHighCardinalityKeyValues(R2dbcQueryContext context) {
         Set<KeyValue> keyValues = new HashSet<>();
         for (int i = 0; i < context.getQueries().size(); i++) {
             String key = context.getQueries().get(i);

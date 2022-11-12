@@ -62,7 +62,7 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
      */
     private QueryParametersTagProvider queryParametersTagProvider = new DefaultQueryParametersTagProvider();
 
-    private R2dbcObservationConvention r2dbcObservationConvention = new R2dbcObservationConvention() {
+    private R2dbcQueryObservationConvention r2DbcQueryObservationConvention = new R2dbcQueryObservationConvention() {
 
     };
 
@@ -105,23 +105,23 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
         if (log.isDebugEnabled()) {
             log.debug("Created a new child observation before query [" + observation + "]");
         }
-        tagQueries(executionInfo, (R2dbcContext) observation.getContext());
+        tagQueries(executionInfo, (R2dbcQueryContext) observation.getContext());
         executionInfo.getValueStore().put(Observation.class, observation);
     }
 
     private Observation clientObservation(@Nullable Observation parentObservation, QueryExecutionInfo executionInfo, String name) {
-        R2dbcContext context = new R2dbcContext();
+        R2dbcQueryContext context = new R2dbcQueryContext();
         context.setRemoteServiceName(name);
         context.setRemoteServiceAddress(this.remoteServiceAddress);
         context.setConnectionName(name);
         context.setThreadName(executionInfo.getThreadName());
         Observation observation = R2DbcObservationDocumentation.R2DBC_QUERY_OBSERVATION.observation(this.observationRegistry, () -> context)
-            .observationConvention(this.r2dbcObservationConvention)
+            .observationConvention(this.r2DbcQueryObservationConvention)
             .parentObservation(parentObservation);
         return observation.start();
     }
 
-    private void tagQueries(QueryExecutionInfo executionInfo, R2dbcContext context) {
+    private void tagQueries(QueryExecutionInfo executionInfo, R2dbcQueryContext context) {
         int i = 0;
         for (QueryInfo queryInfo : executionInfo.getQueries()) {
             context.getQueries().add(queryInfo.getQuery());
@@ -168,7 +168,7 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
         this.queryParametersTagProvider = queryParametersTagProvider;
     }
 
-    public void setR2dbcObservationConvention(R2dbcObservationConvention r2dbcObservationConvention) {
-        this.r2dbcObservationConvention = r2dbcObservationConvention;
+    public void setR2dbcQueryObservationConvention(R2dbcQueryObservationConvention r2DbcQueryObservationConvention) {
+        this.r2DbcQueryObservationConvention = r2DbcQueryObservationConvention;
     }
 }

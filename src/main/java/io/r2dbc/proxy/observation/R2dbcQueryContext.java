@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.observation;
 
+import io.micrometer.observation.Observation;
 import io.micrometer.observation.transport.Kind;
 import io.micrometer.observation.transport.SenderContext;
 
@@ -23,9 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * {@link Observation.Context} for r2dbc query.
+ *
  * @author Tadaya Tsuyukubo
  */
-public class R2dbcContext extends SenderContext<Object> {
+public class R2dbcQueryContext extends SenderContext<Object> {
 
     private String connectionName;
 
@@ -35,7 +38,7 @@ public class R2dbcContext extends SenderContext<Object> {
 
     private List<String> params = new ArrayList<>();
 
-    public R2dbcContext() {
+    public R2dbcQueryContext() {
         super((carrier, key, value) -> {
             // no-op setter
         }, Kind.CLIENT);
