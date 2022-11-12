@@ -115,7 +115,7 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
         context.setRemoteServiceAddress(this.remoteServiceAddress);
         context.setConnectionName(name);
         context.setThreadName(executionInfo.getThreadName());
-        Observation observation = R2DbcObservationDocumentation.R2DBC_QUERY_OBSERVATION.observation(this.observationRegistry, () -> context)
+        Observation observation = R2dbcObservationDocumentation.R2DBC_QUERY_OBSERVATION.observation(this.observationRegistry, () -> context)
             .observationConvention(this.r2DbcQueryObservationConvention)
             .parentObservation(parentObservation);
         return observation.start();
@@ -156,7 +156,7 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
             if (log.isDebugEnabled()) {
                 log.debug("Marking after query result for observation [" + observation + "]");
             }
-            observation.event(R2DbcObservationDocumentation.Events.QUERY_RESULT);
+            observation.event(R2dbcObservationDocumentation.Events.QUERY_RESULT);
         }
     }
 

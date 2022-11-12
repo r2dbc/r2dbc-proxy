@@ -42,8 +42,8 @@ public interface R2dbcQueryObservationConvention extends ObservationConvention<R
     @Override
     default KeyValues getLowCardinalityKeyValues(R2dbcQueryContext context) {
         Set<KeyValue> keyValues = new HashSet<>();
-        keyValues.add(KeyValue.of(R2DbcObservationDocumentation.LowCardinalityKeys.CONNECTION, context.getConnectionName()));
-        keyValues.add(KeyValue.of(R2DbcObservationDocumentation.LowCardinalityKeys.THREAD, context.getThreadName()));
+        keyValues.add(KeyValue.of(R2dbcObservationDocumentation.LowCardinalityKeys.CONNECTION, context.getConnectionName()));
+        keyValues.add(KeyValue.of(R2dbcObservationDocumentation.LowCardinalityKeys.THREAD, context.getThreadName()));
         return KeyValues.of(keyValues);
     }
 
@@ -52,13 +52,13 @@ public interface R2dbcQueryObservationConvention extends ObservationConvention<R
         Set<KeyValue> keyValues = new HashSet<>();
         for (int i = 0; i < context.getQueries().size(); i++) {
             String key = context.getQueries().get(i);
-            String queryKey = String.format(R2DbcObservationDocumentation.HighCardinalityKeys.QUERY.asString(), i);
+            String queryKey = String.format(R2dbcObservationDocumentation.HighCardinalityKeys.QUERY.asString(), i);
             keyValues.add(KeyValue.of(queryKey, key));
         }
         // params could be empty when "includeParameterValues=false" in the listener.
         for (int i = 0; i < context.getParams().size(); i++) {
             String params = context.getParams().get(i);
-            String key = String.format(R2DbcObservationDocumentation.HighCardinalityKeys.QUERY_PARAMETERS.asString(), i);
+            String key = String.format(R2dbcObservationDocumentation.HighCardinalityKeys.QUERY_PARAMETERS.asString(), i);
             keyValues.add(KeyValue.of(key, params));
         }
         return KeyValues.of(keyValues);

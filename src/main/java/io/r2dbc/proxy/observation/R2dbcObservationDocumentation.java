@@ -22,10 +22,12 @@ import io.micrometer.observation.ObservationConvention;
 import io.micrometer.observation.docs.ObservationDocumentation;
 
 /**
+ * {@link ObservationConvention} for r2dbc operations.
+ *
  * @author Marcin Grzejszczak
  * @author Tadaya Tsuyukubo
  */
-public enum R2DbcObservationDocumentation implements ObservationDocumentation {
+public enum R2dbcObservationDocumentation implements ObservationDocumentation {
 
     R2DBC_QUERY_OBSERVATION {
         @Override
