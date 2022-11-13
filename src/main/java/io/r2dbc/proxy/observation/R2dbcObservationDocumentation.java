@@ -32,7 +32,7 @@ public enum R2dbcObservationDocumentation implements ObservationDocumentation {
     R2DBC_QUERY_OBSERVATION {
         @Override
         public Class<? extends ObservationConvention<? extends Observation.Context>> getDefaultConvention() {
-            return R2dbcQueryObservationConvention.class;
+            return QueryObservationConvention.class;
         }
 
         @Override

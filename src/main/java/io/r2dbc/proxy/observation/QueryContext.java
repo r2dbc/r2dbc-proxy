@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Tadaya Tsuyukubo
  */
-public class R2dbcQueryContext extends SenderContext<Object> {
+public class QueryContext extends SenderContext<Object> {
 
     private String connectionName;
 
@@ -38,7 +38,7 @@ public class R2dbcQueryContext extends SenderContext<Object> {
 
     private List<String> params = new ArrayList<>();
 
-    public R2dbcQueryContext() {
+    public QueryContext() {
         super((carrier, key, value) -> {
             // no-op setter
         }, Kind.CLIENT);

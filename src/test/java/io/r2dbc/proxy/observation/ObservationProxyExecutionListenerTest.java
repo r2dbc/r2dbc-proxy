@@ -87,7 +87,7 @@ class ObservationProxyExecutionListenerTest {
 
     @Test
     void query() {
-        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<R2dbcQueryContext>(this.tracer, NOOP_PROPAGATOR));
+        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<QueryContext>(this.tracer, NOOP_PROPAGATOR));
 
         ConnectionFactory connectionFactory = createMockConnectionFactory();
         String url = "r2dbc:postgresql://192.168.1.1:5432/sample";
@@ -112,7 +112,7 @@ class ObservationProxyExecutionListenerTest {
 
     @Test
     void queryWithIncludeParameterValues() {
-        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<R2dbcQueryContext>(this.tracer, NOOP_PROPAGATOR));
+        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<QueryContext>(this.tracer, NOOP_PROPAGATOR));
 
         ConnectionFactory connectionFactory = createMockConnectionFactory();
         String url = "r2dbc:postgresql://192.168.1.1:5432/sample";
@@ -131,7 +131,7 @@ class ObservationProxyExecutionListenerTest {
     void queryWithParentObservation() {
         // for parent observation to create a span, need to register DefaultTracingObservationHandler
         List<TracingObservationHandler<?>> handlers = new ArrayList<>();
-        handlers.add(new PropagatingSenderTracingObservationHandler<R2dbcQueryContext>(this.tracer, NOOP_PROPAGATOR));
+        handlers.add(new PropagatingSenderTracingObservationHandler<QueryContext>(this.tracer, NOOP_PROPAGATOR));
         handlers.add(new DefaultTracingObservationHandler(this.tracer));
         this.registry.observationConfig().observationHandler(new ObservationHandler.FirstMatchingCompositeObservationHandler(handlers));
 
