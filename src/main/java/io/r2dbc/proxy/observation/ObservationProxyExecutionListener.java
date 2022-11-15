@@ -68,10 +68,14 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
 
 
     public ObservationProxyExecutionListener(ObservationRegistry observationRegistry,
-                                             ConnectionFactory connectionFactory, String connectionUrl) {
+                                             ConnectionFactory connectionFactory, @Nullable String connectionUrl) {
         this.observationRegistry = observationRegistry;
         this.connectionFactory = connectionFactory;
-        this.remoteServiceAddress = parseR2dbcConnectionUrl(connectionUrl);
+        if (connectionUrl != null) {
+            this.remoteServiceAddress = parseR2dbcConnectionUrl(connectionUrl);
+        } else {
+            this.remoteServiceAddress = null;
+        }
     }
 
     @Nullable
