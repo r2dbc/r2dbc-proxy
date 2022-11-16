@@ -43,6 +43,15 @@
         <reactor.version>2022.0.0</reactor.version>
         <spring-boot.version>2.7.5</spring-boot.version>
         <mockito.version>4.8.1</mockito.version>
+        <micrometer-bom.version>1.10.0</micrometer-bom.version>
+        <micrometer-tracing-bom.version>1.0.0</micrometer-tracing-bom.version>
+
+        <!-- For micrometer-docs-generator  -->
+        <!--        <micrometer-docs-generator.version>1.0.0</micrometer-docs-generator.version>-->
+        <micrometer-docs-generator.version>1.1.0-SNAPSHOT</micrometer-docs-generator.version>
+        <micrometer-docs-generator.inputPath>${basedir}/src/main/java/io/r2dbc/proxy/observation/</micrometer-docs-generator.inputPath>
+        <micrometer-docs-generator.inclusionPattern>.*</micrometer-docs-generator.inclusionPattern>
+        <micrometer-docs-generator.outputPath>${basedir}/target/observation-docs/</micrometer-docs-generator.outputPath>
     </properties>
 
     <licenses>
@@ -75,9 +84,30 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-bom</artifactId>
+                <version>${micrometer-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-tracing-bom</artifactId>
+                <version>${micrometer-tracing-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -101,6 +131,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Optional  -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-observation</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Test Dependencies -->
         <dependency>
             <groupId>io.projectreactor</groupId>
@@ -121,17 +158,7 @@
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -149,7 +176,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -167,7 +193,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -176,6 +201,39 @@
             <version>${logback.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Test for Observation       -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-observation-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-integration-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.r2dbc</groupId>
+            <artifactId>r2dbc-h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -296,6 +354,34 @@
                 </executions>
             </plugin>
 
+            <!-- To generate observation docs, run " ./mvnw exec:java@generate-micrometer-docs"  -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-micrometer-docs</id>
+                        <configuration>
+                            <mainClass>io.micrometer.docs.DocsGeneratorCommand</mainClass>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <arguments>
+                                <argument>${micrometer-docs-generator.inputPath}</argument>
+                                <argument>${micrometer-docs-generator.inclusionPattern}</argument>
+                                <argument>${micrometer-docs-generator.outputPath}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.micrometer</groupId>
+                        <artifactId>micrometer-docs-generator</artifactId>
+                        <version>${micrometer-docs-generator.version}</version>
+                        <type>jar</type>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>

@@ -185,7 +185,7 @@ _Also see [CONTRIBUTING.adoc](https://github.com/r2dbc/.github/blob/main/CONTRIB
 Building the documentation uses [maven asciidoctor plugin][asciidoctor-maven-plugin].
 
 ```bash
- $ ./mvnw clean asciidoctor:process-asciidoc
+ $ ./mvnw clean exec:java@generate-micrometer-docs asciidoctor:process-asciidoc
 ```
 
 [asciidoctor-maven-plugin]: https://github.com/asciidoctor/asciidoctor-maven-plugin

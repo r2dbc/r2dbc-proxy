@@ -14,3 +14,32 @@ public void beforeQuery(QueryExecutionInfo execInfo) {
     // ...
 }
 ----
+
+== Micrometer Observation support
+R2DBC Proxy has an optional dependency on Micrometer to provide https://micrometer.io/docs/observation[Micrometer Observation] support.
+The `ObservationProxyExecutionListener` creates observations for query executions.
+
+.Configuration Sample
+[source,java]
+----
+ConnectionFactory connectionFactory = ...
+ObservationRegistry observationRegistry = ...
+String r2dbcUrl = ...
+
+ObservationProxyExecutionListener listener = new ObservationProxyExecutionListener(
+observationRegistry, connectionFactory, r2dbcUrl);
+listener.setIncludeParameterValues(true);  // to include binding params (default is false)
+
+ConnectionFactory proxyConnectionFactory = ProxyConnectionFactory.builder(connectionFactory)
+.listener(listener).build();
+----
+
+All https://micrometer.io/docs/observation[Micrometer Observation] implementation classes are located under the `io.r2dbc.proxy.observation` package.
+Since the dependency is optional, the user code needs explicit addition to the `micrometer-observation` dependency.
+
+For Spring Boot 3, a separate project, _TBD_, provides auto-configuration for this.
+
+include::../../../target/observation-docs//_conventions.adoc[]
+include::../../../target/observation-docs/_metrics.adoc[]
+include::../../../target/observation-docs/_spans.adoc[]
+
