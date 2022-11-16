@@ -1,6 +1,11 @@
 R2DBC Proxy Changelog
 =============================
 
+1.1.0.RELEASE
+------------------
+* Add observation support with Micrometer Observation API #122
+
+
 1.0.1.RELEASE
 ------------------
 * Sets ReactorContext entries in ValueStore #121
