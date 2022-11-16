@@ -39,7 +39,7 @@ Since the dependency is optional, the user code needs explicit addition to the `
 
 For Spring Boot 3, a separate project, _TBD_, provides auto-configuration for this.
 
-include::{micrometer-docs}/_conventions.adoc[]
-include::{micrometer-docs}/_metrics.adoc[]
-include::{micrometer-docs}/_spans.adoc[]
+include::../../../target/observation-docs//_conventions.adoc[]
+include::../../../target/observation-docs/_metrics.adoc[]
+include::../../../target/observation-docs/_spans.adoc[]
 

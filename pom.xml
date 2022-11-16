@@ -410,8 +410,6 @@
                         <numbered>true</numbered>
                         <linkcss>true</linkcss>
                         <sectanchors>true</sectanchors>
-
-                        <micrometer-docs>${micrometer-docs-generator.outputPath}</micrometer-docs>
                     </attributes>
                 </configuration>
             </plugin>
