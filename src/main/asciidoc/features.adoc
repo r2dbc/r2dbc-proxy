@@ -35,7 +35,7 @@ ConnectionFactory proxyConnectionFactory = ProxyConnectionFactory.builder(connec
 ----
 
 All https://micrometer.io/docs/observation[Micrometer Observation] implementation classes are located under the `io.r2dbc.proxy.observation` package.
-Since the dependency is optional, the user code needs explicit addition to the `micrometer-observation` dependency.
+Since the dependency is optional, users need to explicit add the `micrometer-observation` dependency.
 
 For Spring Boot 3, a separate project, _TBD_, provides auto-configuration for this.
 
