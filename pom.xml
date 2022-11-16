@@ -32,17 +32,17 @@
     <url>https://github.com/r2dbc/r2dbc-proxy</url>
 
     <properties>
-        <assertj.version>3.21.0</assertj.version>
+        <assertj.version>3.23.1</assertj.version>
         <java.version>1.8</java.version>
         <jsr305.version>3.0.2</jsr305.version>
-        <junit.version>5.8.2</junit.version>
-        <logback.version>1.2.11</logback.version>
+        <junit.version>5.9.1</junit.version>
+        <logback.version>1.3.4</logback.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>1.0.0.RELEASE</r2dbc-spi.version>
-        <reactor.version>2020.0.18</reactor.version>
-        <spring-boot.version>2.6.7</spring-boot.version>
-        <mockito.version>4.0.0</mockito.version>
+        <reactor.version>2022.0.0</reactor.version>
+        <spring-boot.version>2.7.5</spring-boot.version>
+        <mockito.version>4.8.1</mockito.version>
     </properties>
 
     <licenses>
