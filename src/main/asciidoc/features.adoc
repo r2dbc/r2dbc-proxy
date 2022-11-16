@@ -38,3 +38,8 @@ All https://micrometer.io/docs/observation[Micrometer Observation] implementatio
 Since the dependency is optional, the user code needs explicit addition to the `micrometer-observation` dependency.
 
 For Spring Boot 3, a separate project, _TBD_, provides auto-configuration for this.
+
+include::{micrometer-docs}/_conventions.adoc[]
+include::{micrometer-docs}/_metrics.adoc[]
+include::{micrometer-docs}/_spans.adoc[]
+
