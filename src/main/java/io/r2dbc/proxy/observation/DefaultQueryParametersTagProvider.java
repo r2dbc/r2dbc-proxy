@@ -25,6 +25,7 @@ import java.util.List;
  * Default implementation for {@link QueryParametersTagProvider}.
  *
  * @author Tadaya Tsuyukubo
+ * @since 1.1.0
  */
 public class DefaultQueryParametersTagProvider implements QueryParametersTagProvider {
 

@@ -26,6 +26,7 @@ import io.micrometer.observation.docs.ObservationDocumentation;
  *
  * @author Marcin Grzejszczak
  * @author Tadaya Tsuyukubo
+ * @since 1.1.0
  */
 public enum R2dbcObservationDocumentation implements ObservationDocumentation {
 

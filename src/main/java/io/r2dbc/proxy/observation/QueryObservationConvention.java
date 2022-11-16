@@ -25,7 +25,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Default {@link ObservationConvention} for R2DBC query execution.
+ *
  * @author Tadaya Tsuyukubo
+ * @since 1.1.0
  */
 public interface QueryObservationConvention extends ObservationConvention<QueryContext> {
 

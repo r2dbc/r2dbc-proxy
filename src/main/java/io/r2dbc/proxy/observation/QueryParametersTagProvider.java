@@ -24,6 +24,7 @@ import java.util.List;
  * Construct a tag value for query parameters.
  *
  * @author Tadaya Tsuyukubo
+ * @since 1.1.0
  */
 public interface QueryParametersTagProvider {
 

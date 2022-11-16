@@ -27,6 +27,7 @@ import java.util.List;
  * {@link Observation.Context} for r2dbc query.
  *
  * @author Tadaya Tsuyukubo
+ * @since 1.1.0
  */
 public class QueryContext extends SenderContext<Object> {
 
