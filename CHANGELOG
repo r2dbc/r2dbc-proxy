@@ -1,6 +1,11 @@
 R2DBC Proxy Changelog
 =============================
 
+1.0.1.RELEASE
+------------------
+* Sets ReactorContext entries in ValueStore #121
+
+
 1.0.0.RELEASE
 ------------------
 * Upgrade r2dbc-spi to 1.0.0.RELEASE #117
