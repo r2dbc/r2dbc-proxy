@@ -39,7 +39,7 @@ import java.net.URISyntaxException;
  *
  * @author Marcin Grzejszczak
  * @author Tadaya Tsuyukubo
- * @since 1.0.1
+ * @since 1.1.0
  */
 public class ObservationProxyExecutionListener implements ProxyExecutionListener {
 
