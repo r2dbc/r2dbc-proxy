@@ -29,15 +29,13 @@ import io.micrometer.observation.docs.ObservationDocumentation;
  */
 public enum R2dbcObservationDocumentation implements ObservationDocumentation {
 
+    /**
+     * R2DBC Query Observation.
+     */
     R2DBC_QUERY_OBSERVATION {
         @Override
         public Class<? extends ObservationConvention<? extends Observation.Context>> getDefaultConvention() {
             return QueryObservationConvention.class;
-        }
-
-        @Override
-        public String getContextualName() {
-            return "query";
         }
 
         @Override
@@ -64,12 +62,17 @@ public enum R2dbcObservationDocumentation implements ObservationDocumentation {
     enum Events implements Observation.Event {
 
         /**
-         * Annotated before executing a method annotated with @ContinueSpan or @NewSpan.
+         * Retrieving query result.
          */
         QUERY_RESULT {
             @Override
             public String getName() {
                 return "r2dbc.query_result";
+            }
+
+            @Override
+            public String getContextualName() {
+                return "Query Result";
             }
         }
 

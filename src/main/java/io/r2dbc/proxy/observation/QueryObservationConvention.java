@@ -40,6 +40,11 @@ public interface QueryObservationConvention extends ObservationConvention<QueryC
     }
 
     @Override
+    default String getContextualName(QueryContext context) {
+        return "query";
+    }
+
+    @Override
     default KeyValues getLowCardinalityKeyValues(QueryContext context) {
         Set<KeyValue> keyValues = new HashSet<>();
         keyValues.add(KeyValue.of(R2dbcObservationDocumentation.LowCardinalityKeys.CONNECTION, context.getConnectionName()));
