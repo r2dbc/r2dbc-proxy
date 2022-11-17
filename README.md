@@ -42,7 +42,7 @@ If you'd rather like the latest snapshots of the upcoming major version, use our
 
 | R2DBC Proxy | R2DBC SPI
 | ----------- | ----------
-|     `1.0.x` | `1.0.x`
+|     `1.0.x`, `1.1.x` | `1.0.x`
 |     `0.9.x` | `0.9.x`
 |     `0.8.x` | `0.8.x`
 
