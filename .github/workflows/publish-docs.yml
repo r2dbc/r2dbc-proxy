@@ -26,7 +26,7 @@ jobs:
             echo "project_version=$VERSION" >> $GITHUB_ENV
 
       - name: Process asciidoc and javadoc
-        run: ./mvnw -q asciidoctor:process-asciidoc javadoc:javadoc
+        run: ./mvnw -q exec:java@generate-micrometer-docs asciidoctor:process-asciidoc javadoc:javadoc
 
         #
         # construct a directory to be copied to "gh-pages" branch
