@@ -44,6 +44,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import reactor.util.context.ContextView;
 
 /**
  * Test for {@link ConnectionFactoryCallbackHandler}.
@@ -109,6 +110,7 @@ public class ConnectionFactoryCallbackHandlerTest {
         assertThat(connectionInfo.getConnectionId()).isEqualTo(connectionId);
         assertThat(connectionInfo.isClosed()).isFalse();
         assertThat(connectionInfo.getOriginalConnection()).isSameAs(originalConnection);
+        assertThat(connectionInfo.getValueStore().get(ContextView.class)).isNotNull();
 
         assertThat(afterMethod.getTarget()).isSameAs(connectionFactory);
         assertThat(afterMethod.getResult()).isSameAs(originalConnection);
