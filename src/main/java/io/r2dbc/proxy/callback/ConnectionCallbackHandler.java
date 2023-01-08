@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.callback;
 
+import static io.r2dbc.proxy.callback.ContextViewPropagation.propagate;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.util.Assert;
@@ -84,6 +85,7 @@ public final class ConnectionCallbackHandler extends CallbackHandlerSupport {
             MutableStatementInfo statementInfo = new MutableStatementInfo();
             statementInfo.setConnectionInfo(this.connectionInfo);
             statementInfo.setOriginalQuery(query);
+            propagate(connectionInfo, statementInfo);
 
             String updatedQuery = this.proxyConfig.getBindParameterConverter().onCreateStatement(query, statementInfo);
             statementInfo.setUpdatedQuery(updatedQuery);

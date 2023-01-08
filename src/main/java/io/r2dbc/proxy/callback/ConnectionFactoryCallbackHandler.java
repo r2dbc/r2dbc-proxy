@@ -16,6 +16,7 @@
 
 package io.r2dbc.proxy.callback;
 
+import static io.r2dbc.proxy.callback.ContextViewPropagation.propagate;
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
@@ -92,6 +93,7 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
                     connectionInfo.setOriginalConnection(connection);
                     executionInfo.setConnectionInfo(connectionInfo);
 
+                    propagate(executionInfo, connectionInfo);
                     Connection proxyConnection = this.proxyConfig.getProxyFactory().wrapConnection(connection, connectionInfo);
                     return proxyConnection;
                 })
