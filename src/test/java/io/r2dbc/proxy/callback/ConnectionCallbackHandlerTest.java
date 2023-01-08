@@ -18,12 +18,14 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
+import io.r2dbc.proxy.core.StatementInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.Wrapped;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.reactivestreams.Publisher;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.Mono;
@@ -38,6 +40,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import reactor.util.context.ContextView;
 
 /**
  * Test for {@link ConnectionCallbackHandler}.
@@ -100,6 +103,8 @@ public class ConnectionCallbackHandlerTest {
 
         Connection connection = mock(Connection.class);
         DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
+        ContextView contextView = mock(ContextView.class);
+        connectionInfo.getValueStore().put(ContextView.class, contextView);
 
         String query = "MY-QUERY";
 
@@ -109,7 +114,9 @@ public class ConnectionCallbackHandlerTest {
         Statement resultStatement = mock(Statement.class);
         doReturn(originalStatement).when(connection).createStatement(query);
 
-        doReturn(resultStatement).when(proxyFactory).wrapStatement(eq(originalStatement), any(), eq(connectionInfo));
+        ArgumentCaptor<StatementInfo> statementInfoCaptor = ArgumentCaptor.forClass(StatementInfo.class);
+
+        doReturn(resultStatement).when(proxyFactory).wrapStatement(eq(originalStatement), statementInfoCaptor.capture(), eq(connectionInfo));
 
         ConnectionCallbackHandler callback = new ConnectionCallbackHandler(connection, connectionInfo, proxyConfig);
 
@@ -119,6 +126,8 @@ public class ConnectionCallbackHandlerTest {
 
         MethodExecutionInfo executionInfo = listener.getAfterMethodExecutionInfo();
         assertThat(executionInfo.getResult()).isEqualTo(originalStatement);
+
+        assertThat(statementInfoCaptor.getValue().getValueStore().get(ContextView.class)).isEqualTo(contextView);
     }
 
     @Test
