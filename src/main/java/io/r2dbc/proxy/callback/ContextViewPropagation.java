@@ -5,7 +5,7 @@ import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.StatementInfo;
 import reactor.util.context.ContextView;
 
-public class ContextViewPropagation {
+class ContextViewPropagation {
 
     private ContextViewPropagation() {
     }
