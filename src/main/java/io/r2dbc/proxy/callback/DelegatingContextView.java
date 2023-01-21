@@ -54,4 +54,9 @@ public class DelegatingContextView implements ContextView {
     public Stream<Map.Entry<Object, Object>> stream() {
         return this.delegate.stream();
     }
+
+    @Override
+    public String toString() {
+        return "DelegatingContextView{" + delegate + '}';
+    }
 }

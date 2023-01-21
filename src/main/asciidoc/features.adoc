@@ -3,17 +3,71 @@
 
 == Accessing reactor context values
 
-In listener callbacks, the `ValueSource` object contains a reactor's `ContextView` object under `ContextView.class` key.
+In the callbacks, `ValueSource` contains a reactor's `ContextView` object under `ContextView.class` key.
 This provides a readonly access to the reactor context.
 
 [source,java]
 ----
 @Override
 public void beforeQuery(QueryExecutionInfo execInfo) {
-    ContextView contextView = execInfo.getValueStore().get(ContextView.class, ContextView.class);
+    // query execution scoped context
+    ContextView contextViewForQuery = execInfo.getValueStore().get(ContextView.class, ContextView.class);
+    // connection scoped context
+    ContextView contextViewForConnection = execInfo.getConnectionInfo().getValueStore().get(ContextView.class, ContextView.class);
     // ...
 }
 ----
+
+=== Available ContextView scopes
+
+While interacting with R2DBC APIs, there are multiple places that could put values into the reactor contexts.
+This example illustrates what context values are available in the corresponding callback APIs.
+
+[source,java]
+----
+Mono.from(connectionFactory.create()).contextWrite(context -> context.put("foo", "FOO"))   // <1>
+    .flatMapMany(connection -> Mono.from(connection
+        .createStatement("SELECT id, name FROM emp WHERE id = ?")
+        .bind(0, 20)
+        .execute()).contextWrite(context -> context.put("bar", "BAR")))    // <2>
+    .flatMap(result -> Mono.from(result
+        .map((row, rowMetadata) -> row.get("name", String.class)))
+        .contextWrite(context -> context.put("qux", "QUX"))    // <3>
+    )
+    .contextWrite(context -> context.put("baz", "BAZ"))    // <4>
+    ...
+----
+
+<1>  Context for connection
+<2>  Context for query execution
+<3>  Context for result-set retrieval
+<4>  Context for the entire flow
+
+*BindParameterConverter#onCreateStatement*
+
+* `StatementInfo#getValueStore` has no `ContextView`
+* `ConnectionInfo#getValueStore` has a `ContextView` that holds keys - `foo` and `baz`
+
+*BindParameterConverter#onBind*
+
+* `StatementInfo#getValueStore` has no `ContextView`
+* `ConnectionInfo#getValueStore` has a `ContextView` that holds keys - `foo` and `baz`
+
+*ProxyExecutionListener#[before|after]Query*
+
+* `QueryExecutionInfo#getValueStore` has a `ContextView` that holds keys - `bar` and `baz`
+* `ConnectionInfo#getValueStore` has a `ContextView` that holds keys - `foo` and `baz`
+
+*ProxyExecutionListener#[before|after]Method*
+
+* `MethodExecutionInfo#getValueStore` for `create` has a `ContextView` that holds keys - `foo` and `baz`
+* `MethodExecutionInfo#getValueStore` for `createStatement` has no `ContextView`
+* `MethodExecutionInfo#getValueStore` for `bind` has no `ContextView`
+* `MethodExecutionInfo#getValueStore` for `execute` has a `ContextView` that holds keys - `bar` and `baz`
+* `MethodExecutionInfo#getValueStore` for `map` has a `ContextView` that holds keys - `baz` and `qux`
+* `MethodExecutionInfo#getValueStore` for `get` has no `ContextView`
+* `ConnectionInfo#getValueStore` for all methods(`create`, `createStatement`, `bind`, `execute`, `map`, `get`) have a `ContextView` that holds keys - `foo` and `baz`
+
 
 == Micrometer Observation support
 R2DBC Proxy has an optional dependency on Micrometer to provide https://micrometer.io/docs/observation[Micrometer Observation] support.

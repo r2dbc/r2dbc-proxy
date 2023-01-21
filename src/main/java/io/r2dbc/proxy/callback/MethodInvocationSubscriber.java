@@ -144,7 +144,7 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
 
     }
 
-    private void beforeMethod() {
+    protected void beforeMethod() {
         this.executionInfo.setThreadName(Thread.currentThread().getName());
         this.executionInfo.setThreadId(Thread.currentThread().getId());
         this.executionInfo.setProxyEventType(ProxyEventType.BEFORE_METHOD);

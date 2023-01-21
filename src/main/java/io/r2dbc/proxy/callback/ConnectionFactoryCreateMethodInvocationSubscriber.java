@@ -18,6 +18,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.spi.ConnectionFactory;
 import reactor.core.CoreSubscriber;
+import reactor.util.context.ContextView;
 
 /**
  * Special subscriber for {@link ConnectionFactory#create()} to invoke before/after
@@ -41,4 +42,10 @@ class ConnectionFactoryCreateMethodInvocationSubscriber extends MethodInvocation
         this.delegate.onComplete();
     }
 
+    @Override
+    protected void beforeMethod() {
+        // register reactor context as read only at connection-info level
+        this.executionInfo.getConnectionInfo().getValueStore().put(ContextView.class, new DelegatingContextView(currentContext()));
+        super.beforeMethod();
+    }
 }

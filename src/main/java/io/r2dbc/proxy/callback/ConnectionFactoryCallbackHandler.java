@@ -56,11 +56,15 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
             StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
 
             // Method execution info
-            // Since Connection is not yet created, do not set ConnectionInfo
             MutableMethodExecutionInfo executionInfo = new MutableMethodExecutionInfo();
             executionInfo.setMethod(method);
             executionInfo.setMethodArgs(args);
             executionInfo.setTarget(target);
+
+            // The actual connection is not yet created, but in order to populate connection level context-view,
+            // create an empty connection info here and set it to the execution info
+            DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
+            executionInfo.setConnectionInfo(connectionInfo);
 
             Publisher<?> result = (Publisher<?>) this.methodInvocationStrategy.invoke(method, target, args);
 
@@ -82,15 +86,12 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
                     // set produced object as result
                     executionInfo.setResult(resultObj);
 
-                    // construct ConnectionInfo and returns proxy Connection
+                    // populate ConnectionInfo and returns proxy Connection
                     Connection connection = (Connection) resultObj;  // original connection
                     String connectionId = this.proxyConfig.getConnectionIdManager().getId(connection);
-
-                    DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
                     connectionInfo.setConnectionId(connectionId);
                     connectionInfo.setClosed(false);
                     connectionInfo.setOriginalConnection(connection);
-                    executionInfo.setConnectionInfo(connectionInfo);
 
                     Connection proxyConnection = this.proxyConfig.getProxyFactory().wrapConnection(connection, connectionInfo);
                     return proxyConnection;
