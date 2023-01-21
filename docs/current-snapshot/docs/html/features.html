@@ -83,7 +83,11 @@
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#">1. Accessing reactor context values</a></li>
+<li><a href="#">1. Accessing reactor context values</a>
+<ul class="sectlevel2">
+<li><a href="#">1.1. Available ContextView scopes</a></li>
+</ul>
+</li>
 <li><a href="#">2. Micrometer Observation support</a>
 <ul class="sectlevel2">
 <li><a href="#observability-conventions">2.1. Observability - Conventions</a></li>
@@ -111,16 +115,128 @@
 <h2>1. Accessing reactor context values</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In listener callbacks, the <code>ValueSource</code> object contains a reactor&#8217;s <code>ContextView</code> object under <code>ContextView.class</code> key.
+<p>In the callbacks, <code>ValueSource</code> contains a reactor&#8217;s <code>ContextView</code> object under <code>ContextView.class</code> key.
 This provides a readonly access to the reactor context.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">@Override
 public void beforeQuery(QueryExecutionInfo execInfo) {
-    ContextView contextView = execInfo.getValueStore().get(ContextView.class, ContextView.class);
+    // query execution scoped context
+    ContextView contextViewForQuery = execInfo.getValueStore().get(ContextView.class, ContextView.class);
+    // connection scoped context
+    ContextView contextViewForConnection = execInfo.getConnectionInfo().getValueStore().get(ContextView.class, ContextView.class);
     // ...
 }</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3>1.1. Available ContextView scopes</h3>
+<div class="paragraph">
+<p>While interacting with R2DBC APIs, there are multiple places that could put values into the reactor contexts.
+This example illustrates what context values are available in the corresponding callback APIs.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">Mono.from(connectionFactory.create()).contextWrite(context -&gt; context.put("foo", "FOO"))   <i class="conum" data-value="1"></i><b>(1)</b>
+    .flatMapMany(connection -&gt; Mono.from(connection
+        .createStatement("SELECT id, name FROM emp WHERE id = ?")
+        .bind(0, 20)
+        .execute()).contextWrite(context -&gt; context.put("bar", "BAR")))    <i class="conum" data-value="2"></i><b>(2)</b>
+    .flatMap(result -&gt; Mono.from(result
+        .map((row, rowMetadata) -&gt; row.get("name", String.class)))
+        .contextWrite(context -&gt; context.put("qux", "QUX"))    <i class="conum" data-value="3"></i><b>(3)</b>
+    )
+    .contextWrite(context -&gt; context.put("baz", "BAZ"))    <i class="conum" data-value="4"></i><b>(4)</b>
+    ...</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Context for connection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Context for query execution</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Context for result-set retrieval</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Context for the entire flow</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>BindParameterConverter#onCreateStatement</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>StatementInfo#getValueStore</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>BindParameterConverter#onBind</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>StatementInfo#getValueStore</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>ProxyExecutionListener#[before|after]Query</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>QueryExecutionInfo#getValueStore</code> has a <code>ContextView</code> that holds keys - <code>bar</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>ProxyExecutionListener#[before|after]Method</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>create</code> has a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>createStatement</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>bind</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>execute</code> has a <code>ContextView</code> that holds keys - <code>bar</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>map</code> has a <code>ContextView</code> that holds keys - <code>baz</code> and <code>qux</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>get</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> for all methods(<code>create</code>, <code>createStatement</code>, <code>bind</code>, <code>execute</code>, <code>map</code>, <code>get</code>) have a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -388,7 +504,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-11-28 01:54:53 UTC
+Last updated 2023-01-21 07:59:38 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
