@@ -84,7 +84,7 @@
 <div class="details">
 <span id="author" class="author">Tadaya Tsuyukubo &lt;tadaya@ttddyy.net&gt;</span><br>
 <span id="revnumber">version 1.1.1.BUILD-SNAPSHOT,</span>
-<span id="revdate">2023-05-24</span>
+<span id="revdate">2023-05-25</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1445,8 +1445,25 @@ Since the dependency is optional, users need to explicit add the <code>micromete
 <div class="sect3">
 <h4 id="observability-conventions"><a class="anchor" href="#observability-conventions"></a>7.2.1. Observability - Conventions</h4>
 <div class="paragraph">
-<p>Below you can find a list of all <code>GlobalObservabilityConventions</code> and <code>ObservabilityConventions</code> declared by this project.</p>
+<p>Below you can find a list of all <code>GlobalObservationConvention</code> and <code>ObservationConvention</code> declared by this project.</p>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. ObservationConvention implementations</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ObservationConvention Class Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Applicable ObservationContext Class Name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.r2dbc.proxy.observation.QueryObservationConvention</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QueryContext</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="observability-metrics"><a class="anchor" href="#observability-metrics"></a>7.2.2. Observability - Metrics</h4>
@@ -1508,7 +1525,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </table>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. Low cardinality Keys</caption>
+<caption class="title">Table 3. Low cardinality Keys</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -1541,7 +1558,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. High cardinality Keys</caption>
+<caption class="title">Table 4. High cardinality Keys</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -1624,7 +1641,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </table>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. Tag Keys</caption>
+<caption class="title">Table 5. Tag Keys</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -1653,7 +1670,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. Event Values</caption>
+<caption class="title">Table 6. Event Values</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -1678,7 +1695,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 <div id="footer">
 <div id="footer-text">
 Version 1.1.1.BUILD-SNAPSHOT<br>
-Last updated 2023-05-24 05:46:26 UTC
+Last updated 2023-05-25 06:37:34 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
