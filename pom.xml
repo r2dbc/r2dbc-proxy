@@ -40,14 +40,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>1.0.0.RELEASE</r2dbc-spi.version>
-        <reactor.version>2022.0.0</reactor.version>
+        <reactor-bom.version>2022.0.7</reactor-bom.version>
         <spring-boot.version>2.7.5</spring-boot.version>
         <mockito.version>4.8.1</mockito.version>
-        <micrometer-bom.version>1.10.0</micrometer-bom.version>
-        <micrometer-tracing-bom.version>1.0.0</micrometer-tracing-bom.version>
+        <micrometer-bom.version>1.10.7</micrometer-bom.version>
+        <micrometer-tracing-bom.version>1.0.6</micrometer-tracing-bom.version>
 
         <!-- For micrometer-docs-generator  -->
-        <micrometer-docs-generator.version>1.0.0</micrometer-docs-generator.version>
+        <micrometer-docs-generator.version>1.0.1</micrometer-docs-generator.version>
         <micrometer-docs-generator.inputPath>${basedir}/src/main/java/io/r2dbc/proxy/observation/</micrometer-docs-generator.inputPath>
         <micrometer-docs-generator.inclusionPattern>.*</micrometer-docs-generator.inclusionPattern>
         <micrometer-docs-generator.outputPath>${basedir}/target/observation-docs/</micrometer-docs-generator.outputPath>
@@ -78,7 +78,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>${reactor.version}</version>
+                <version>${reactor-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
