@@ -1,6 +1,15 @@
 R2DBC Proxy Changelog
 =============================
 
+1.1.1.RELEASE
+------------------
+* Propagate Contextview to ConnectionInfo and StatementInfo #127
+* Upgrade reactor-bom to 2022.0.7 #129
+* Upgrade micrometer-bom to 1.10.7 #130
+* Upgrade micrometer-tracing-bom to 1.0.6 #131
+* Upgrade micrometer-docs-generator to 1.0.1 #125
+
+
 1.1.0.RELEASE
 ------------------
 * Add observation support with Micrometer Observation API #122
