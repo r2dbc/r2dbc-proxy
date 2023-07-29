@@ -1,6 +1,6 @@
 [[use-cases]]
 = Use cases
-:datasource-proxy: https://github.com/ttddyy/datasource-proxy:
+:datasource-proxy: https://github.com/ttddyy/datasource-proxy
 :slow-query-doc: https://ttddyy.github.io/datasource-proxy/docs/current/user-guide/#_slow_query_logging_listener
 :r2dbc-proxy-samples: https://github.com/ttddyy/r2dbc-proxy-examples
 :TracingExecutionListener: https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/TracingExecutionListener.java
