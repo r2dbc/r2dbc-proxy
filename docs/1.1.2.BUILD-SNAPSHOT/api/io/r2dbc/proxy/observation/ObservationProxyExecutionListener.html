@@ -143,7 +143,17 @@ implements <a href="../../../../io/r2dbc/proxy/listener/ProxyExecutionListener.h
 <tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/observation/ObservationProxyExecutionListener.html#ObservationProxyExecutionListener-io.micrometer.observation.ObservationRegistry-io.r2dbc.spi.ConnectionFactory-java.lang.String-">ObservationProxyExecutionListener</a></span>(io.micrometer.observation.ObservationRegistry&nbsp;observationRegistry,
                                  <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi">ConnectionFactory</a>&nbsp;connectionFactory,
-                                 <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;connectionUrl)</code>&nbsp;</td>
+                                 <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;connectionUrl)</code>
+<div class="block">Constructor that takes a connection url.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/observation/ObservationProxyExecutionListener.html#ObservationProxyExecutionListener-io.micrometer.observation.ObservationRegistry-io.r2dbc.spi.ConnectionFactory-java.lang.String-java.lang.Integer-">ObservationProxyExecutionListener</a></span>(io.micrometer.observation.ObservationRegistry&nbsp;observationRegistry,
+                                 <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi">ConnectionFactory</a>&nbsp;connectionFactory,
+                                 <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;host,
+                                 <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>&nbsp;port)</code>
+<div class="block">Constructor that takes host and port.</div>
+</td>
 </tr>
 </table>
 </li>
@@ -222,13 +232,43 @@ implements <a href="../../../../io/r2dbc/proxy/listener/ProxyExecutionListener.h
 <a name="ObservationProxyExecutionListener-io.micrometer.observation.ObservationRegistry-io.r2dbc.spi.ConnectionFactory-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>ObservationProxyExecutionListener</h4>
 <pre>public&nbsp;ObservationProxyExecutionListener(io.micrometer.observation.ObservationRegistry&nbsp;observationRegistry,
                                          <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi">ConnectionFactory</a>&nbsp;connectionFactory,
                                          <a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
                                          <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;connectionUrl)</pre>
+<div class="block">Constructor that takes a connection url.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>observationRegistry</code> - observation registry</dd>
+<dd><code>connectionFactory</code> - connection factory</dd>
+<dd><code>connectionUrl</code> - connection url string (optional)</dd>
+</dl>
+</li>
+</ul>
+<a name="ObservationProxyExecutionListener-io.micrometer.observation.ObservationRegistry-io.r2dbc.spi.ConnectionFactory-java.lang.String-java.lang.Integer-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>ObservationProxyExecutionListener</h4>
+<pre>public&nbsp;ObservationProxyExecutionListener(io.micrometer.observation.ObservationRegistry&nbsp;observationRegistry,
+                                         <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi">ConnectionFactory</a>&nbsp;connectionFactory,
+                                         <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;host,
+                                         <a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
+                                         <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>&nbsp;port)</pre>
+<div class="block">Constructor that takes host and port.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>observationRegistry</code> - observation registry</dd>
+<dd><code>connectionFactory</code> - connection factory</dd>
+<dd><code>host</code> - host</dd>
+<dd><code>port</code> - port number (optional)</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>1.1.2</dd>
+</dl>
 </li>
 </ul>
 </li>
