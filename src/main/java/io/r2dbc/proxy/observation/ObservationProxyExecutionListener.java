@@ -66,7 +66,13 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
 
     };
 
-
+    /**
+     * Constructor that takes a connection url.
+     *
+     * @param observationRegistry observation registry
+     * @param connectionFactory   connection factory
+     * @param connectionUrl       connection url string (optional)
+     */
     public ObservationProxyExecutionListener(ObservationRegistry observationRegistry,
                                              ConnectionFactory connectionFactory, @Nullable String connectionUrl) {
         this.observationRegistry = observationRegistry;
@@ -78,10 +84,32 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
         }
     }
 
+    /**
+     * Constructor that takes host and port.
+     *
+     * @param observationRegistry observation registry
+     * @param connectionFactory   connection factory
+     * @param host                host
+     * @param port                port number (optional)
+     * @since 1.1.2
+     */
+    public ObservationProxyExecutionListener(ObservationRegistry observationRegistry,
+                                             ConnectionFactory connectionFactory, String host, @Nullable Integer port) {
+        this.observationRegistry = observationRegistry;
+        this.connectionFactory = connectionFactory;
+        this.remoteServiceAddress = buildRemoteServiceAddress(host, port);
+    }
+
     @Nullable
     private String parseR2dbcConnectionUrl(String connectionUrl) {
-        String host = (String) ConnectionFactoryOptions.parse(connectionUrl).getValue(ConnectionFactoryOptions.HOST);
-        Integer portNumber = (Integer) ConnectionFactoryOptions.parse(connectionUrl).getValue(ConnectionFactoryOptions.PORT);
+        ConnectionFactoryOptions options = ConnectionFactoryOptions.parse(connectionUrl);
+        String host = (String) options.getValue(ConnectionFactoryOptions.HOST);
+        Integer portNumber = (Integer) options.getValue(ConnectionFactoryOptions.PORT);
+        return buildRemoteServiceAddress(host, portNumber);
+    }
+
+    @Nullable
+    private String buildRemoteServiceAddress(@Nullable String host, @Nullable Integer portNumber) {
         int port = portNumber != null ? portNumber : -1;
         try {
             URI uri = new URI(null, null, host, port, null, null, null);

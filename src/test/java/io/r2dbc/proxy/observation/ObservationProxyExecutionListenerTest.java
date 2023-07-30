@@ -38,6 +38,9 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
@@ -45,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -171,4 +176,51 @@ class ObservationProxyExecutionListenerTest {
 
         return MockQueryExecutionInfo.builder().threadName("my-thread").queries(Arrays.asList(queryInfo)).build();
     }
+
+    @ParameterizedTest
+    @MethodSource
+    void remoteServiceAddressWithConnectionUrl(String connectionUrl, String expectedIp, int expectedPort) {
+        runAndVerifyRemoteServiceAddress(() -> {
+            ConnectionFactory connectionFactory = createMockConnectionFactory();
+            return new ObservationProxyExecutionListener(this.registry, connectionFactory, connectionUrl);
+        }, expectedIp, expectedPort);
+    }
+
+    private static Stream<Arguments> remoteServiceAddressWithConnectionUrl() {
+        return Stream.of(
+            Arguments.of("r2dbc:postgresql://192.168.1.1:5432/sample", "192.168.1.1", 5432),
+            Arguments.of("r2dbc:postgresql://192.168.1.1/sample", "192.168.1.1", -1)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void remoteServiceAddressWithConnectionHostAndPort(String host, Integer port, String expectedIp, int expectedPort) {
+        runAndVerifyRemoteServiceAddress(() -> {
+            ConnectionFactory connectionFactory = createMockConnectionFactory();
+            return new ObservationProxyExecutionListener(this.registry, connectionFactory, host, port);
+        }, expectedIp, expectedPort);
+    }
+
+    private static Stream<Arguments> remoteServiceAddressWithConnectionHostAndPort() {
+        return Stream.of(
+            Arguments.of("192.168.1.1", 5432, "192.168.1.1", 5432),
+            Arguments.of("192.168.1.1", null, "192.168.1.1", -1),
+            Arguments.of("192.168.1.1", -1, "192.168.1.1", -1)
+        );
+    }
+
+    void runAndVerifyRemoteServiceAddress(Supplier<ObservationProxyExecutionListener> listenerSupplier, String expectedIp, int expectedPort) {
+        this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<QueryContext>(this.tracer, NOOP_PROPAGATOR));
+        QueryExecutionInfo queryExecutionInfo = createQueryExecutionInfo();
+
+        ObservationProxyExecutionListener listener = listenerSupplier.get();
+        listener.beforeQuery(queryExecutionInfo);
+        listener.afterQuery(queryExecutionInfo);
+
+        TracingAssertions.assertThat(this.tracer).onlySpan()
+            .hasIpEqualTo(expectedIp)
+            .hasPortEqualTo(expectedPort);
+    }
+
 }
