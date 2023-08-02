@@ -1,6 +1,15 @@
 R2DBC Proxy Changelog
 =============================
 
+1.1.2.RELEASE
+------------------
+* Add a new constructor with host and port parameters to ObservationProxyExecutionListener #135
+* Upgrade reactor-bom to 2022.0.9 #136
+* Upgrade micrometer-bom to 1.10.9 #136
+* Upgrade micrometer-tracing-bom to 1.0.8 #136
+* Upgrade micrometer-docs-generator to 1.0.2 #136
+
+
 1.1.1.RELEASE
 ------------------
 * Propagate Contextview to ConnectionInfo and StatementInfo #127
