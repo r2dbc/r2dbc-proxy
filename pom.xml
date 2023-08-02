@@ -35,19 +35,19 @@
         <assertj.version>3.23.1</assertj.version>
         <java.version>1.8</java.version>
         <jsr305.version>3.0.2</jsr305.version>
-        <junit.version>5.9.1</junit.version>
-        <logback.version>1.3.4</logback.version>
+        <junit.version>5.10.0</junit.version>
+        <logback.version>1.3.8</logback.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>1.0.0.RELEASE</r2dbc-spi.version>
-        <reactor-bom.version>2022.0.7</reactor-bom.version>
-        <spring-boot.version>2.7.5</spring-boot.version>
+        <reactor-bom.version>2022.0.9</reactor-bom.version>
+        <spring-boot.version>2.7.14</spring-boot.version>
         <mockito.version>4.8.1</mockito.version>
-        <micrometer-bom.version>1.10.7</micrometer-bom.version>
-        <micrometer-tracing-bom.version>1.0.6</micrometer-tracing-bom.version>
+        <micrometer-bom.version>1.10.9</micrometer-bom.version>
+        <micrometer-tracing-bom.version>1.0.8</micrometer-tracing-bom.version>
 
         <!-- For micrometer-docs-generator  -->
-        <micrometer-docs-generator.version>1.0.1</micrometer-docs-generator.version>
+        <micrometer-docs-generator.version>1.0.2</micrometer-docs-generator.version>
         <micrometer-docs-generator.inputPath>${basedir}/src/main/java/io/r2dbc/proxy/observation/</micrometer-docs-generator.inputPath>
         <micrometer-docs-generator.inclusionPattern>.*</micrometer-docs-generator.inclusionPattern>
         <micrometer-docs-generator.outputPath>${basedir}/target/observation-docs/</micrometer-docs-generator.outputPath>
