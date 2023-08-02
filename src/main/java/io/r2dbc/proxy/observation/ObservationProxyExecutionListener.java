@@ -94,7 +94,7 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
      * @since 1.1.2
      */
     public ObservationProxyExecutionListener(ObservationRegistry observationRegistry,
-                                             ConnectionFactory connectionFactory, String host, @Nullable Integer port) {
+                                             ConnectionFactory connectionFactory, @Nullable String host, @Nullable Integer port) {
         this.observationRegistry = observationRegistry;
         this.connectionFactory = connectionFactory;
         this.remoteServiceAddress = buildRemoteServiceAddress(host, port);
@@ -110,6 +110,9 @@ public class ObservationProxyExecutionListener implements ProxyExecutionListener
 
     @Nullable
     private String buildRemoteServiceAddress(@Nullable String host, @Nullable Integer portNumber) {
+        if (host == null) {
+            return null;
+        }
         int port = portNumber != null ? portNumber : -1;
         try {
             URI uri = new URI(null, null, host, port, null, null, null);

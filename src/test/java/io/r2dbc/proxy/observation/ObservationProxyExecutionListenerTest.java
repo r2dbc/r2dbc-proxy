@@ -28,6 +28,7 @@ import io.micrometer.tracing.handler.TracingObservationHandler;
 import io.micrometer.tracing.propagation.Propagator;
 import io.micrometer.tracing.test.simple.SimpleSpan;
 import io.micrometer.tracing.test.simple.SimpleTracer;
+import io.micrometer.tracing.test.simple.SpanAssert;
 import io.micrometer.tracing.test.simple.TracingAssertions;
 import io.r2dbc.proxy.core.Bindings;
 import io.r2dbc.proxy.core.BoundValue;
@@ -41,6 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
@@ -195,7 +197,7 @@ class ObservationProxyExecutionListenerTest {
 
     @ParameterizedTest
     @MethodSource
-    void remoteServiceAddressWithConnectionHostAndPort(String host, Integer port, String expectedIp, int expectedPort) {
+    void remoteServiceAddressWithConnectionHostAndPort(String host, Integer port, String expectedIp, Integer expectedPort) {
         runAndVerifyRemoteServiceAddress(() -> {
             ConnectionFactory connectionFactory = createMockConnectionFactory();
             return new ObservationProxyExecutionListener(this.registry, connectionFactory, host, port);
@@ -206,11 +208,14 @@ class ObservationProxyExecutionListenerTest {
         return Stream.of(
             Arguments.of("192.168.1.1", 5432, "192.168.1.1", 5432),
             Arguments.of("192.168.1.1", null, "192.168.1.1", -1),
-            Arguments.of("192.168.1.1", -1, "192.168.1.1", -1)
+            Arguments.of("192.168.1.1", -1, "192.168.1.1", -1),
+            Arguments.of(null, 5432, null, null),
+            Arguments.of(null, -1, null, null),
+            Arguments.of(null, null, null, null)
         );
     }
 
-    void runAndVerifyRemoteServiceAddress(Supplier<ObservationProxyExecutionListener> listenerSupplier, String expectedIp, int expectedPort) {
+    void runAndVerifyRemoteServiceAddress(Supplier<ObservationProxyExecutionListener> listenerSupplier, @Nullable String expectedIp, @Nullable Integer expectedPort) {
         this.registry.observationConfig().observationHandler(new PropagatingSenderTracingObservationHandler<QueryContext>(this.tracer, NOOP_PROPAGATOR));
         QueryExecutionInfo queryExecutionInfo = createQueryExecutionInfo();
 
@@ -218,9 +223,18 @@ class ObservationProxyExecutionListenerTest {
         listener.beforeQuery(queryExecutionInfo);
         listener.afterQuery(queryExecutionInfo);
 
-        TracingAssertions.assertThat(this.tracer).onlySpan()
-            .hasIpEqualTo(expectedIp)
-            .hasPortEqualTo(expectedPort);
+        TracingAssertions.assertThat(this.tracer).onlySpan();
+        SimpleSpan span = this.tracer.onlySpan();
+        if (expectedIp == null) {
+            SpanAssert.assertThat(span).hasIpThatIsBlank();
+        } else {
+            SpanAssert.assertThat(span).hasIpEqualTo(expectedIp);
+        }
+        if (expectedPort == null) {
+            SpanAssert.assertThat(span).hasPortThatIsNotSet();
+        } else {
+            SpanAssert.assertThat(span).hasPortEqualTo(expectedPort);
+        }
     }
 
 }
