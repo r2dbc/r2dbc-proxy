@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
+import io.r2dbc.spi.OutParameters;
+import io.r2dbc.spi.Readable;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
@@ -25,9 +27,13 @@ import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockResult;
 import io.r2dbc.spi.test.MockRow;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.reactivestreams.Publisher;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifierOptions;
 import reactor.test.publisher.TestPublisher;
@@ -35,13 +41,20 @@ import reactor.util.context.Context;
 
 import java.lang.reflect.Method;
 import java.time.Clock;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 /**
  * Test for {@link ResultCallbackHandler}.
@@ -501,6 +514,179 @@ public class ResultCallbackHandlerTest {
 
         Object result = callback.invoke(mockResult, GET_PROXY_CONFIG_METHOD, null);
         assertThat(result).isSameAs(proxyConfig);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void mapWithFunction(Result mockResult, boolean expectProxy, List<Class<?>> interfaces) throws Throwable {
+        Method mapMethod = ReflectionUtils.findMethod(Result.class, "map", Function.class);
+        AtomicReference<Readable> holder = new AtomicReference<>();
+        Function<Readable, ?> mapFunction = (readable) -> {
+            holder.set(readable);
+            return "done";
+        };
+
+        invokeAndVerifyResult(mockResult, mapMethod, mapFunction);
+
+        Readable value = holder.get();
+        if (expectProxy) {
+            assertThat(value).isInstanceOf(Wrapped.class);
+            assertThat(((Wrapped<?>) value).unwrap()).isSameAs(CustomRow.INSTANCE);
+        } else {
+            assertThat(value).isNotInstanceOf(Wrapped.class);
+        }
+
+        for (Class<?> expectedInterface : interfaces) {
+            assertThat(value).isInstanceOf(expectedInterface);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void mapWithBiFunction(Result mockResult, boolean expectProxy, List<Class<?>> interfaces) throws Throwable {
+        AtomicReference<Row> holder = new AtomicReference<>();
+        BiFunction<Row, RowMetadata, ?> mapFunction = (row, metadata) -> {
+            holder.set(row);
+            return "done";
+        };
+        Method mapMethod = ReflectionUtils.findMethod(Result.class, "map", BiFunction.class);
+
+        invokeAndVerifyResult(mockResult, mapMethod, mapFunction);
+
+        Readable value = holder.get();
+        if (expectProxy) {
+            assertThat(value).isInstanceOf(Wrapped.class);
+            assertThat(((Wrapped<?>) value).unwrap()).isSameAs(CustomRow.INSTANCE);
+        }
+        for (Class<?> expectedInterface : interfaces) {
+            assertThat(value).isInstanceOf(expectedInterface);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void flatMap(Result mockResult, boolean expectProxy, List<Class<?>> interfaces) throws Throwable {
+        AtomicReference<Result.Segment> holder = new AtomicReference<>();
+        Function<Result.Segment, Publisher<?>> mapFunction = (segment) -> {
+            holder.set(segment);
+            return Mono.just("done");
+        };
+        Method method = ReflectionUtils.findMethod(Result.class, "flatMap", Function.class);
+
+        invokeAndVerifyResult(mockResult, method, mapFunction);
+
+        Result.Segment value = holder.get();
+        if (expectProxy) {
+            assertThat(value).isInstanceOf(Wrapped.class);
+            assertThat(((Wrapped<?>) value).unwrap()).isSameAs(CustomRowSegment.INSTANCE);
+        } else {
+            assertThat(value).isNotInstanceOf(Wrapped.class);
+        }
+        for (Class<?> expectedInterface : interfaces) {
+            assertThat(value).isInstanceOf(expectedInterface);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void invokeAndVerifyResult(Result mockResult, Method method, Object mapFunction) throws Throwable {
+        MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        ProxyConfig proxyConfig = ProxyConfig.builder().build();
+        QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
+        Object[] args = new Object[]{mapFunction};
+        ResultCallbackHandler callback = new ResultCallbackHandler(mockResult, queryExecutionInfo, proxyConfig, queriesExecutionContext);
+
+        Object result = callback.invoke(mockResult, method, args);
+
+        assertThat(result).isInstanceOf(Publisher.class);
+        StepVerifier.create((Publisher<String>) result)
+            .expectSubscription()
+            .expectNext("done")
+            .verifyComplete();
+    }
+
+    static Stream<Arguments> mapWithBiFunction() {
+        Result rowResult = MockResult.builder().row(CustomRow.INSTANCE).build();
+        return Stream.of(
+            arguments(rowResult, true, Arrays.asList(CustomRow.class, Row.class, Readable.class, CustomMarker.class))
+        );
+    }
+
+    static Stream<Arguments> mapWithFunction() {
+        // Readable
+        Result rowResult = MockResult.builder().row(CustomRow.INSTANCE).build();
+        Result outParametersResult = MockResult.builder().outParameters(CustomOutParameters.INSTANCE).build();
+        return Stream.of(
+            // only row is proxied
+            arguments(rowResult, true, Arrays.asList(CustomRow.class, Row.class, Readable.class, CustomMarker.class)),
+            arguments(outParametersResult, false, Arrays.asList(CustomOutParameters.class, OutParameters.class, Readable.class, CustomMarker.class))
+        );
+    }
+
+    static Stream<Arguments> flatMap() {
+        // Test all types of Result.Segment
+        Result rowSegmentResult = MockResult.builder().segment(CustomRowSegment.INSTANCE).build();
+        Result outSegmentResult = MockResult.builder().segment(CustomOutSegment.INSTANCE).build();
+        Result updateCountSegment = MockResult.builder().segment(CustomUpdateCountSegment.INSTANCE).build();
+        Result messageSegment = MockResult.builder().segment(CustomMessageSegment.INSTANCE).build();
+        Result segment = MockResult.builder().segment(CustomSegment.INSTANCE).build();
+        return Stream.of(
+            // only row segment is proxied for ".row()"
+            arguments(rowSegmentResult, true, Arrays.asList(CustomRowSegment.class, Result.RowSegment.class, Result.Segment.class, CustomMarker.class)),
+            arguments(outSegmentResult, false, Arrays.asList(CustomOutSegment.class, Result.OutSegment.class, Result.Segment.class, CustomMarker.class)),
+            arguments(updateCountSegment, false, Arrays.asList(CustomUpdateCountSegment.class, Result.UpdateCount.class, Result.Segment.class, CustomMarker.class)),
+            arguments(messageSegment, false, Arrays.asList(CustomMessageSegment.class, Result.Message.class, Result.Segment.class, CustomMarker.class)),
+            arguments(segment, false, Arrays.asList(CustomSegment.class, Result.Segment.class, CustomMarker.class))
+        );
+    }
+
+    interface CustomMarker {
+
+    }
+
+    interface CustomRow extends Row, CustomMarker {
+
+        CustomRow INSTANCE = createMock(CustomRow.class);
+    }
+
+    interface CustomOutParameters extends OutParameters, CustomMarker {
+
+        CustomOutParameters INSTANCE = mock(CustomOutParameters.class, withSettings().extraInterfaces(CustomOutParameters.class.getInterfaces()));
+
+    }
+
+    interface CustomRowSegment extends Result.RowSegment, CustomMarker {
+
+        CustomRowSegment INSTANCE = createMock(CustomRowSegment.class);
+
+
+    }
+
+    interface CustomOutSegment extends Result.OutSegment, CustomMarker {
+
+        CustomOutSegment INSTANCE = createMock(CustomOutSegment.class);
+
+    }
+
+    interface CustomUpdateCountSegment extends Result.UpdateCount, CustomMarker {
+
+        CustomUpdateCountSegment INSTANCE = createMock(CustomUpdateCountSegment.class);
+
+    }
+
+    interface CustomMessageSegment extends Result.Message, CustomMarker {
+
+        CustomMessageSegment INSTANCE = createMock(CustomMessageSegment.class);
+
+    }
+
+    interface CustomSegment extends Result.Segment, CustomMarker {
+
+        CustomSegment INSTANCE = createMock(CustomSegment.class);
+
+    }
+
+    private static <T> T createMock(Class<T> type) {
+        return mock(type, withSettings().extraInterfaces(type.getInterfaces()));
     }
 
 }

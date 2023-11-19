@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ import io.r2dbc.spi.Wrapped;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * {@link ProxyFactory} implementation using JDK dynamic proxy.
@@ -112,8 +115,27 @@ final class JdkProxyFactory implements ProxyFactory {
 
         CallbackHandler logic = new RowCallbackHandler(row, queryExecutionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-        return createProxy(invocationHandler, Row.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
+
+        Set<Class<?>> proxyInterfaces = new HashSet<>();
+        Collections.addAll(proxyInterfaces, Row.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
+        Collections.addAll(proxyInterfaces, row.getClass().getInterfaces());
+        return createProxy(invocationHandler, proxyInterfaces.toArray(new Class<?>[]{}));
     }
+
+    @Override
+    public Result.RowSegment wrapRowSegment(Result.RowSegment rowSegment, QueryExecutionInfo queryExecutionInfo) {
+        Assert.requireNonNull(rowSegment, "rowSegment must not be null");
+        Assert.requireNonNull(queryExecutionInfo, "queryExecutionInfo must not be null");
+
+        CallbackHandler logic = new RowSegmentCallbackHandler(rowSegment, queryExecutionInfo, this.proxyConfig);
+        CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
+
+        Set<Class<?>> proxyInterfaces = new HashSet<>();
+        Collections.addAll(proxyInterfaces, Result.RowSegment.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
+        Collections.addAll(proxyInterfaces, rowSegment.getClass().getInterfaces());
+        return createProxy(invocationHandler, proxyInterfaces.toArray(new Class<?>[]{}));
+    }
+
 
     @SuppressWarnings("unchecked")
     protected <T> T createProxy(InvocationHandler invocationHandler, Class<?>... interfaces) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.util.Assert;
+import io.r2dbc.spi.Readable;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
@@ -83,20 +84,21 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
             return connectionInfo.getOriginalConnection();
         }
 
-        boolean isMapRowMethod =  "map".equals(methodName) && args[0] instanceof BiFunction;
-
+        // replace mapping function
+        boolean isMapRowMethod = "map".equals(methodName);
         if (isMapRowMethod) {
-            BiFunction<Row, RowMetadata, ?> mappingFunction = (BiFunction<Row, RowMetadata, ?>)args[0];
-            BiFunction<Row, RowMetadata, ?> newMappingFunction = (row, rowMetadata) -> {
-                Row rowProxy = this.proxyConfig.getProxyFactory().wrapRow(row, this.queryExecutionInfo);
-                return mappingFunction.apply(rowProxy, rowMetadata);
-            };
-            args[0] = newMappingFunction;
+            if (args[0] instanceof BiFunction) {
+                args[0] = createMappingForMap((BiFunction<Row, RowMetadata, ?>) args[0]);
+            } else {
+                args[0] = createMappingForMap((Function<? super Readable, ?>) args[0]);
+            }
+        } else if ("flatMap".equals(methodName)) {
+            args[0] = createMappingForFlatMap((Function<Result.Segment, Publisher<?>>) args[0]);
         }
 
         Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null);
 
-        if (isMapRowMethod || "getRowsUpdated".equals(methodName)) {
+        if (isMapRowMethod || "flatMap".equals(methodName) || "getRowsUpdated".equals(methodName)) {
             Function<? super Publisher<Object>, ? extends Publisher<Object>> transformer =
                 Operators.liftPublisher((pub, subscriber) ->
                     new ResultInvocationSubscriber(subscriber, this.queryExecutionInfo, this.proxyConfig, this.queriesExecutionContext));
@@ -105,4 +107,36 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
         return invocationResult;
     }
+
+    // for Result#map(Function)
+    private Function<? super Readable, ?> createMappingForMap(Function<? super Readable, ?> mapping) {
+        return (readable) -> {
+            if (readable instanceof Row) {
+                Row rowProxy = this.proxyConfig.getProxyFactory().wrapRow((Row) readable, this.queryExecutionInfo);
+                return mapping.apply(rowProxy);
+            }
+            return mapping.apply(readable);
+        };
+    }
+
+    // for Result#map(BiFunction)
+    private BiFunction<Row, RowMetadata, ?> createMappingForMap(BiFunction<Row, RowMetadata, ?> mapping) {
+        return (row, rowMetadata) -> {
+            Row rowProxy = this.proxyConfig.getProxyFactory().wrapRow(row, this.queryExecutionInfo);
+            return mapping.apply(rowProxy, rowMetadata);
+        };
+    }
+
+    // for Result#flatMap(Function)
+    private Function<Result.Segment, Publisher<?>> createMappingForFlatMap(Function<Result.Segment, Publisher<?>> mapping) {
+        return (segment) -> {
+            if (segment instanceof Result.RowSegment) {
+                Result.RowSegment rowSegmentProxy = this.proxyConfig.getProxyFactory().wrapRowSegment((Result.RowSegment)segment, this.queryExecutionInfo);
+                return mapping.apply(rowSegmentProxy);
+            }
+            return mapping.apply(segment);
+        };
+    }
+
+    ;
 }

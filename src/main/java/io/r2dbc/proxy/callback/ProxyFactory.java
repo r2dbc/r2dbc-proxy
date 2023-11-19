@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,5 +101,17 @@ public interface ProxyFactory {
      * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
      */
     Row wrapRow(Row row, QueryExecutionInfo executionInfo);
+
+    /**
+     * Create a proxy {@link Result.RowSegment}.
+     *
+     * @param rowSegment    original rowSegment
+     * @param executionInfo executionInfo
+     * @return proxy rowSegment
+     * @throws IllegalArgumentException if {@code rowSegment} is {@code null}
+     * @throws IllegalArgumentException if {@code executionInfo} is {@code null}
+     * @since 1.1.3
+     */
+    Result.RowSegment wrapRowSegment(Result.RowSegment rowSegment, QueryExecutionInfo executionInfo);
 
 }
