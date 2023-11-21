@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,10 @@ import io.r2dbc.proxy.listener.CompositeProxyExecutionListener;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
 import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.spi.Batch;
+import io.r2dbc.spi.Connection;
+import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,7 +104,7 @@ public class CallbackHandlerSupportTest {
 
         // when it creates a proxy for Result
         Result mockResultProxy = MockResult.empty();
-        when(proxyFactory.wrapResult(any(), any(), any())).thenAnswer((args)-> {
+        when(proxyFactory.wrapResult(any(), any(), any())).thenAnswer((args) -> {
             ((QueriesExecutionContext) args.getArgument(2)).incrementConsumedCount();
             return mockResultProxy;
         });
@@ -216,7 +219,6 @@ public class CallbackHandlerSupportTest {
         Flux<? extends Result> result = this.callbackHandlerSupport.interceptQueryExecution(resultPublisher, executionInfo);
 
 
-
         // Cancels immediately
         StepVerifier.create(result.log())
             .expectSubscription()
@@ -245,7 +247,7 @@ public class CallbackHandlerSupportTest {
 
         // when it creates a proxy for Result
         Result mockResultProxy = mock(Result.class);
-        when(proxyFactory.wrapResult(any(), any(), any())).thenAnswer((args)-> {
+        when(proxyFactory.wrapResult(any(), any(), any())).thenAnswer((args) -> {
             ((QueriesExecutionContext) args.getArgument(2)).incrementConsumedCount();
             return mockResultProxy;
         });
@@ -678,7 +680,7 @@ public class CallbackHandlerSupportTest {
         // verify method on target is invoked
         verify(target).execute();
 
-        StepVerifier.create((Publisher<Result>)result, StepVerifierOptions.create().withInitialContext(Context.of("foo", "FOO")))
+        StepVerifier.create((Publisher<Result>) result, StepVerifierOptions.create().withInitialContext(Context.of("foo", "FOO")))
             .expectSubscription()
             .expectAccessibleContext()
             .contains("foo", "FOO")
@@ -690,40 +692,95 @@ public class CallbackHandlerSupportTest {
     }
 
     @Test
-    void proceedExecutionWithToString_HashCode_Equals_Methods() throws Throwable {
-
-        class MyStub {
+    void handleCommonMethods() {
+        class MyStub implements Wrapped<String> {
 
             @Override
             public String toString() {
-                return "FOO";
+                return "FOO-toString";
             }
+
+            @Override
+            public String unwrap() {
+                return "unwrapped";  // not used since target object is passed
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <E> E unwrap(Class<E> targetClass) {
+                return (E) "unwrapped-with-target";
+            }
+
         }
-
-        // target method returns Producer
-        Method toStringMethod = ReflectionUtils.findMethod(Object.class, "toString");
-        Method hashCodeMethod = ReflectionUtils.findMethod(Object.class, "hashCode");
-        Method equalsMethod = ReflectionUtils.findMethod(Object.class, "equals", Object.class);
         MyStub target = new MyStub();
-        LastExecutionAwareListener listener = new LastExecutionAwareListener();
-
         Object result;
 
         // verify toString()
-        result = this.callbackHandlerSupport.proceedExecution(toStringMethod, target, null, listener, null, null);
-        assertThat(result).isEqualTo("MyStub-proxy [FOO]");
+        result = this.callbackHandlerSupport.handleCommonMethod("toString", target, null, null);
+        assertThat(result).isEqualTo("MyStub-proxy [FOO-toString]");
 
         // verify hashCode()
-        result = this.callbackHandlerSupport.proceedExecution(hashCodeMethod, target, null, listener, null, null);
+        result = this.callbackHandlerSupport.handleCommonMethod("hashCode", target, null, null);
         assertThat(result).isEqualTo(target.hashCode());
 
-        // verify equals() with null
-        result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{null}, listener, null, null);
+        // verify equals() with null argument - ".equals(null)"
+        result = this.callbackHandlerSupport.handleCommonMethod("equals", target, new Object[]{null}, null);
         assertThat(result).isEqualTo(false);
 
-        // verify equals() with target
-        result = this.callbackHandlerSupport.proceedExecution(equalsMethod, target, new Object[]{target}, listener, null, null);
+        // verify equals() with null - ".equals(null)"
+        result = this.callbackHandlerSupport.handleCommonMethod("equals", target, new Object[]{null}, null);
+        assertThat(result).isEqualTo(false);
+
+        // verify equals() with target - ".equals(target)"
+        result = this.callbackHandlerSupport.handleCommonMethod("equals", target, new Object[]{target}, null);
         assertThat(result).isEqualTo(true);
+
+        // verify getProxyConfig()
+        result = this.callbackHandlerSupport.handleCommonMethod("getProxyConfig", target, null, null);
+        assertThat(result).isEqualTo(this.proxyConfig);
+
+        // verify unwrap()
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", target, null, null);
+        assertThat(result).isSameAs(target);
+
+        // verify unwrap(String.class)
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", target, new Object[]{String.class}, null);
+        assertThat(result).isEqualTo("unwrapped-with-target");
+
+        // verify unwrapConnection()
+        Connection mockConnection = mock(Connection.class);
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrapConnection", target, null, mockConnection);
+        assertThat(result).isSameAs(mockConnection);
+    }
+    @Test
+    void equality() {
+        ProxyConfig proxyConfig = ProxyConfig.builder().build();
+        ConnectionFactory original = mock(ConnectionFactory.class);
+        ConnectionFactory another = mock(ConnectionFactory.class);
+        ConnectionFactory proxy = proxyConfig.getProxyFactory().wrapConnectionFactory(original);
+        ConnectionFactory anotherProxy = proxyConfig.getProxyFactory().wrapConnectionFactory(another);
+
+        assertThat(proxy.equals(original)).isTrue();
+        assertThat(proxy.equals(another)).isFalse();
+        assertThat(proxy.equals(anotherProxy)).isFalse();
+
+        Object result;
+
+        // original.equals(original)
+        result = this.callbackHandlerSupport.handleCommonMethod("equals", original, new Object[]{original}, null);
+        assertThat(result).isEqualTo(true);
+
+        // original.equals(proxy)
+        result = this.callbackHandlerSupport.handleCommonMethod("equals", original, new Object[]{proxy}, null);
+        assertThat(result).isEqualTo(true);
+
+        // original.equals(another)
+        result = this.callbackHandlerSupport.handleCommonMethod("equals", original, new Object[]{another}, null);
+        assertThat(result).isEqualTo(false);
+
+        // original.equals(anotherProxy)
+        result = this.callbackHandlerSupport.handleCommonMethod("equals", original, new Object[]{anotherProxy}, null);
+        assertThat(result).isEqualTo(false);
     }
 
     @Test

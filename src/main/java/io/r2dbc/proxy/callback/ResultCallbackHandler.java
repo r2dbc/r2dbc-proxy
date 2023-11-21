@@ -26,6 +26,7 @@ import io.r2dbc.spi.RowMetadata;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Operators;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.function.BiFunction;
@@ -71,17 +72,15 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
         Assert.requireNonNull(proxy, "proxy must not be null");
         Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
         ConnectionInfo connectionInfo = this.queryExecutionInfo.getConnectionInfo();
 
-        if ("unwrap".equals(methodName)) {  // for Wrapped
-            return this.result;
-        } else if ("unwrapConnection".equals(methodName)) {  // for ConnectionHolder
-            return connectionInfo.getOriginalConnection();
+        if (isCommonMethod(methodName)) {
+            return handleCommonMethod(methodName, this.result, args, connectionInfo.getOriginalConnection());
         }
 
         // replace mapping function
@@ -131,7 +130,7 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
     private Function<Result.Segment, Publisher<?>> createMappingForFlatMap(Function<Result.Segment, Publisher<?>> mapping) {
         return (segment) -> {
             if (segment instanceof Result.RowSegment) {
-                Result.RowSegment rowSegmentProxy = this.proxyConfig.getProxyFactory().wrapRowSegment((Result.RowSegment)segment, this.queryExecutionInfo);
+                Result.RowSegment rowSegmentProxy = this.proxyConfig.getProxyFactory().wrapRowSegment((Result.RowSegment) segment, this.queryExecutionInfo);
                 return mapping.apply(rowSegmentProxy);
             }
             return mapping.apply(segment);

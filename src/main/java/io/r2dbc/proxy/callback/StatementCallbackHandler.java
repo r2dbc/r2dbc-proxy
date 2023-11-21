@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,11 +69,15 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
 
         String methodName = method.getName();
 
-        if ("unwrap".equals(methodName)) {
-            return this.statement;
-        } else if ("unwrapConnection".equals(methodName)) {
-            return this.connectionInfo.getOriginalConnection();
+        if (isCommonMethod(methodName)) {
+            return handleCommonMethod(methodName, this.statement, args, this.connectionInfo.getOriginalConnection());
         }
+
+//        if ("unwrap".equals(methodName)) {
+//            return this.statement;
+//        } else if ("unwrapConnection".equals(methodName)) {
+//            return this.connectionInfo.getOriginalConnection();
+//        }
 
         if ("bind".equals(methodName) || "bindNull".equals(methodName)) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2021-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import io.r2dbc.proxy.core.R2dbcProxyException;
 import io.r2dbc.proxy.listener.ResultRowConverter;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Row;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
 
@@ -54,17 +55,15 @@ public final class RowCallbackHandler extends CallbackHandlerSupport {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
         Assert.requireNonNull(proxy, "proxy must not be null");
         Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
         ConnectionInfo connectionInfo = this.queryExecutionInfo.getConnectionInfo();
 
-        if ("unwrap".equals(methodName)) {  // for Wrapped
-            return this.row;
-        } else if ("unwrapConnection".equals(methodName)) {  // for ConnectionHolder
-            return connectionInfo.getOriginalConnection();
+        if (isCommonMethod(methodName)) {
+            return handleCommonMethod(methodName, this.row, args, connectionInfo.getOriginalConnection());
         }
 
         // when converter decides to perform the original call("getOperation.proceed()"), this lambda is called.

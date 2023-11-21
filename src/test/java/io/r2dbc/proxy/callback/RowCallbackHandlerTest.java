@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2021-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.listener.ResultRowConverter;
+import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Wrapped;
 import io.r2dbc.spi.test.MockRow;
@@ -144,6 +145,7 @@ public class RowCallbackHandlerTest {
     void unwrap() throws Throwable {
         MockRow mockRow = MockRow.empty();
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        queryExecutionInfo.setConnectionInfo(MockConnectionInfo.empty());
         ProxyConfig proxyConfig = new ProxyConfig();
 
         RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);
@@ -156,6 +158,7 @@ public class RowCallbackHandlerTest {
     void getProxyConfig() throws Throwable {
         MockRow mockRow = MockRow.empty();
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        queryExecutionInfo.setConnectionInfo(MockConnectionInfo.empty());
         ProxyConfig proxyConfig = new ProxyConfig();
 
         RowCallbackHandler callback = new RowCallbackHandler(mockRow, queryExecutionInfo, proxyConfig);

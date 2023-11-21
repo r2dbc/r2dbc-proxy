@@ -21,6 +21,7 @@ import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Row;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
 
@@ -53,17 +54,15 @@ public final class RowSegmentCallbackHandler extends CallbackHandlerSupport {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
         Assert.requireNonNull(proxy, "proxy must not be null");
         Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
         ConnectionInfo connectionInfo = this.queryExecutionInfo.getConnectionInfo();
 
-        if ("unwrap".equals(methodName)) {  // for Wrapped
-            return this.rowSegment;
-        } else if ("unwrapConnection".equals(methodName)) {  // for ConnectionHolder
-            return connectionInfo.getOriginalConnection();
+        if (isCommonMethod(methodName)) {
+            return handleCommonMethod(methodName, this.rowSegment, args, connectionInfo.getOriginalConnection());
         }
 
         Object result = proceedExecution(method, this.rowSegment, args, this.proxyConfig.getListeners(), connectionInfo, null);

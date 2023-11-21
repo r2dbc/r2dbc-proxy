@@ -18,6 +18,7 @@ package io.r2dbc.proxy.callback;
 
 import io.r2dbc.proxy.core.ProxyEventType;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
+import io.r2dbc.proxy.test.MockConnectionInfo;
 import io.r2dbc.spi.OutParameters;
 import io.r2dbc.spi.Readable;
 import io.r2dbc.spi.Result;
@@ -494,6 +495,7 @@ public class ResultCallbackHandlerTest {
     void unwrap() throws Throwable {
         Result mockResult = MockResult.empty();
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        queryExecutionInfo.setConnectionInfo(MockConnectionInfo.empty());
         ProxyConfig proxyConfig = new ProxyConfig();
         QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
 
@@ -507,6 +509,7 @@ public class ResultCallbackHandlerTest {
     void getProxyConfig() throws Throwable {
         Result mockResult = MockResult.empty();
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        queryExecutionInfo.setConnectionInfo(MockConnectionInfo.empty());
         ProxyConfig proxyConfig = new ProxyConfig();
         QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
 
@@ -590,6 +593,7 @@ public class ResultCallbackHandlerTest {
     @SuppressWarnings("unchecked")
     private void invokeAndVerifyResult(Result mockResult, Method method, Object mapFunction) throws Throwable {
         MutableQueryExecutionInfo queryExecutionInfo = new MutableQueryExecutionInfo();
+        queryExecutionInfo.setConnectionInfo(MockConnectionInfo.empty());
         ProxyConfig proxyConfig = ProxyConfig.builder().build();
         QueriesExecutionContext queriesExecutionContext = new QueriesExecutionContext(mock(Clock.class));
         Object[] args = new Object[]{mapFunction};

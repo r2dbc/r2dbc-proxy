@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
+import reactor.util.annotation.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -51,16 +52,14 @@ public final class BatchCallbackHandler extends CallbackHandlerSupport {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
         Assert.requireNonNull(proxy, "proxy must not be null");
         Assert.requireNonNull(method, "method must not be null");
 
         String methodName = method.getName();
 
-        if ("unwrap".equals(methodName)) {
-            return this.batch;
-        } else if ("unwrapConnection".equals(methodName)) {
-            return this.connectionInfo.getOriginalConnection();
+        if (isCommonMethod(methodName)) {
+            return handleCommonMethod(methodName, this.batch, args, this.connectionInfo.getOriginalConnection());
         }
 
         Object result = proceedExecution(method, this.batch, args, this.proxyConfig.getListeners(), this.connectionInfo, null);

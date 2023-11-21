@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Wrapped;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,11 +33,10 @@ import reactor.util.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static java.util.stream.Collectors.toSet;
 
 /**
  * Defines methods to augment execution of proxy methods used by child classes.
@@ -77,19 +77,12 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         return result;
     };
 
-    private static final Set<Method> PASS_THROUGH_METHODS;
-
-    static {
-        try {
-            Method objectToStringMethod = Object.class.getMethod("toString");
-            PASS_THROUGH_METHODS = Arrays.stream(Object.class.getMethods())
-                .filter(method -> !objectToStringMethod.equals(method))
-                .collect(toSet());
-
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static final Set<String> COMMON_METHODS = new HashSet<>(Arrays.asList(
+        "toString", "equals", "hashCode",
+        "unwrap",  // "Wrapped#unwrap"
+        "getProxyConfig", //  "ProxyConfigHolder#getProxyConfig"
+        "unwrapConnection"  // "ConnectionHolder#unwrapConnection"
+    ));
 
     protected final ProxyConfig proxyConfig;
 
@@ -97,6 +90,38 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
 
     public CallbackHandlerSupport(ProxyConfig proxyConfig) {
         this.proxyConfig = Assert.requireNonNull(proxyConfig, "proxyConfig must not be null");
+    }
+
+    protected boolean isCommonMethod(String methodName) {
+        return COMMON_METHODS.contains(methodName);
+    }
+
+    @Nullable
+    protected Object handleCommonMethod(String methodName, Object original, @Nullable Object[] args, @Nullable Connection originalConnection) {
+        if ("toString".equals(methodName)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(original.getClass().getSimpleName());
+            sb.append("-proxy [");
+            sb.append(original);
+            sb.append("]");
+            return sb.toString(); // differentiate toString message.
+        } else if ("equals".equals(methodName)) {
+            // when target is a proxy, also compares the proxied object
+            return original.equals(args[0]) || (args[0] instanceof Wrapped && args[0] instanceof ProxyConfigHolder && original.equals(((Wrapped<?>) args[0]).unwrap()));
+        } else if ("hashCode".equals(methodName)) {
+            return original.hashCode();
+        } else if ("getProxyConfig".equals(methodName)) {
+            return this.proxyConfig;  // "ProxyConfigHolder#getProxyConfig"
+        } else if ("unwrapConnection".equals(methodName)) {
+            return originalConnection;  // "ConnectionHolder#unwrapConnection"
+        } else if ("unwrap".equals(methodName)) {
+            if (args == null) {
+                return original; // for no-arg "unwrap"
+            } else {
+                return ((Wrapped<?>) original).unwrap((Class<?>) args[0]);
+            }
+        }
+        throw new IllegalStateException(methodName + " does not match to the common method names.");
     }
 
     /**
@@ -120,30 +145,6 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
         Assert.requireNonNull(method, "method must not be null");
         Assert.requireNonNull(target, "target must not be null");
         Assert.requireNonNull(listener, "listener must not be null");
-
-        if (PASS_THROUGH_METHODS.contains(method)) {
-            try {
-                return method.invoke(target, args);
-            } catch (InvocationTargetException ex) {
-                throw ex.getTargetException();
-            }
-        }
-
-        // special handling for toString()
-        if ("toString".equals(method.getName())) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(target.getClass().getSimpleName());   // ConnectionFactory, Connection, Batch, or Statement
-            sb.append("-proxy [");
-            sb.append(target.toString());
-            sb.append("]");
-            return sb.toString(); // differentiate toString message.
-        }
-
-        // special handling for "ProxyConfigHolder#getProxyConfig"
-        if ("getProxyConfig".equals(method.getName())) {
-            return this.proxyConfig;
-        }
-
 
         StopWatch stopWatch = new StopWatch(this.proxyConfig.getClock());
 
