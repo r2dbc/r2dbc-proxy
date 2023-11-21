@@ -113,7 +113,7 @@ var activeTableTab = "activeTableTab";
 extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
 <div class="block">The context of queries execution.
  <p>
- Holds the count of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a> produced by <code>Statement#execute</code> and count that has
+ Holds the count of <code>Result</code> produced by <code>Statement#execute</code> and count that has
  consumed <code>Result#[map|getRowsUpdated]</code>.</div>
 <dl>
 <dt><span class="simpleTagLabel">Author:</span></dt>
@@ -169,13 +169,13 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/QueriesExecutionContext.html#incrementProducedCount--">incrementProducedCount</a></span>()</code>
-<div class="block">Increment the count of produced <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a> from <code>Statement#execute</code>.</div>
+<div class="block">Increment the count of produced <code>Result</code> from <code>Statement#execute</code>.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/QueriesExecutionContext.html#isAllConsumed--">isAllConsumed</a></span>()</code>
-<div class="block">Whether currently all produced <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a>s are consumed.</div>
+<div class="block">Whether currently all produced <code>Result</code>s are consumed.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
@@ -187,7 +187,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/QueriesExecutionContext.html#markAllProduced--">markAllProduced</a></span>()</code>
-<div class="block">When <code>QueryInvocationSubscriber</code> produced all <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a> objects.</div>
+<div class="block">When <code>QueryInvocationSubscriber</code> produced all <code>Result</code> objects.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
@@ -242,7 +242,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <li class="blockList">
 <h4>incrementProducedCount</h4>
 <pre>public&nbsp;void&nbsp;incrementProducedCount()</pre>
-<div class="block">Increment the count of produced <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a> from <code>Statement#execute</code>.</div>
+<div class="block">Increment the count of produced <code>Result</code> from <code>Statement#execute</code>.</div>
 </li>
 </ul>
 <a name="incrementConsumedCount--">
@@ -289,7 +289,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <div class="block">Whether the executed queries have finished and results are consumed.
  <p>
  The query is considered finished when the publisher from <code>Statement#execute()</code> have produced
- <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a>s and those are consumed via <code>Result#getRowsUpdated</code> or <code>Result#map</code>.</div>
+ <code>Result</code>s and those are consumed via <code>Result#getRowsUpdated</code> or <code>Result#map</code>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd><code>true</code> if all <code>Result</code> are produced and consumed.</dd>
@@ -303,10 +303,10 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <li class="blockList">
 <h4>isAllConsumed</h4>
 <pre>public&nbsp;boolean&nbsp;isAllConsumed()</pre>
-<div class="block">Whether currently all produced <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a>s are consumed.</div>
+<div class="block">Whether currently all produced <code>Result</code>s are consumed.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd><code>true</code> if all produced <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a>s are consumed.</dd>
+<dd><code>true</code> if all produced <code>Result</code>s are consumed.</dd>
 </dl>
 </li>
 </ul>
@@ -317,7 +317,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <li class="blockList">
 <h4>markAllProduced</h4>
 <pre>public&nbsp;void&nbsp;markAllProduced()</pre>
-<div class="block">When <code>QueryInvocationSubscriber</code> produced all <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a> objects.</div>
+<div class="block">When <code>QueryInvocationSubscriber</code> produced all <code>Result</code> objects.</div>
 </li>
 </ul>
 </li>

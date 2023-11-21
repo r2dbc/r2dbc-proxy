@@ -175,9 +175,9 @@ implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function
 </td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html?is-external=true" title="class or interface in java.util.function">BiConsumer</a>&lt;<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html?is-external=true" title="class or interface in io.r2dbc.spi">Parameter</a>,<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html?is-external=true" title="class or interface in java.lang">StringBuilder</a>&gt;</code></td>
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html?is-external=true" title="class or interface in java.util.function">BiConsumer</a>&lt;io.r2dbc.spi.Parameter,<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html?is-external=true" title="class or interface in java.lang">StringBuilder</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/support/QueryExecutionInfoFormatter.html#onBoundValueParameter">onBoundValueParameter</a></span></code>
-<div class="block">Default implementation for formatting <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Parameter</code></a> value.</div>
+<div class="block">Default implementation for formatting <code>Parameter</code> value.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -399,8 +399,8 @@ implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function
 <ul class="blockList">
 <li class="blockList">
 <h4>onBoundValueParameter</h4>
-<pre>public&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html?is-external=true" title="class or interface in java.util.function">BiConsumer</a>&lt;<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html?is-external=true" title="class or interface in io.r2dbc.spi">Parameter</a>,<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html?is-external=true" title="class or interface in java.lang">StringBuilder</a>&gt; onBoundValueParameter</pre>
-<div class="block">Default implementation for formatting <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Parameter</code></a> value.
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html?is-external=true" title="class or interface in java.util.function">BiConsumer</a>&lt;io.r2dbc.spi.Parameter,<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html?is-external=true" title="class or interface in java.lang">StringBuilder</a>&gt; onBoundValueParameter</pre>
+<div class="block">Default implementation for formatting <code>Parameter</code> value.
 
  <p> Example: "null(in,INTEGER)", "Foo(out,String)".</div>
 </li>
@@ -638,7 +638,7 @@ implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function
 <pre>public&nbsp;<a href="../../../../io/r2dbc/proxy/support/QueryExecutionInfoFormatter.html" title="class in io.r2dbc.proxy.support">QueryExecutionInfoFormatter</a>&nbsp;showBatchSize()</pre>
 <div class="block">Show batch size with default format.
 
- i.e. Number of the calls of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Batch.html?is-external=true#add-java.lang.String-" title="class or interface in io.r2dbc.spi"><code>Batch.add(String)</code></a>}.</div>
+ i.e. Number of the calls of <code>Batch.add(String)</code>}.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>formatter</dd>
@@ -654,7 +654,7 @@ implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function
 <pre>public&nbsp;<a href="../../../../io/r2dbc/proxy/support/QueryExecutionInfoFormatter.html" title="class in io.r2dbc.proxy.support">QueryExecutionInfoFormatter</a>&nbsp;showBindingsSize()</pre>
 <div class="block">Show binding size with default format.
 
- i.e. Number of the calls of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html?is-external=true#add--" title="class or interface in io.r2dbc.spi"><code>Statement.add()</code></a>}.</div>
+ i.e. Number of the calls of <code>Statement.add()</code>}.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>formatter</dd>

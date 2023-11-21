@@ -106,7 +106,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>public interface <span class="typeNameLabel">ConnectionInfo</span></pre>
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Connection</code></a> related information.</div>
+<div class="block">Hold <code>Connection</code> related information.</div>
 <dl>
 <dt><span class="simpleTagLabel">Author:</span></dt>
 <dd>Tadaya Tsuyukubo</dd>
@@ -132,7 +132,7 @@ var activeTableTab = "activeTableTab";
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html#getCommitCount--">getCommitCount</a></span>()</code>
-<div class="block">Returns how many times <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true#commitTransaction--" title="class or interface in io.r2dbc.spi"><code>Connection.commitTransaction()</code></a> method is called.</div>
+<div class="block">Returns how many times <code>Connection.commitTransaction()</code> method is called.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -142,21 +142,21 @@ var activeTableTab = "activeTableTab";
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true" title="class or interface in io.r2dbc.spi">Connection</a></code></td>
+<td class="colFirst"><code>io.r2dbc.spi.Connection</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html#getOriginalConnection--">getOriginalConnection</a></span>()</code>
-<div class="block">Retrieve original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Connection</code></a>.</div>
+<div class="block">Retrieve original <code>Connection</code>.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html#getRollbackCount--">getRollbackCount</a></span>()</code>
-<div class="block">Returns how many times <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true#rollbackTransaction--" title="class or interface in io.r2dbc.spi"><code>Connection.rollbackTransaction()</code></a> method is called.</div>
+<div class="block">Returns how many times <code>Connection.rollbackTransaction()</code> method is called.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html#getTransactionCount--">getTransactionCount</a></span>()</code>
-<div class="block">Returns how many times <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true#beginTransaction--" title="class or interface in io.r2dbc.spi"><code>Connection.beginTransaction()</code></a> method is called.</div>
+<div class="block">Returns how many times <code>Connection.beginTransaction()</code> method is called.</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -216,8 +216,8 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <h4>getOriginalConnection</h4>
-<pre><a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true" title="class or interface in io.r2dbc.spi">Connection</a>&nbsp;getOriginalConnection()</pre>
-<div class="block">Retrieve original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Connection</code></a>.</div>
+<pre>io.r2dbc.spi.Connection&nbsp;getOriginalConnection()</pre>
+<div class="block">Retrieve original <code>Connection</code>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>connection</dd>
@@ -277,7 +277,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <h4>getTransactionCount</h4>
 <pre>int&nbsp;getTransactionCount()</pre>
-<div class="block">Returns how many times <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true#beginTransaction--" title="class or interface in io.r2dbc.spi"><code>Connection.beginTransaction()</code></a> method is called.</div>
+<div class="block">Returns how many times <code>Connection.beginTransaction()</code> method is called.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>num of beginTransaction() method being called</dd>
@@ -291,7 +291,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <h4>getCommitCount</h4>
 <pre>int&nbsp;getCommitCount()</pre>
-<div class="block">Returns how many times <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true#commitTransaction--" title="class or interface in io.r2dbc.spi"><code>Connection.commitTransaction()</code></a> method is called.</div>
+<div class="block">Returns how many times <code>Connection.commitTransaction()</code> method is called.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>num of commitTransaction method being called</dd>
@@ -305,7 +305,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <h4>getRollbackCount</h4>
 <pre>int&nbsp;getRollbackCount()</pre>
-<div class="block">Returns how many times <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true#rollbackTransaction--" title="class or interface in io.r2dbc.spi"><code>Connection.rollbackTransaction()</code></a> method is called.</div>
+<div class="block">Returns how many times <code>Connection.rollbackTransaction()</code> method is called.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>num of rollback methods being called</dd>
@@ -336,7 +336,7 @@ var activeTableTab = "activeTableTab";
 <div class="block">Set <code>boolean</code> to indicate whether the connection is closed or not.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>closed</code> - set <code>true</code> if <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Connection</code></a> is closed</dd>
+<dd><code>closed</code> - set <code>true</code> if <code>Connection</code> is closed</dd>
 </dl>
 </li>
 </ul>

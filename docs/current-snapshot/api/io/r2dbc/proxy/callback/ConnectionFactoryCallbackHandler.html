@@ -18,7 +18,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -115,7 +115,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public final class <span class="typeNameLabel">ConnectionFactoryCallbackHandler</span>
 extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
-<div class="block">Proxy callback handler for <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>ConnectionFactory</code></a>.</div>
+<div class="block">Proxy callback handler for <code>ConnectionFactory</code>.</div>
 <dl>
 <dt><span class="simpleTagLabel">Author:</span></dt>
 <dd>Tadaya Tsuyukubo</dd>
@@ -186,7 +186,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#ConnectionFactoryCallbackHandler-io.r2dbc.spi.ConnectionFactory-io.r2dbc.proxy.callback.ProxyConfig-">ConnectionFactoryCallbackHandler</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi">ConnectionFactory</a>&nbsp;connectionFactory,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#ConnectionFactoryCallbackHandler-io.r2dbc.spi.ConnectionFactory-io.r2dbc.proxy.callback.ProxyConfig-">ConnectionFactoryCallbackHandler</a></span>(io.r2dbc.spi.ConnectionFactory&nbsp;connectionFactory,
                                 <a href="../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</code>&nbsp;</td>
 </tr>
 </table>
@@ -205,13 +205,20 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>protected <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html?is-external=true" title="class or interface in reactor.core.publisher">Flux</a>&lt;? extends <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi">Result</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#interceptQueryExecution-org.reactivestreams.Publisher-io.r2dbc.proxy.callback.MutableQueryExecutionInfo-">interceptQueryExecution</a></span>(<a href="https://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/org/reactivestreams/Publisher.html?is-external=true" title="class or interface in org.reactivestreams">Publisher</a>&lt;? extends <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi">Result</a>&gt;&nbsp;publisher,
+<td class="colFirst"><code>protected <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#handleCommonMethod-java.lang.String-java.lang.Object-java.lang.Object:A-io.r2dbc.spi.Connection-">handleCommonMethod</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;methodName,
+                  <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;original,
+                  <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;args,
+                  io.r2dbc.spi.Connection&nbsp;originalConnection)</code>&nbsp;</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>protected <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html?is-external=true" title="class or interface in reactor.core.publisher">Flux</a>&lt;? extends io.r2dbc.spi.Result&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#interceptQueryExecution-org.reactivestreams.Publisher-io.r2dbc.proxy.callback.MutableQueryExecutionInfo-">interceptQueryExecution</a></span>(<a href="https://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/org/reactivestreams/Publisher.html?is-external=true" title="class or interface in org.reactivestreams">Publisher</a>&lt;? extends io.r2dbc.spi.Result&gt;&nbsp;publisher,
                        io.r2dbc.proxy.callback.MutableQueryExecutionInfo&nbsp;executionInfo)</code>
 <div class="block">Augment query execution result to hook up listener lifecycle.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#invoke-java.lang.Object-java.lang.reflect.Method-java.lang.Object:A-">invoke</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;proxy,
       <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;method,
@@ -220,7 +227,11 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
  invocation to this method.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>protected boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#isCommonMethod-java.lang.String-">isCommonMethod</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;methodName)</code>&nbsp;</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#proceedExecution-java.lang.reflect.Method-java.lang.Object-java.lang.Object:A-io.r2dbc.proxy.listener.ProxyExecutionListener-io.r2dbc.proxy.core.ConnectionInfo-java.util.function.Consumer-">proceedExecution</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;method,
                 <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;target,
@@ -231,7 +242,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <div class="block">Augment method invocation and call method listener.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#setMethodInvocationStrategy-io.r2dbc.proxy.callback.CallbackHandlerSupport.MethodInvocationStrategy-">setMethodInvocationStrategy</a></span>(<a href="../../../../io/r2dbc/proxy/callback/CallbackHandlerSupport.MethodInvocationStrategy.html" title="interface in io.r2dbc.proxy.callback">CallbackHandlerSupport.MethodInvocationStrategy</a>&nbsp;methodInvocationStrategy)</code>
 <div class="block">Set <a href="../../../../io/r2dbc/proxy/callback/CallbackHandlerSupport.MethodInvocationStrategy.html" title="interface in io.r2dbc.proxy.callback"><code>CallbackHandlerSupport.MethodInvocationStrategy</code></a> to invoke the original instance(non-proxy) and retrieve result.</div>
@@ -300,7 +311,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <ul class="blockListLast">
 <li class="blockList">
 <h4>ConnectionFactoryCallbackHandler</h4>
-<pre>public&nbsp;ConnectionFactoryCallbackHandler(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi">ConnectionFactory</a>&nbsp;connectionFactory,
+<pre>public&nbsp;ConnectionFactoryCallbackHandler(io.r2dbc.spi.ConnectionFactory&nbsp;connectionFactory,
                                         <a href="../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</pre>
 </li>
 </ul>
@@ -320,6 +331,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <h4>invoke</h4>
 <pre>public&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;invoke(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;proxy,
                      <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;method,
+                     <a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
                      <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;args)
               throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang">Throwable</a></pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/r2dbc/proxy/callback/CallbackHandler.html#invoke-java.lang.Object-java.lang.reflect.Method-java.lang.Object:A-">CallbackHandler</a></code></span></div>
@@ -332,11 +344,35 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <dd><code>args</code> - an array of objects that has passed to the method invocation.
                this can be <code>null</code> when method is invoked with no argument.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>result returned from the method invocation on the proxy instance</dd>
+<dd>result returned from the method invocation on the proxy instance. (can be <code>null</code>.)</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang">Throwable</a></code> - the exception thrown from the method invocation on the proxy instance.</dd>
 <dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalArgumentException.html?is-external=true" title="class or interface in java.lang">IllegalArgumentException</a></code> - if <code>proxy</code> is <code>null</code></dd>
 </dl>
+</li>
+</ul>
+<a name="isCommonMethod-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isCommonMethod</h4>
+<pre>protected&nbsp;boolean&nbsp;isCommonMethod(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;methodName)</pre>
+</li>
+</ul>
+<a name="handleCommonMethod-java.lang.String-java.lang.Object-java.lang.Object:A-io.r2dbc.spi.Connection-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>handleCommonMethod</h4>
+<pre><a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
+protected&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;handleCommonMethod(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;methodName,
+                                              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;original,
+                                              <a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
+                                              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;args,
+                                              <a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
+                                              io.r2dbc.spi.Connection&nbsp;originalConnection)</pre>
 </li>
 </ul>
 <a name="proceedExecution-java.lang.reflect.Method-java.lang.Object-java.lang.Object:A-io.r2dbc.proxy.listener.ProxyExecutionListener-io.r2dbc.proxy.core.ConnectionInfo-java.util.function.Consumer-">
@@ -362,7 +398,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <dd><code>target</code> - an object being invoked</dd>
 <dd><code>args</code> - arguments for the method. <code>null</code> if the method doesn't take any arguments.</dd>
 <dd><code>listener</code> - listener that before/after method callbacks will be called</dd>
-<dd><code>connectionInfo</code> - current connection information. <code>null</code> when invoked operation is not associated to the <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Connection</code></a>.</dd>
+<dd><code>connectionInfo</code> - current connection information. <code>null</code> when invoked operation is not associated to the <code>Connection</code>.</dd>
 <dd><code>onComplete</code> - a callback that will be invoked at successful termination(onComplete) of the result publisher.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>result of invoking the original object</dd>
@@ -380,8 +416,8 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <ul class="blockList">
 <li class="blockList">
 <h4>interceptQueryExecution</h4>
-<pre>protected&nbsp;<a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html?is-external=true" title="class or interface in reactor.core.publisher">Flux</a>&lt;? extends <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi">Result</a>&gt;&nbsp;interceptQueryExecution(<a href="https://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/org/reactivestreams/Publisher.html?is-external=true" title="class or interface in org.reactivestreams">Publisher</a>&lt;? extends <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi">Result</a>&gt;&nbsp;publisher,
-                                                         io.r2dbc.proxy.callback.MutableQueryExecutionInfo&nbsp;executionInfo)</pre>
+<pre>protected&nbsp;<a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html?is-external=true" title="class or interface in reactor.core.publisher">Flux</a>&lt;? extends io.r2dbc.spi.Result&gt;&nbsp;interceptQueryExecution(<a href="https://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/org/reactivestreams/Publisher.html?is-external=true" title="class or interface in org.reactivestreams">Publisher</a>&lt;? extends io.r2dbc.spi.Result&gt;&nbsp;publisher,
+                                                                      io.r2dbc.proxy.callback.MutableQueryExecutionInfo&nbsp;executionInfo)</pre>
 <div class="block">Augment query execution result to hook up listener lifecycle.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

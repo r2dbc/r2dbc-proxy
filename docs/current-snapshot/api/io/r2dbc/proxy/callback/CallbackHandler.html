@@ -101,7 +101,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Known Implementing Classes:</dt>
-<dd><a href="../../../../io/r2dbc/proxy/callback/BatchCallbackHandler.html" title="class in io.r2dbc.proxy.callback">BatchCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/ConnectionCallbackHandler.html" title="class in io.r2dbc.proxy.callback">ConnectionCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html" title="class in io.r2dbc.proxy.callback">ConnectionFactoryCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/ResultCallbackHandler.html" title="class in io.r2dbc.proxy.callback">ResultCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/RowCallbackHandler.html" title="class in io.r2dbc.proxy.callback">RowCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/StatementCallbackHandler.html" title="class in io.r2dbc.proxy.callback">StatementCallbackHandler</a></dd>
+<dd><a href="../../../../io/r2dbc/proxy/callback/BatchCallbackHandler.html" title="class in io.r2dbc.proxy.callback">BatchCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/ConnectionCallbackHandler.html" title="class in io.r2dbc.proxy.callback">ConnectionCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html" title="class in io.r2dbc.proxy.callback">ConnectionFactoryCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/ResultCallbackHandler.html" title="class in io.r2dbc.proxy.callback">ResultCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/RowCallbackHandler.html" title="class in io.r2dbc.proxy.callback">RowCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/RowSegmentCallbackHandler.html" title="class in io.r2dbc.proxy.callback">RowSegmentCallbackHandler</a>, <a href="../../../../io/r2dbc/proxy/callback/StatementCallbackHandler.html" title="class in io.r2dbc.proxy.callback">StatementCallbackHandler</a></dd>
 </dl>
 <hr>
 <br>
@@ -162,11 +162,12 @@ var activeTableTab = "activeTableTab";
 <ul class="blockListLast">
 <li class="blockList">
 <h4>invoke</h4>
-<pre><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;invoke(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;proxy,
-              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;method,
-              <a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
-              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;args)
-       throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang">Throwable</a></pre>
+<pre><a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
+<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;invoke(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;proxy,
+                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;method,
+                        <a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html?is-external=true" title="class or interface in reactor.util.annotation">@Nullable</a>
+                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;args)
+                 throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang">Throwable</a></pre>
 <div class="block">When proxy is invoked, actual implementation of the proxy handler delegates the
  invocation to this method.</div>
 <dl>
@@ -176,7 +177,7 @@ var activeTableTab = "activeTableTab";
 <dd><code>args</code> - an array of objects that has passed to the method invocation.
                this can be <code>null</code> when method is invoked with no argument.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>result returned from the method invocation on the proxy instance</dd>
+<dd>result returned from the method invocation on the proxy instance. (can be <code>null</code>.)</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang">Throwable</a></code> - the exception thrown from the method invocation on the proxy instance.</dd>
 <dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalArgumentException.html?is-external=true" title="class or interface in java.lang">IllegalArgumentException</a></code> - if <code>proxy</code> is <code>null</code></dd>

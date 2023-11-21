@@ -110,7 +110,7 @@
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code>static <a href="../../../../../io/r2dbc/proxy/ProxyConnectionFactory.Builder.html" title="class in io.r2dbc.proxy">ProxyConnectionFactory.Builder</a></code></td>
-<td class="colLast"><span class="typeNameLabel">ProxyConnectionFactory.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/ProxyConnectionFactory.html#builder-io.r2dbc.spi.ConnectionFactory-io.r2dbc.proxy.callback.ProxyConfig-">builder</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi">ConnectionFactory</a>&nbsp;connectionFactory,
+<td class="colLast"><span class="typeNameLabel">ProxyConnectionFactory.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/ProxyConnectionFactory.html#builder-io.r2dbc.spi.ConnectionFactory-io.r2dbc.proxy.callback.ProxyConfig-">builder</a></span>(io.r2dbc.spi.ConnectionFactory&nbsp;connectionFactory,
        <a href="../../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</code>
 <div class="block">Create a new <a href="../../../../../io/r2dbc/proxy/ProxyConnectionFactory.Builder.html" title="class in io.r2dbc.proxy"><code>ProxyConnectionFactory.Builder</code></a>.</div>
 </td>
@@ -171,36 +171,43 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/BatchCallbackHandler.html#BatchCallbackHandler-io.r2dbc.spi.Batch-io.r2dbc.proxy.core.ConnectionInfo-io.r2dbc.proxy.callback.ProxyConfig-">BatchCallbackHandler</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Batch.html?is-external=true" title="class or interface in io.r2dbc.spi">Batch</a>&nbsp;batch,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/BatchCallbackHandler.html#BatchCallbackHandler-io.r2dbc.spi.Batch-io.r2dbc.proxy.core.ConnectionInfo-io.r2dbc.proxy.callback.ProxyConfig-">BatchCallbackHandler</a></span>(io.r2dbc.spi.Batch&nbsp;batch,
                     <a href="../../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a>&nbsp;connectionInfo,
                     <a href="../../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/ConnectionCallbackHandler.html#ConnectionCallbackHandler-io.r2dbc.spi.Connection-io.r2dbc.proxy.core.ConnectionInfo-io.r2dbc.proxy.callback.ProxyConfig-">ConnectionCallbackHandler</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html?is-external=true" title="class or interface in io.r2dbc.spi">Connection</a>&nbsp;connection,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/ConnectionCallbackHandler.html#ConnectionCallbackHandler-io.r2dbc.spi.Connection-io.r2dbc.proxy.core.ConnectionInfo-io.r2dbc.proxy.callback.ProxyConfig-">ConnectionCallbackHandler</a></span>(io.r2dbc.spi.Connection&nbsp;connection,
                          <a href="../../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a>&nbsp;connectionInfo,
                          <a href="../../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#ConnectionFactoryCallbackHandler-io.r2dbc.spi.ConnectionFactory-io.r2dbc.proxy.callback.ProxyConfig-">ConnectionFactoryCallbackHandler</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/ConnectionFactory.html?is-external=true" title="class or interface in io.r2dbc.spi">ConnectionFactory</a>&nbsp;connectionFactory,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/ConnectionFactoryCallbackHandler.html#ConnectionFactoryCallbackHandler-io.r2dbc.spi.ConnectionFactory-io.r2dbc.proxy.callback.ProxyConfig-">ConnectionFactoryCallbackHandler</a></span>(io.r2dbc.spi.ConnectionFactory&nbsp;connectionFactory,
                                 <a href="../../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/ResultCallbackHandler.html#ResultCallbackHandler-io.r2dbc.spi.Result-io.r2dbc.proxy.core.QueryExecutionInfo-io.r2dbc.proxy.callback.ProxyConfig-io.r2dbc.proxy.callback.QueriesExecutionContext-">ResultCallbackHandler</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi">Result</a>&nbsp;result,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/ResultCallbackHandler.html#ResultCallbackHandler-io.r2dbc.spi.Result-io.r2dbc.proxy.core.QueryExecutionInfo-io.r2dbc.proxy.callback.ProxyConfig-io.r2dbc.proxy.callback.QueriesExecutionContext-">ResultCallbackHandler</a></span>(io.r2dbc.spi.Result&nbsp;result,
                      <a href="../../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;queryExecutionInfo,
                      <a href="../../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig,
                      <a href="../../../../../io/r2dbc/proxy/callback/QueriesExecutionContext.html" title="class in io.r2dbc.proxy.callback">QueriesExecutionContext</a>&nbsp;queriesExecutionContext)</code>
-<div class="block">Callback handler logic for <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a>.</div>
+<div class="block">Callback handler logic for <code>Result</code>.</div>
 </td>
 </tr>
 <tr class="altColor">
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/RowCallbackHandler.html#RowCallbackHandler-io.r2dbc.spi.Row-io.r2dbc.proxy.core.QueryExecutionInfo-io.r2dbc.proxy.callback.ProxyConfig-">RowCallbackHandler</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Row.html?is-external=true" title="class or interface in io.r2dbc.spi">Row</a>&nbsp;row,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/RowCallbackHandler.html#RowCallbackHandler-io.r2dbc.spi.Row-io.r2dbc.proxy.core.QueryExecutionInfo-io.r2dbc.proxy.callback.ProxyConfig-">RowCallbackHandler</a></span>(io.r2dbc.spi.Row&nbsp;row,
                   <a href="../../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;queryExecutionInfo,
                   <a href="../../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</code>
-<div class="block">Callback handler logic for <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Row.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Row</code></a>.</div>
+<div class="block">Callback handler logic for <code>Row</code>.</div>
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/StatementCallbackHandler.html#StatementCallbackHandler-io.r2dbc.spi.Statement-io.r2dbc.proxy.core.StatementInfo-io.r2dbc.proxy.core.ConnectionInfo-io.r2dbc.proxy.callback.ProxyConfig-">StatementCallbackHandler</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html?is-external=true" title="class or interface in io.r2dbc.spi">Statement</a>&nbsp;statement,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/RowSegmentCallbackHandler.html#RowSegmentCallbackHandler-io.r2dbc.spi.Result.RowSegment-io.r2dbc.proxy.core.QueryExecutionInfo-io.r2dbc.proxy.callback.ProxyConfig-">RowSegmentCallbackHandler</a></span>(io.r2dbc.spi.Result.RowSegment&nbsp;rowSegment,
+                         <a href="../../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;queryExecutionInfo,
+                         <a href="../../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</code>
+<div class="block">Callback handler logic for <code>Row</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/callback/StatementCallbackHandler.html#StatementCallbackHandler-io.r2dbc.spi.Statement-io.r2dbc.proxy.core.StatementInfo-io.r2dbc.proxy.core.ConnectionInfo-io.r2dbc.proxy.callback.ProxyConfig-">StatementCallbackHandler</a></span>(io.r2dbc.spi.Statement&nbsp;statement,
                         <a href="../../../../../io/r2dbc/proxy/core/StatementInfo.html" title="interface in io.r2dbc.proxy.core">StatementInfo</a>&nbsp;statementInfo,
                         <a href="../../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a>&nbsp;connectionInfo,
                         <a href="../../../../../io/r2dbc/proxy/callback/ProxyConfig.html" title="class in io.r2dbc.proxy.callback">ProxyConfig</a>&nbsp;proxyConfig)</code>&nbsp;</td>

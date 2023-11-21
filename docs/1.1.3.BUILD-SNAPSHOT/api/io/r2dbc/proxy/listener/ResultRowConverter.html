@@ -107,7 +107,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html?is-external=true" title="class or interface in java.lang">@FunctionalInterface</a>
 public interface <span class="typeNameLabel">ResultRowConverter</span></pre>
-<div class="block">Callback for <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Row.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Row#get(...)</code></a> methods.</div>
+<div class="block">Callback for <code>Row#get(...)</code> methods.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>0.9.0</dd>
@@ -161,7 +161,7 @@ public interface <span class="typeNameLabel">ResultRowConverter</span></pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/listener/ResultRowConverter.html#onGet-io.r2dbc.spi.Row-java.lang.reflect.Method-java.lang.Object:A-io.r2dbc.proxy.listener.ResultRowConverter.GetOperation-">onGet</a></span>(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Row.html?is-external=true" title="class or interface in io.r2dbc.spi">Row</a>&nbsp;proxyRow,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/listener/ResultRowConverter.html#onGet-io.r2dbc.spi.Row-java.lang.reflect.Method-java.lang.Object:A-io.r2dbc.proxy.listener.ResultRowConverter.GetOperation-">onGet</a></span>(io.r2dbc.spi.Row&nbsp;proxyRow,
      <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;method,
      <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;args,
      <a href="../../../../io/r2dbc/proxy/listener/ResultRowConverter.GetOperation.html" title="interface in io.r2dbc.proxy.listener">ResultRowConverter.GetOperation</a>&nbsp;getOperation)</code>
@@ -204,7 +204,7 @@ public interface <span class="typeNameLabel">ResultRowConverter</span></pre>
 <li class="blockList">
 <h4>onGet</h4>
 <pre><a href="https://docs.oracle.com/javase/8/docs/api/javax/annotation/Nullable.html?is-external=true" title="class or interface in javax.annotation">@Nullable</a>
-<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;onGet(<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Row.html?is-external=true" title="class or interface in io.r2dbc.spi">Row</a>&nbsp;proxyRow,
+<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;onGet(io.r2dbc.spi.Row&nbsp;proxyRow,
                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;method,
                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;args,
                        <a href="../../../../io/r2dbc/proxy/listener/ResultRowConverter.GetOperation.html" title="interface in io.r2dbc.proxy.listener">ResultRowConverter.GetOperation</a>&nbsp;getOperation)</pre>
@@ -216,7 +216,7 @@ public interface <span class="typeNameLabel">ResultRowConverter</span></pre>
  To perform the original <code>Row#get(...)</code> method, invoke <code>getOperation.proceed()</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>proxyRow</code> - proxy <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Row.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Row</code></a></dd>
+<dd><code>proxyRow</code> - proxy <code>Row</code></dd>
 <dd><code>method</code> - invoked method</dd>
 <dd><code>args</code> - arguments of the original <code>Row#get(...)</code> call</dd>
 <dd><code>getOperation</code> - perform <code>Row#get(...)</code> operation and returns its result</dd>

@@ -197,7 +197,7 @@ implements <a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" tit
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/r2dbc/proxy/test/MockQueryExecutionInfo.html#getCurrentResultCount--">getCurrentResultCount</a></span>()</code>
-<div class="block">Represent Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a>.</div>
+<div class="block">Represent Nth <code>Result</code>.</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
@@ -400,7 +400,7 @@ implements <a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" tit
  Contains valid value only after the query execution.
 
  Query execution is considered successful when the <a href="https://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/org/reactivestreams/Publisher.html?is-external=true" title="class or interface in org.reactivestreams"><code>Publisher</code></a>
- returned from <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html?is-external=true#execute--" title="class or interface in io.r2dbc.spi"><code>Statement.execute()</code></a> either received completion
+ returned from <code>Statement.execute()</code> either received completion
  or at least one element is emitted regardless of it has received cancellation.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -420,7 +420,7 @@ implements <a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" tit
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getBatchSize--">QueryExecutionInfo</a></code></span></div>
 <div class="block">Get the size of the batch query.
 
- i.e. Number of the calls of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Batch.html?is-external=true#add-java.lang.String-" title="class or interface in io.r2dbc.spi"><code>Batch.add(String)</code></a>.</div>
+ i.e. Number of the calls of <code>Batch.add(String)</code>.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getBatchSize--">getBatchSize</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -473,7 +473,7 @@ implements <a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" tit
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getBindingsSize--">QueryExecutionInfo</a></code></span></div>
 <div class="block">Get the number of the binding.
 
- i.e. Number of the calls of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html?is-external=true#add--" title="class or interface in io.r2dbc.spi"><code>Statement.add()</code></a>.</div>
+ i.e. Number of the calls of <code>Statement.add()</code>.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getBindingsSize--">getBindingsSize</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -562,15 +562,15 @@ implements <a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" tit
 <h4>getCurrentResultCount</h4>
 <pre>public&nbsp;int&nbsp;getCurrentResultCount()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getCurrentResultCount--">QueryExecutionInfo</a></code></span></div>
-<div class="block">Represent Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a>.
+<div class="block">Represent Nth <code>Result</code>.
 
  On each query result callback(<a href="../../../../io/r2dbc/proxy/listener/ProxyExecutionListener.html#eachQueryResult-io.r2dbc.proxy.core.QueryExecutionInfo-"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a>),
- this value indicates Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a> starting from 1.
+ this value indicates Nth <code>Result</code> starting from 1.
  (1st query result, 2nd query result, 3rd, 4th,...).
 
  This returns 0 for before query execution(<a href="../../../../io/r2dbc/proxy/listener/ProxyExecutionListener.html#beforeQuery-io.r2dbc.proxy.core.QueryExecutionInfo-"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a>).
  For after query execution(<a href="../../../../io/r2dbc/proxy/listener/ProxyExecutionListener.html#afterQuery-io.r2dbc.proxy.core.QueryExecutionInfo-"><code>ProxyExecutionListener.afterQuery(QueryExecutionInfo)</code></a>), this returns
- total number of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html?is-external=true" title="class or interface in io.r2dbc.spi"><code>Result</code></a> returned by this query execution.</div>
+ total number of <code>Result</code> returned by this query execution.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getCurrentResultCount--">getCurrentResultCount</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
