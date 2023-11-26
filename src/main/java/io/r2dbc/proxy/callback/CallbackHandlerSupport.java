@@ -118,7 +118,14 @@ abstract class CallbackHandlerSupport implements CallbackHandler {
             if (args == null) {
                 return original; // for no-arg "unwrap"
             } else {
-                return ((Wrapped<?>) original).unwrap((Class<?>) args[0]);
+                Class<?> targetClass = (Class<?>) args[0];
+                if (original instanceof Wrapped) {
+                    return ((Wrapped<?>) original).unwrap(targetClass);
+                }
+                if (targetClass.isInstance(original)) {
+                    return original;  // "original instanceof targetClass"
+                }
+                return null;
             }
         }
         throw new IllegalStateException(methodName + " does not match to the common method names.");

@@ -752,6 +752,64 @@ public class CallbackHandlerSupportTest {
         result = this.callbackHandlerSupport.handleCommonMethod("unwrapConnection", target, null, mockConnection);
         assertThat(result).isSameAs(mockConnection);
     }
+
+    @Test
+    void unwrap() {
+        AtomicReference<Class<?>> targetClassHolder = new AtomicReference<>();
+        class MyStub implements Wrapped<String> {
+
+            @Override
+            public String unwrap() {
+                return "unwrapped";  // not used since target object is passed
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <E> E unwrap(Class<E> targetClass) {
+                targetClassHolder.set(targetClass);
+                return (E) "unwrapped-with-args";
+            }
+
+        }
+
+        MyStub stub = new MyStub();
+        Object result;
+
+        // verify unwrap() with non-Wrapped target
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", "str", null, null);
+        assertThat(result).isEqualTo("str");
+
+        // verify unwrap(String.class) with non-Wrapped target
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", "str", new Object[]{String.class}, null);
+        assertThat(result).isEqualTo("str");
+
+        // verify unwrap(Integer.class) with non-Wrapped target
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", "str", new Object[]{Integer.class}, null);
+        assertThat(result).isNull();
+
+        // verify unwrap() with Wrapped target
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", stub, null, null);
+        assertThat(result).isSameAs(stub);
+        assertThat(targetClassHolder).hasValue(null);
+
+        // verify unwrap(String.class) with Wrapped target
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", stub, new Object[]{String.class}, null);
+        assertThat(result).as("should delegate to MyStub.unwrap(String.class)").isEqualTo("unwrapped-with-args");
+        assertThat(targetClassHolder).hasValue(String.class);
+        targetClassHolder.set(null);  // clear
+
+        // verify unwrap(Integer.class) with Wrapped target
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", stub, new Object[]{Integer.class}, null);
+        assertThat(result).as("should delegate to MyStub.unwrap(Integer.class)").isEqualTo("unwrapped-with-args");
+        assertThat(targetClassHolder).hasValue(Integer.class);
+        targetClassHolder.set(null);  // clear
+
+        // verify unwrap(MyStub.class) with Wrapped target
+        result = this.callbackHandlerSupport.handleCommonMethod("unwrap", stub, new Object[]{MyStub.class}, null);
+        assertThat(result).as("should delegate to MyStub.unwrap(MyStub.class)").isEqualTo("unwrapped-with-args");
+        assertThat(targetClassHolder).hasValue(MyStub.class);
+    }
+
     @Test
     void equality() {
         ProxyConfig proxyConfig = ProxyConfig.builder().build();
