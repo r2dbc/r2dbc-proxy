@@ -1,6 +1,14 @@
 R2DBC Proxy Changelog
 =============================
 
+1.1.3.RELEASE
+------------------
+* Trigger afterQuery() on the default methods in Result #138
+* Consistently handle common methods in callback handlers #139
+* Upgrade reactor-bom to 2022.0.13 #140
+* Upgrade micrometer-bom to 1.10.13 #140
+* Upgrade micrometer-tracing-bom to 1.0.12 #140
+
 1.1.2.RELEASE
 ------------------
 * Add a new constructor with host and port parameters to ObservationProxyExecutionListener #135
