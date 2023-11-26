@@ -32,7 +32,7 @@
     <url>https://github.com/r2dbc/r2dbc-proxy</url>
 
     <properties>
-        <assertj.version>3.23.1</assertj.version>
+        <assertj.version>3.24.2</assertj.version>
         <java.version>1.8</java.version>
         <jsr305.version>3.0.2</jsr305.version>
         <junit.version>5.10.0</junit.version>
@@ -40,11 +40,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>1.0.0.RELEASE</r2dbc-spi.version>
-        <reactor-bom.version>2022.0.9</reactor-bom.version>
-        <spring-boot.version>2.7.14</spring-boot.version>
-        <mockito.version>4.8.1</mockito.version>
-        <micrometer-bom.version>1.10.9</micrometer-bom.version>
-        <micrometer-tracing-bom.version>1.0.8</micrometer-tracing-bom.version>
+        <reactor-bom.version>2022.0.13</reactor-bom.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <mockito.version>4.11.0</mockito.version>
+        <micrometer-bom.version>1.10.13</micrometer-bom.version>
+        <micrometer-tracing-bom.version>1.0.12</micrometer-tracing-bom.version>
 
         <!-- For micrometer-docs-generator  -->
         <micrometer-docs-generator.version>1.0.2</micrometer-docs-generator.version>
