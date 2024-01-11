@@ -29,7 +29,7 @@ import java.lang.reflect.Method;
  * Proxy callback handler for {@link Result.RowSegment}.
  *
  * @author Tadaya Tsuyukubo
- * @since 1.3.1
+ * @since 1.1.3
  */
 public final class RowSegmentCallbackHandler extends CallbackHandlerSupport {
 
