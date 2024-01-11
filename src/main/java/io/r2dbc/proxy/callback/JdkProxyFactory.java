@@ -31,9 +31,6 @@ import io.r2dbc.spi.Wrapped;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * {@link ProxyFactory} implementation using JDK dynamic proxy.
@@ -115,11 +112,7 @@ final class JdkProxyFactory implements ProxyFactory {
 
         CallbackHandler logic = new RowCallbackHandler(row, queryExecutionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-
-        Set<Class<?>> proxyInterfaces = new HashSet<>();
-        Collections.addAll(proxyInterfaces, Row.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
-        Collections.addAll(proxyInterfaces, row.getClass().getInterfaces());
-        return createProxy(invocationHandler, proxyInterfaces.toArray(new Class<?>[]{}));
+        return createProxy(invocationHandler, Row.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
     }
 
     @Override
@@ -129,16 +122,14 @@ final class JdkProxyFactory implements ProxyFactory {
 
         CallbackHandler logic = new RowSegmentCallbackHandler(rowSegment, queryExecutionInfo, this.proxyConfig);
         CallbackInvocationHandler invocationHandler = new CallbackInvocationHandler(logic);
-
-        Set<Class<?>> proxyInterfaces = new HashSet<>();
-        Collections.addAll(proxyInterfaces, Result.RowSegment.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
-        Collections.addAll(proxyInterfaces, rowSegment.getClass().getInterfaces());
-        return createProxy(invocationHandler, proxyInterfaces.toArray(new Class<?>[]{}));
+        return createProxy(invocationHandler, Result.RowSegment.class, Wrapped.class, ConnectionHolder.class, ProxyConfigHolder.class);
     }
 
 
     @SuppressWarnings("unchecked")
     protected <T> T createProxy(InvocationHandler invocationHandler, Class<?>... interfaces) {
+        // For graalvm native image, interfaces must be statically listed, and dynamic creation using
+        // collections, such as "set.toArray(new Class<?>[]{})", is not allowed.
         return (T) Proxy.newProxyInstance(getClass().getClassLoader(), interfaces, invocationHandler);
     }
 

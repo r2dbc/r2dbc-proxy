@@ -611,7 +611,8 @@ public class ResultCallbackHandlerTest {
     static Stream<Arguments> mapWithBiFunction() {
         Result rowResult = MockResult.builder().row(CustomRow.INSTANCE).build();
         return Stream.of(
-            arguments(rowResult, true, Arrays.asList(CustomRow.class, Row.class, Readable.class, CustomMarker.class))
+            arguments(rowResult, true, Arrays.asList(Row.class, Readable.class),
+                Arrays.asList(CustomRow.class, CustomMarker.class))
         );
     }
 
@@ -621,7 +622,7 @@ public class ResultCallbackHandlerTest {
         Result outParametersResult = MockResult.builder().outParameters(CustomOutParameters.INSTANCE).build();
         return Stream.of(
             // only row is proxied
-            arguments(rowResult, true, Arrays.asList(CustomRow.class, Row.class, Readable.class, CustomMarker.class)),
+            arguments(rowResult, true, Arrays.asList(Row.class, Readable.class)),
             arguments(outParametersResult, false, Arrays.asList(CustomOutParameters.class, OutParameters.class, Readable.class, CustomMarker.class))
         );
     }
@@ -635,7 +636,7 @@ public class ResultCallbackHandlerTest {
         Result segment = MockResult.builder().segment(CustomSegment.INSTANCE).build();
         return Stream.of(
             // only row segment is proxied for ".row()"
-            arguments(rowSegmentResult, true, Arrays.asList(CustomRowSegment.class, Result.RowSegment.class, Result.Segment.class, CustomMarker.class)),
+            arguments(rowSegmentResult, true, Arrays.asList(Result.RowSegment.class, Result.Segment.class)),
             arguments(outSegmentResult, false, Arrays.asList(CustomOutSegment.class, Result.OutSegment.class, Result.Segment.class, CustomMarker.class)),
             arguments(updateCountSegment, false, Arrays.asList(CustomUpdateCountSegment.class, Result.UpdateCount.class, Result.Segment.class, CustomMarker.class)),
             arguments(messageSegment, false, Arrays.asList(CustomMessageSegment.class, Result.Message.class, Result.Segment.class, CustomMarker.class)),
