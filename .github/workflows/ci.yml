@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     if: github.repository == 'r2dbc/r2dbc-proxy'
-    runs-on: ${{ matrix.os }}
+    runs-on: [ubuntu-latest, windows-latest]
     strategy:
         matrix:
             include:
