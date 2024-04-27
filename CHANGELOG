@@ -4,7 +4,7 @@ R2DBC Proxy Changelog
 1.1.5.RELEASE
 ------------------
 * Add getters to ProxyConnectionFactory.Builder #146
-* Upgrade reactor-bom to 2022.0.15 #148
+* Upgrade reactor-bom to 2022.0.18 #147
 
 1.1.4.RELEASE
 ------------------
