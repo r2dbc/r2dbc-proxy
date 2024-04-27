@@ -226,5 +226,24 @@ public final class ProxyConnectionFactory {
             return this;
         }
 
+        /**
+         * Return the {@link ConnectionFactory} passed at creation.
+         *
+         * @return the connection factory
+         * @since 1.1.5
+         */
+        public ConnectionFactory getConnectionFactory() {
+            return this.connectionFactory;
+        }
+
+        /**
+         * Return the {@link ProxyConfig}.
+         *
+         * @return the proxy config
+         * @since 1.1.5
+         */
+        public ProxyConfig getProxyConfig() {
+            return this.proxyConfig;
+        }
     }
 }

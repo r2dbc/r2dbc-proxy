@@ -57,7 +57,6 @@ public class ProxyConnectionFactoryTest {
 
     @Test
     void builder() {
-
         ConnectionFactory connectionFactory = MockConnectionFactory.builder().build();
         ProxyConfig mockProxyConfig = mock(ProxyConfig.class);
 
@@ -108,6 +107,10 @@ public class ProxyConnectionFactoryTest {
         // invoke fifth listener and verify callback is called
         listeners.get(4).eachQueryResult(MockQueryExecutionInfo.empty());
         assertThat(onEachQueryResult).isTrue();
+
+        // getters
+        assertThat(builder.getConnectionFactory()).isSameAs(connectionFactory);
+        assertThat(builder.getProxyConfig()).isSameAs(mockProxyConfig);
     }
 
 }
