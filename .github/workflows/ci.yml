@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     if: github.repository == 'r2dbc/r2dbc-proxy'
-    runs-on: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     strategy:
         matrix:
             include:
@@ -18,8 +18,10 @@ jobs:
                   mvn: ./mvnw
                 - os: windows-latest
                   mvn: mvn
-                - os: macos-latest
-                  mvn: ./mvnw
+               # Since macOS 14.4.1, macos-latest does not have java 8.
+               # https://github.com/actions/runner-images/blob/main/images/macos/macos-144-arm64-Readme.md
+               # - os: macos-latest
+               #   mvn: ./mvnw
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 1.8
