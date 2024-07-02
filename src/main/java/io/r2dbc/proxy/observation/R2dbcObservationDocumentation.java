@@ -89,16 +89,6 @@ public enum R2dbcObservationDocumentation implements ObservationDocumentation {
             public String asString() {
                 return "r2dbc.connection";
             }
-        },
-
-        /**
-         * Name of the R2DBC thread.
-         */
-        THREAD {
-            @Override
-            public String asString() {
-                return "r2dbc.thread";
-            }
         }
 
     }
@@ -122,6 +112,16 @@ public enum R2dbcObservationDocumentation implements ObservationDocumentation {
             @Override
             public String asString() {
                 return "r2dbc.params[%s]";
+            }
+        },
+
+        /**
+         * Name of the R2DBC thread.
+         */
+        THREAD {
+            @Override
+            public String asString() {
+                return "r2dbc.thread";
             }
         }
 
