@@ -51,7 +51,6 @@ public interface QueryObservationConvention extends ObservationConvention<QueryC
     default KeyValues getLowCardinalityKeyValues(QueryContext context) {
         Set<KeyValue> keyValues = new HashSet<>();
         keyValues.add(KeyValue.of(R2dbcObservationDocumentation.LowCardinalityKeys.CONNECTION, context.getConnectionName()));
-        keyValues.add(KeyValue.of(R2dbcObservationDocumentation.LowCardinalityKeys.THREAD, context.getThreadName()));
         return KeyValues.of(keyValues);
     }
 
@@ -69,6 +68,7 @@ public interface QueryObservationConvention extends ObservationConvention<QueryC
             String key = String.format(R2dbcObservationDocumentation.HighCardinalityKeys.QUERY_PARAMETERS.asString(), i);
             keyValues.add(KeyValue.of(key, params));
         }
+        keyValues.add(KeyValue.of(R2dbcObservationDocumentation.HighCardinalityKeys.THREAD, context.getThreadName()));
         return KeyValues.of(keyValues);
     }
 }
