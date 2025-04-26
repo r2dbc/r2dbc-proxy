@@ -60,7 +60,7 @@ public enum R2dbcObservationDocumentation implements ObservationDocumentation {
         }
     };
 
-    enum Events implements Observation.Event {
+    public enum Events implements Observation.Event {
 
         /**
          * Retrieving query result.
@@ -79,7 +79,7 @@ public enum R2dbcObservationDocumentation implements ObservationDocumentation {
 
     }
 
-    enum LowCardinalityKeys implements KeyName {
+    public enum LowCardinalityKeys implements KeyName {
 
         /**
          * Name of the R2DBC connection.
@@ -103,7 +103,7 @@ public enum R2dbcObservationDocumentation implements ObservationDocumentation {
 
     }
 
-    enum HighCardinalityKeys implements KeyName {
+    public enum HighCardinalityKeys implements KeyName {
 
         /**
          * Name of the R2DBC query.
