@@ -133,18 +133,6 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
-<td class="colLast"><span class="typeNameLabel">StatementInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/core/StatementInfo.html#getValueStore--">getValueStore</a></span>()</code>
-<div class="block">Retrieve <a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical statement.</div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
-<td class="colLast"><span class="typeNameLabel">MethodExecutionInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/core/MethodExecutionInfo.html#getValueStore--">getValueStore</a></span>()</code>
-<div class="block">Retrieve <a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of before/after method execution.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
 <td class="colLast"><span class="typeNameLabel">QueryExecutionInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getValueStore--">getValueStore</a></span>()</code>
 <div class="block">Retrieve <a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of before/after method execution.</div>
 </td>
@@ -153,6 +141,18 @@
 <td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
 <td class="colLast"><span class="typeNameLabel">ConnectionInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/core/ConnectionInfo.html#getValueStore--">getValueStore</a></span>()</code>
 <div class="block">Retrieve <a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical connection.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
+<td class="colLast"><span class="typeNameLabel">StatementInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/core/StatementInfo.html#getValueStore--">getValueStore</a></span>()</code>
+<div class="block">Retrieve <a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical statement.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
+<td class="colLast"><span class="typeNameLabel">MethodExecutionInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/core/MethodExecutionInfo.html#getValueStore--">getValueStore</a></span>()</code>
+<div class="block">Retrieve <a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of before/after method execution.</div>
 </td>
 </tr>
 </tbody>
@@ -171,7 +171,7 @@
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
-<td class="colLast"><span class="typeNameLabel">MockMethodExecutionInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockMethodExecutionInfo.html#getValueStore--">getValueStore</a></span>()</code>&nbsp;</td>
+<td class="colLast"><span class="typeNameLabel">MockStatementInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockStatementInfo.html#getValueStore--">getValueStore</a></span>()</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
@@ -179,7 +179,7 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
-<td class="colLast"><span class="typeNameLabel">MockStatementInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockStatementInfo.html#getValueStore--">getValueStore</a></span>()</code>&nbsp;</td>
+<td class="colLast"><span class="typeNameLabel">MockMethodExecutionInfo.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockMethodExecutionInfo.html#getValueStore--">getValueStore</a></span>()</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></td>
@@ -195,16 +195,16 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/test/MockMethodExecutionInfo.Builder.html" title="class in io.r2dbc.proxy.test">MockMethodExecutionInfo.Builder</a></code></td>
-<td class="colLast"><span class="typeNameLabel">MockMethodExecutionInfo.Builder.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockMethodExecutionInfo.Builder.html#valueStore-io.r2dbc.proxy.core.ValueStore-">valueStore</a></span>(<a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a>&nbsp;valueStore)</code>&nbsp;</td>
+<td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/test/MockStatementInfo.Builder.html" title="class in io.r2dbc.proxy.test">MockStatementInfo.Builder</a></code></td>
+<td class="colLast"><span class="typeNameLabel">MockStatementInfo.Builder.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockStatementInfo.Builder.html#valueStore-io.r2dbc.proxy.core.ValueStore-">valueStore</a></span>(<a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a>&nbsp;valueStore)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/test/MockQueryExecutionInfo.Builder.html" title="class in io.r2dbc.proxy.test">MockQueryExecutionInfo.Builder</a></code></td>
 <td class="colLast"><span class="typeNameLabel">MockQueryExecutionInfo.Builder.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockQueryExecutionInfo.Builder.html#valueStore-io.r2dbc.proxy.core.ValueStore-">valueStore</a></span>(<a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a>&nbsp;valueStore)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/test/MockStatementInfo.Builder.html" title="class in io.r2dbc.proxy.test">MockStatementInfo.Builder</a></code></td>
-<td class="colLast"><span class="typeNameLabel">MockStatementInfo.Builder.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockStatementInfo.Builder.html#valueStore-io.r2dbc.proxy.core.ValueStore-">valueStore</a></span>(<a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a>&nbsp;valueStore)</code>&nbsp;</td>
+<td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/test/MockMethodExecutionInfo.Builder.html" title="class in io.r2dbc.proxy.test">MockMethodExecutionInfo.Builder</a></code></td>
+<td class="colLast"><span class="typeNameLabel">MockMethodExecutionInfo.Builder.</span><code><span class="memberNameLink"><a href="../../../../../io/r2dbc/proxy/test/MockMethodExecutionInfo.Builder.html#valueStore-io.r2dbc.proxy.core.ValueStore-">valueStore</a></span>(<a href="../../../../../io/r2dbc/proxy/core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a>&nbsp;valueStore)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../io/r2dbc/proxy/test/MockConnectionInfo.Builder.html" title="class in io.r2dbc.proxy.test">MockConnectionInfo.Builder</a></code></td>
@@ -264,6 +264,6 @@
 <!--   -->
 </a></div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
-<p class="legalCopy"><small>Copyright &#169; 2024. All rights reserved.</small></p>
+<p class="legalCopy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
 </body>
 </html>
