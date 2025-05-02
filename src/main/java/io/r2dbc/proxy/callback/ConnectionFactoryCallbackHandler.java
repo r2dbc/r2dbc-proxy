@@ -61,8 +61,11 @@ public final class ConnectionFactoryCallbackHandler extends CallbackHandlerSuppo
             executionInfo.setMethodArgs(args);
             executionInfo.setTarget(target);
 
-            // The actual connection is not yet created, but in order to populate connection level context-view,
-            // create an empty connection info here and set it to the execution info
+            // The actual connection has not been created yet, but to populate the connection-level context view (mainly for ValueStore),
+            // an empty ConnectionInfo is created here and set into the execution info.
+            // NOTE: Until it is associated with an actual connection, retrieving the connection (`getOriginalConnection`) and connection ID (`getConnectionId`)
+            // will return null. For example, during `beforeMethod` of `ConnectionFactory#create()`.
+            // This is a design decision to always provide a connection-level ValueStore.
             DefaultConnectionInfo connectionInfo = new DefaultConnectionInfo();
             executionInfo.setConnectionInfo(connectionInfo);
 

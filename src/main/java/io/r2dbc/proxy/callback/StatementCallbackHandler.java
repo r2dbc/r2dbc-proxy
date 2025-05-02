@@ -73,12 +73,6 @@ public final class StatementCallbackHandler extends CallbackHandlerSupport {
             return handleCommonMethod(methodName, this.statement, args, this.connectionInfo.getOriginalConnection());
         }
 
-//        if ("unwrap".equals(methodName)) {
-//            return this.statement;
-//        } else if ("unwrapConnection".equals(methodName)) {
-//            return this.connectionInfo.getOriginalConnection();
-//        }
-
         if ("bind".equals(methodName) || "bindNull".equals(methodName)) {
 
             BoundValue boundValue;

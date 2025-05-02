@@ -21,6 +21,7 @@ import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.ValueStore;
 import io.r2dbc.proxy.util.Assert;
 import io.r2dbc.spi.Connection;
+import reactor.util.annotation.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
@@ -91,11 +92,13 @@ final class DefaultConnectionInfo implements ConnectionInfo {
     }
 
     @Override
+    @Nullable
     public Connection getOriginalConnection() {
         return this.originalConnection;
     }
 
     @Override
+    @Nullable
     public String getConnectionId() {
         return this.connectionId;
     }

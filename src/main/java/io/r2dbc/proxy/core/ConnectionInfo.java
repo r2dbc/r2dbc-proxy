@@ -17,7 +17,10 @@
 package io.r2dbc.proxy.core;
 
 
+import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.spi.Connection;
+import io.r2dbc.spi.ConnectionFactory;
+import reactor.util.annotation.Nullable;
 
 /**
  * Hold {@link Connection} related information.
@@ -25,20 +28,27 @@ import io.r2dbc.spi.Connection;
  * @author Tadaya Tsuyukubo
  */
 public interface ConnectionInfo {
-
     /**
      * Retrieve original {@link Connection}.
      *
-     * @return connection
+     * @return connection; {@code null} is returned when {@link ConnectionInfo} is evaluated
+     * before it is associated with an actual connection, for example, during
+     * {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} for
+     * {@link ConnectionFactory#create()}.
      */
+    @Nullable
     Connection getOriginalConnection();
 
     /**
      * Get ID for the connection.
      *
-     * @return connection ID
+     * @return connection ID; {@code null} is returned when {@link ConnectionInfo} is evaluated
+     * before it is associated with an actual connection, for example, during
+     * {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} for
+     * {@link ConnectionFactory#create()}.
      * @see io.r2dbc.proxy.callback.ConnectionIdManager
      */
+    @Nullable
     String getConnectionId();
 
     /**

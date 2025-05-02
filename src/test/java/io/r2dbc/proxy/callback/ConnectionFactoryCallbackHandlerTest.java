@@ -19,6 +19,7 @@ package io.r2dbc.proxy.callback;
 import io.r2dbc.proxy.core.ConnectionInfo;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.listener.LastExecutionAwareListener;
+import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.proxy.listener.ProxyMethodExecutionListener;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
@@ -112,6 +113,63 @@ public class ConnectionFactoryCallbackHandlerTest {
 
         assertThat(afterMethod.getTarget()).isSameAs(connectionFactory);
         assertThat(afterMethod.getResult()).isSameAs(originalConnection);
+    }
+
+    @Test
+    void connectionInfoInBeforeAndAfterMethod() throws Throwable {
+        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+        Connection originalConnection = mock(Connection.class);
+        ConnectionIdManager idManager = mock(ConnectionIdManager.class);
+
+        // mock call to original ConnectionFactory#create()
+        doReturn(Mono.just(originalConnection)).when(connectionFactory).create();
+
+        String connectionId = "100";
+        when(idManager.getId(originalConnection)).thenReturn(connectionId);
+
+        AtomicReference<Connection> connectionBeforeMethod = new AtomicReference<>();
+        AtomicReference<Connection> connectionAfterMethod = new AtomicReference<>();
+        AtomicReference<String> connectionIdBeforeMethod = new AtomicReference<>();
+        AtomicReference<String> connectionIdAfterMethod = new AtomicReference<>();
+        ProxyExecutionListener listener = new ProxyExecutionListener() {
+
+            @Override
+            public void beforeMethod(MethodExecutionInfo executionInfo) {
+                ConnectionInfo connectionInfo = executionInfo.getConnectionInfo();
+                assertThat(connectionInfo).isNotNull();
+                connectionBeforeMethod.set(connectionInfo.getOriginalConnection());
+                connectionIdBeforeMethod.set(connectionInfo.getConnectionId());
+            }
+
+            @Override
+            public void afterMethod(MethodExecutionInfo executionInfo) {
+                ConnectionInfo connectionInfo = executionInfo.getConnectionInfo();
+                assertThat(connectionInfo).isNotNull();
+                connectionAfterMethod.set(connectionInfo.getOriginalConnection());
+                connectionIdAfterMethod.set(connectionInfo.getConnectionId());
+            }
+        };
+
+        ProxyConfig proxyConfig = ProxyConfig.builder()
+            .connectionIdManager(idManager)
+            .listener(listener)
+            .build();
+
+        ConnectionFactoryCallbackHandler handler = new ConnectionFactoryCallbackHandler(connectionFactory, proxyConfig);
+
+        Object result = handler.invoke(connectionFactory, CREATE_METHOD, null);
+
+        assertThat(result).isInstanceOf(Publisher.class);
+
+        StepVerifier.create((Publisher<?>) result)
+            .expectSubscription()
+            .expectNextCount(1)
+            .verifyComplete();
+
+        assertThat(connectionBeforeMethod).hasValue(null);
+        assertThat(connectionIdBeforeMethod).hasValue(null);
+        assertThat(connectionAfterMethod).hasValue(originalConnection);
+        assertThat(connectionIdAfterMethod).hasValue("100");
     }
 
     @Test
