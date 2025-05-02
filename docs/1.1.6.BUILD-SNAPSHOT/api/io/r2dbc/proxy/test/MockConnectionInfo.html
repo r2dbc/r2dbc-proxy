@@ -299,7 +299,10 @@ implements <a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html#getOriginalConnection--">getOriginalConnection</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>connection</dd>
+<dd>connection; <code>null</code> is returned when <a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a> is evaluated
+ before it is associated with an actual connection, for example, during
+ <a href="../../../../io/r2dbc/proxy/listener/ProxyExecutionListener.html#beforeMethod-io.r2dbc.proxy.core.MethodExecutionInfo-"><code>ProxyExecutionListener.beforeMethod(MethodExecutionInfo)</code></a> for
+ <code>ConnectionFactory.create()</code>.</dd>
 </dl>
 </li>
 </ul>
@@ -316,7 +319,10 @@ implements <a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html#getConnectionId--">getConnectionId</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>connection ID</dd>
+<dd>connection ID; <code>null</code> is returned when <a href="../../../../io/r2dbc/proxy/core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a> is evaluated
+ before it is associated with an actual connection, for example, during
+ <a href="../../../../io/r2dbc/proxy/listener/ProxyExecutionListener.html#beforeMethod-io.r2dbc.proxy.core.MethodExecutionInfo-"><code>ProxyExecutionListener.beforeMethod(MethodExecutionInfo)</code></a> for
+ <code>ConnectionFactory.create()</code>.</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../io/r2dbc/proxy/callback/ConnectionIdManager.html" title="interface in io.r2dbc.proxy.callback"><code>ConnectionIdManager</code></a></dd>
 </dl>
