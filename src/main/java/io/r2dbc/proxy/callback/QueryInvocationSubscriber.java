@@ -22,8 +22,10 @@ import io.r2dbc.spi.Result;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
+import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.Scannable;
+import reactor.core.publisher.Operators;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
 import reactor.util.context.ContextView;
@@ -66,8 +68,12 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
     @Override
     public void onSubscribe(Subscription s) {
         this.subscription = s;
-        beforeQuery();
-        this.delegate.onSubscribe(this);
+        try {
+            beforeQuery();
+        } catch (Exception ex) {
+            Operators.onErrorDropped(ex, currentContext());
+        }
+        this.delegate.onSubscribe(this);  // trusted
     }
 
     @Override
@@ -86,10 +92,14 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
         // mark this publisher produced all Results
         this.queriesExecutionContext.markAllProduced();
         if (this.queriesExecutionContext.isQueryFinished()) {
-            afterQuery();
+            try {
+                afterQuery();
+            } catch (Exception ex) {
+                Operators.onErrorDropped(ex, currentContext());
+            }
         }
 
-        this.delegate.onError(t);
+        this.delegate.onError(t);  // trusted
     }
 
     @Override
@@ -98,10 +108,14 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
         this.queriesExecutionContext.markAllProduced();
         if (this.queriesExecutionContext.isQueryFinished()) {
             this.executionInfo.setSuccess(true);
-            afterQuery();
+            try {
+                afterQuery();
+            } catch (Exception ex) {
+                Operators.onErrorDropped(ex, currentContext());
+            }
         }
 
-        this.delegate.onComplete();
+        this.delegate.onComplete();  // trusted
     }
 
     @Override
@@ -119,7 +133,11 @@ class QueryInvocationSubscriber implements CoreSubscriber<Result>, Subscription,
             if (this.resultProduced) {
                 this.executionInfo.setSuccess(true);
             }
-            afterQuery();
+            try {
+                afterQuery();
+            } catch (Exception ex) {
+                Operators.onErrorDropped(ex, currentContext());
+            }
         }
         this.subscription.cancel();
     }

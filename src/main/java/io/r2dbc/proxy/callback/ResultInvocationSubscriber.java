@@ -24,6 +24,7 @@ import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
 import reactor.core.Fuseable;
 import reactor.core.Scannable;
+import reactor.core.publisher.Operators;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
 
@@ -73,35 +74,51 @@ class ResultInvocationSubscriber implements CoreSubscriber<Object>, Subscription
     @Override
     public void onSubscribe(Subscription s) {
         this.subscription = s;
-        this.delegate.onSubscribe(this);
+        this.delegate.onSubscribe(this);  // trusted
     }
 
     @Override
     public void onNext(Object mappedResult) {
-        eachQueryResult(mappedResult, null);
-        this.delegate.onNext(mappedResult);
+        try {
+            eachQueryResult(mappedResult, null);
+        } catch (Exception ex) {
+            Operators.onErrorDropped(ex, currentContext());
+        }
+        this.delegate.onNext(mappedResult);  // trusted
     }
 
     @Override
     public void onError(Throwable t) {
-        eachQueryResult(null, t);
+        try {
+            eachQueryResult(null, t);
+        } catch (Exception ex) {
+            Operators.onErrorDropped(ex, currentContext());
+        }
 
         this.queriesExecutionContext.incrementConsumedCount();
         if (this.queriesExecutionContext.isQueryFinished()) {
-            afterQuery();
+            try {
+                afterQuery();
+            } catch (Exception ex) {
+                Operators.onErrorDropped(ex, currentContext());
+            }
         }
 
-        this.delegate.onError(t);
+        this.delegate.onError(t);  // trusted
     }
 
     @Override
     public void onComplete() {
         this.queriesExecutionContext.incrementConsumedCount();
         if (this.queriesExecutionContext.isQueryFinished()) {
-            afterQuery();
+            try {
+                afterQuery();
+            } catch (Exception ex) {
+                Operators.onErrorDropped(ex, currentContext());
+            }
         }
 
-        this.delegate.onComplete();
+        this.delegate.onComplete();  // trusted
     }
 
     @Override
@@ -114,7 +131,11 @@ class ResultInvocationSubscriber implements CoreSubscriber<Object>, Subscription
         // do not determine success/failure by cancel
         this.queriesExecutionContext.incrementConsumedCount();
         if (this.queriesExecutionContext.isQueryFinished()) {
-            afterQuery();
+            try {
+                afterQuery();
+            } catch (Exception ex) {
+                Operators.onErrorDropped(ex, currentContext());
+            }
         }
 
         this.subscription.cancel();

@@ -23,6 +23,7 @@ import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
 import reactor.core.Fuseable;
 import reactor.core.Scannable;
+import reactor.core.publisher.Operators;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
 import reactor.util.context.ContextView;
@@ -68,8 +69,12 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
     @Override
     public void onSubscribe(Subscription s) {
         this.subscription = s;
-        beforeMethod();
-        this.delegate.onSubscribe(this);
+        try {
+            beforeMethod();
+        } catch (Exception ex) {
+            Operators.onErrorDropped(ex, currentContext());
+        }
+        this.delegate.onSubscribe(this);  // trusted
     }
 
     @Override
@@ -81,17 +86,26 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
     @Override
     public void onError(Throwable t) {
         this.executionInfo.setThrown(t);
-        afterMethod();
-        this.delegate.onError(t);
+        try {
+            afterMethod();
+        } catch (Exception ex) {
+            Operators.onErrorDropped(ex, currentContext());
+        }
+        this.delegate.onError(t);  // trusted
     }
 
     @Override
     public void onComplete() {
         if (this.onComplete != null) {
+            // onComplete provided within r2dbc-proxy, no try-catch required
             this.onComplete.accept(this.executionInfo);
         }
-        afterMethod();
-        this.delegate.onComplete();
+        try {
+            afterMethod();
+        } catch (Exception ex) {
+            Operators.onErrorDropped(ex, currentContext());
+        }
+        this.delegate.onComplete();  // trusted
     }
 
     @Override
@@ -101,8 +115,12 @@ class MethodInvocationSubscriber implements CoreSubscriber<Object>, Subscription
 
     @Override
     public void cancel() {
-        afterMethod();
-        this.subscription.cancel();
+        try {
+            afterMethod();
+        } catch (Exception ex) {
+            Operators.onErrorDropped(ex, currentContext());
+        }
+        this.subscription.cancel(); // trusted
     }
 
     @Override
