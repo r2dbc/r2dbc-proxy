@@ -178,10 +178,10 @@
 <ul class="sectlevel2">
 <li><a href="#features_accessing-reactor-context-values">7.1. Accessing reactor context values</a>
 <ul class="sectlevel3">
-<li><a href="#features_available-contextview-scopes">7.1.1. Available ContextView scopes</a></li>
+<li><a href="#">7.1.1. Available ContextView scopes</a></li>
 </ul>
 </li>
-<li><a href="#">7.2. Micrometer Observation support</a>
+<li><a href="#features_micrometer-observation-support">7.2. Micrometer Observation support</a>
 <ul class="sectlevel3">
 <li><a href="#observability-conventions">7.2.1. Observability - Conventions</a></li>
 <li><a href="#observability-metrics">7.2.2. Observability - Metrics</a>
@@ -1305,7 +1305,7 @@ public void beforeQuery(QueryExecutionInfo execInfo) {
 </div>
 </div>
 <div class="sect3">
-<h4 id="features_available-contextview-scopes"><a class="anchor" href="#features_available-contextview-scopes"></a>7.1.1. Available ContextView scopes</h4>
+<h4>7.1.1. Available ContextView scopes</h4>
 <div class="paragraph">
 <p>While interacting with R2DBC APIs, there are multiple places that could put values into the reactor contexts.
 This example illustrates what context values are available in the corresponding callback APIs.</p>
@@ -1415,7 +1415,7 @@ This example illustrates what context values are available in the corresponding 
 </div>
 </div>
 <div class="sect2">
-<h3>7.2. Micrometer Observation support</h3>
+<h3 id="features_micrometer-observation-support"><a class="anchor" href="#features_micrometer-observation-support"></a>7.2. Micrometer Observation support</h3>
 <div class="paragraph">
 <p>R2DBC Proxy has an optional dependency on Micrometer to provide <a href="https://micrometer.io/docs/observation">Micrometer Observation</a> support.
 The <code>ObservationProxyExecutionListener</code> creates observations for query executions.</p>
@@ -1689,7 +1689,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 <div id="footer">
 <div id="footer-text">
 Version 1.1.6.BUILD-SNAPSHOT<br>
-Last updated 2025-05-06 05:09:58 UTC
+Last updated 2025-05-06 05:13:21 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
