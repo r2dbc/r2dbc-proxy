@@ -185,7 +185,11 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <h4>beforeMethod</h4>
 <pre>default&nbsp;void&nbsp;beforeMethod(<a href="../../../../io/r2dbc/proxy/core/MethodExecutionInfo.html" title="interface in io.r2dbc.proxy.core">MethodExecutionInfo</a>&nbsp;executionInfo)</pre>
-<div class="block">Called before every invocation of methods.</div>
+<div class="block">Called before every invocation of methods.
+ <p>
+ Exception Handling:
+ Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html?is-external=true#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>executionInfo</code> - method execution context</dd>
@@ -199,7 +203,11 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <h4>afterMethod</h4>
 <pre>default&nbsp;void&nbsp;afterMethod(<a href="../../../../io/r2dbc/proxy/core/MethodExecutionInfo.html" title="interface in io.r2dbc.proxy.core">MethodExecutionInfo</a>&nbsp;executionInfo)</pre>
-<div class="block">Called after every invocation of methods.</div>
+<div class="block">Called after every invocation of methods.
+ <p>
+ Exception Handling:
+ Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html?is-external=true#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>executionInfo</code> - method execution context</dd>
@@ -216,7 +224,11 @@ var activeTableTab = "activeTableTab";
 <div class="block">Called before executing a query (<code>Batch.execute()</code> or <code>Statement.execute()</code>).
  <p>
  Note: this callback is called when the publisher, result of the <code>execute()</code>, is being
- subscribed. Not at the time of <code>execute()</code> is called,</div>
+ subscribed. Not at the time of <code>execute()</code> is called,
+ <p>
+ Exception Handling:
+ Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html?is-external=true#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>execInfo</code> - query execution context</dd>
@@ -245,7 +257,11 @@ var activeTableTab = "activeTableTab";
  the duration since <a href="../../../../io/r2dbc/proxy/listener/ProxyExecutionListener.html#beforeQuery-io.r2dbc.proxy.core.QueryExecutionInfo-"><code>beforeQuery(QueryExecutionInfo)</code></a>.
  <p>
  Note: this callback is called when the publisher, result of the <code>execute()</code>, is being
- subscribed. Not at the time of <code>execute()</code> is called,</div>
+ subscribed. Not at the time of <code>execute()</code> is called,
+ <p>
+ Exception Handling:
+ Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html?is-external=true#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>execInfo</code> - query execution context</dd>
@@ -264,7 +280,11 @@ var activeTableTab = "activeTableTab";
  While processing query results <code>Result</code>, this callback
  is called per result.
  <p>
- <a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getCurrentMappedResult--"><code>QueryExecutionInfo.getCurrentMappedResult()</code></a> contains the mapped result.</div>
+ <a href="../../../../io/r2dbc/proxy/core/QueryExecutionInfo.html#getCurrentMappedResult--"><code>QueryExecutionInfo.getCurrentMappedResult()</code></a> contains the mapped result.
+ <p>
+ Exception Handling:
+ Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html?is-external=true#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>execInfo</code> - query execution context</dd>

@@ -83,9 +83,9 @@
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#">1. Accessing reactor context values</a>
+<li><a href="#features_accessing-reactor-context-values">1. Accessing reactor context values</a>
 <ul class="sectlevel2">
-<li><a href="#">1.1. Available ContextView scopes</a></li>
+<li><a href="#features_available-contextview-scopes">1.1. Available ContextView scopes</a></li>
 </ul>
 </li>
 <li><a href="#">2. Micrometer Observation support</a>
@@ -112,7 +112,7 @@
 </div>
 <div id="content">
 <div class="sect1">
-<h2>1. Accessing reactor context values</h2>
+<h2 id="features_accessing-reactor-context-values"><a class="anchor" href="#features_accessing-reactor-context-values"></a>1. Accessing reactor context values</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>In the callbacks, <code>ValueSource</code> contains a reactor&#8217;s <code>ContextView</code> object under <code>ContextView.class</code> key.
@@ -131,7 +131,7 @@ public void beforeQuery(QueryExecutionInfo execInfo) {
 </div>
 </div>
 <div class="sect2">
-<h3>1.1. Available ContextView scopes</h3>
+<h3 id="features_available-contextview-scopes"><a class="anchor" href="#features_available-contextview-scopes"></a>1.1. Available ContextView scopes</h3>
 <div class="paragraph">
 <p>While interacting with R2DBC APIs, there are multiple places that could put values into the reactor contexts.
 This example illustrates what context values are available in the corresponding callback APIs.</p>
@@ -296,6 +296,29 @@ Since the dependency is optional, users need to explicit add the <code>micromete
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">Virtual Thread Environment</div>
+<div class="paragraph">
+<p>The default <code>QueryObservationConvention</code> includes the thread name as a low-cardinality tag in spans.</p>
+</div>
+<div class="paragraph">
+<p>In a virtual thread environment, each thread has a unique name.
+As a result, tagging thread names as a low-cardinality key-value can lead to cardinality explosion in tracing backends.</p>
+</div>
+<div class="paragraph">
+<p>To avoid this, use <code>VirtualThreadQueryObservationConvention</code>, a subclass of <code>QueryObservationConvention</code>, which omits the thread name tag.
+This convention is recommended when running in a virtual thread environment.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="observability-metrics"><a class="anchor" href="#observability-metrics"></a>2.2. Observability - Metrics</h3>
@@ -389,39 +412,6 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. High cardinality Keys</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>Name</p>
-</div></div></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>Description</p>
-</div></div></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p><code>r2dbc.params[%s]</code> <em>(required)</em></p>
-</div></div></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>Query parameter values. (since the name contains <code>%s</code> the final value will be resolved at runtime)</p>
-</div></div></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p><code>r2dbc.query[%s]</code> <em>(required)</em></p>
-</div></div></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>Name of the R2DBC query. (since the name contains <code>%s</code> the final value will be resolved at runtime)</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 <div class="paragraph">
 <p>Since, events were set on this documented entry, they will be converted to the following counters.</p>
 </div>
@@ -473,7 +463,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </table>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. Tag Keys</caption>
+<caption class="title">Table 3. Tag Keys</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -502,7 +492,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. Event Values</caption>
+<caption class="title">Table 4. Event Values</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -525,7 +515,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-02 00:10:56 UTC
+Last updated 2025-05-06 05:09:58 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
