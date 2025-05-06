@@ -39,7 +39,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <r2dbc-spi.version>1.0.0.RELEASE</r2dbc-spi.version>
-        <reactor-bom.version>2022.0.18</reactor-bom.version>
+        <reactor-bom.version>2022.0.22</reactor-bom.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <mockito.version>4.11.0</mockito.version>
         <micrometer-bom.version>1.10.13</micrometer-bom.version>
