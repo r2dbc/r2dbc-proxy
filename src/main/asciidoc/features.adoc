@@ -1,6 +1,7 @@
 [[features]]
 = Features
 
+[[features_accessing-reactor-context-values]]
 == Accessing reactor context values
 
 In the callbacks, `ValueSource` contains a reactor's `ContextView` object under `ContextView.class` key.
@@ -18,6 +19,7 @@ public void beforeQuery(QueryExecutionInfo execInfo) {
 }
 ----
 
+[[features_available-contextview-scopes]]
 === Available ContextView scopes
 
 While interacting with R2DBC APIs, there are multiple places that could put values into the reactor contexts.
@@ -94,6 +96,18 @@ Since the dependency is optional, users need to explicit add the `micrometer-obs
 For Spring Boot 3, a separate project, _TBD_, provides auto-configuration for this.
 
 include::../../../target/observation-docs//_conventions.adoc[]
+[IMPORTANT]
+.Virtual Thread Environment
+====
+The default `QueryObservationConvention` includes the thread name as a low-cardinality tag in spans.
+
+In a virtual thread environment, each thread has a unique name.
+As a result, tagging thread names as a low-cardinality key-value can lead to cardinality explosion in tracing backends.
+
+To avoid this, use `VirtualThreadQueryObservationConvention`, a subclass of `QueryObservationConvention`, which omits the thread name tag.
+This convention is recommended when running in a virtual thread environment.
+====
+
 include::../../../target/observation-docs/_metrics.adoc[]
 include::../../../target/observation-docs/_spans.adoc[]
 
