@@ -1,6 +1,15 @@
 R2DBC Proxy Changelog
 =============================
 
+1.1.6.RELEASE
+------------------
+* Improve Exception Handling in ProxyExecutionListener #154
+* Make enums in R2dbcObservationDocumentation public #153
+* Add VirtualThreadQueryObservationConvention #149
+* Fix nullability in ConnectionInfo #151
+* Upgrade to reactor-bom 2022.0.22 #155
+* Upgrade to micrometer-docs-generator 1.0.4 #156
+
 1.1.5.RELEASE
 ------------------
 * Add getters to ProxyConnectionFactory.Builder #146
