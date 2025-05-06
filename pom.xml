@@ -46,7 +46,7 @@
         <micrometer-tracing-bom.version>1.0.12</micrometer-tracing-bom.version>
 
         <!-- For micrometer-docs-generator  -->
-        <micrometer-docs-generator.version>1.0.2</micrometer-docs-generator.version>
+        <micrometer-docs-generator.version>1.0.4</micrometer-docs-generator.version>
         <micrometer-docs-generator.inputPath>${basedir}/src/main/java/io/r2dbc/proxy/observation/</micrometer-docs-generator.inputPath>
         <micrometer-docs-generator.inclusionPattern>.*</micrometer-docs-generator.inclusionPattern>
         <micrometer-docs-generator.outputPath>${basedir}/target/observation-docs/</micrometer-docs-generator.outputPath>
