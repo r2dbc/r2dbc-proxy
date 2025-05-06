@@ -19,7 +19,6 @@ public void beforeQuery(QueryExecutionInfo execInfo) {
 }
 ----
 
-[[features_available-contextview-scopes]]
 === Available ContextView scopes
 
 While interacting with R2DBC APIs, there are multiple places that could put values into the reactor contexts.
@@ -70,7 +69,7 @@ Mono.from(connectionFactory.create()).contextWrite(context -> context.put("foo",
 * `MethodExecutionInfo#getValueStore` for `get` has no `ContextView`
 * `ConnectionInfo#getValueStore` for all methods(`create`, `createStatement`, `bind`, `execute`, `map`, `get`) have a `ContextView` that holds keys - `foo` and `baz`
 
-
+[[features_micrometer-observation-support]]
 == Micrometer Observation support
 R2DBC Proxy has an optional dependency on Micrometer to provide https://micrometer.io/docs/observation[Micrometer Observation] support.
 The `ObservationProxyExecutionListener` creates observations for query executions.
