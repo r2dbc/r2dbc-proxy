@@ -97,6 +97,11 @@ public final class ResultCallbackHandler extends CallbackHandlerSupport {
 
         Object invocationResult = proceedExecution(method, this.result, args, this.proxyConfig.getListeners(), connectionInfo, null);
 
+        if ("filter".equals(methodName)) {
+            // A filtered result belongs to the same query and must retain its consumption tracking.
+            return this.proxyConfig.getProxyFactory().wrapResult((Result) invocationResult, this.queryExecutionInfo, this.queriesExecutionContext);
+        }
+
         if (isMapRowMethod || "flatMap".equals(methodName) || "getRowsUpdated".equals(methodName)) {
             Function<? super Publisher<Object>, ? extends Publisher<Object>> transformer =
                 Operators.liftPublisher((pub, subscriber) ->
