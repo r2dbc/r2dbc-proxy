@@ -2,10 +2,10 @@
 = Features
 
 [[features_accessing-reactor-context-values]]
-== Accessing reactor context values
+== Accessing Reactor Context Values
 
-In the callbacks, `ValueSource` contains a reactor's `ContextView` object under `ContextView.class` key.
-This provides a readonly access to the reactor context.
+In the callbacks, `ValueSource` contains a Reactor `ContextView` object under the `ContextView.class` key.
+This provides read-only access to the Reactor context.
 
 [source,java]
 ----
@@ -19,10 +19,10 @@ public void beforeQuery(QueryExecutionInfo execInfo) {
 }
 ----
 
-=== Available ContextView scopes
+=== Available `ContextView` scopes
 
-While interacting with R2DBC APIs, there are multiple places that could put values into the reactor contexts.
-This example illustrates what context values are available in the corresponding callback APIs.
+As you interact with R2DBC APIs, values may be written to Reactor contexts in several places. The following
+example shows which context values are available in the corresponding callback APIs.
 
 [source,java]
 ----
@@ -39,7 +39,7 @@ Mono.from(connectionFactory.create()).contextWrite(context -> context.put("foo",
     ...
 ----
 
-<1>  Context for connection
+<1>  Context for the connection
 <2>  Context for query execution
 <3>  Context for result-set retrieval
 <4>  Context for the entire flow
@@ -47,34 +47,35 @@ Mono.from(connectionFactory.create()).contextWrite(context -> context.put("foo",
 *BindParameterConverter#onCreateStatement*
 
 * `StatementInfo#getValueStore` has no `ContextView`
-* `ConnectionInfo#getValueStore` has a `ContextView` that holds keys - `foo` and `baz`
+* `ConnectionInfo#getValueStore` has a `ContextView` containing keys `foo` and `baz`
 
 *BindParameterConverter#onBind*
 
 * `StatementInfo#getValueStore` has no `ContextView`
-* `ConnectionInfo#getValueStore` has a `ContextView` that holds keys - `foo` and `baz`
+* `ConnectionInfo#getValueStore` has a `ContextView` containing keys `foo` and `baz`
 
 *ProxyExecutionListener#[before|after]Query*
 
-* `QueryExecutionInfo#getValueStore` has a `ContextView` that holds keys - `bar` and `baz`
-* `ConnectionInfo#getValueStore` has a `ContextView` that holds keys - `foo` and `baz`
+* `QueryExecutionInfo#getValueStore` has a `ContextView` containing keys `bar` and `baz`
+* `ConnectionInfo#getValueStore` has a `ContextView` containing keys `foo` and `baz`
 
 *ProxyExecutionListener#[before|after]Method*
 
-* `MethodExecutionInfo#getValueStore` for `create` has a `ContextView` that holds keys - `foo` and `baz`
+* `MethodExecutionInfo#getValueStore` for `create` has a `ContextView` containing keys `foo` and `baz`
 * `MethodExecutionInfo#getValueStore` for `createStatement` has no `ContextView`
 * `MethodExecutionInfo#getValueStore` for `bind` has no `ContextView`
-* `MethodExecutionInfo#getValueStore` for `execute` has a `ContextView` that holds keys - `bar` and `baz`
-* `MethodExecutionInfo#getValueStore` for `map` has a `ContextView` that holds keys - `baz` and `qux`
+* `MethodExecutionInfo#getValueStore` for `execute` has a `ContextView` containing keys `bar` and `baz`
+* `MethodExecutionInfo#getValueStore` for `map` has a `ContextView` containing keys `baz` and `qux`
 * `MethodExecutionInfo#getValueStore` for `get` has no `ContextView`
-* `ConnectionInfo#getValueStore` for all methods(`create`, `createStatement`, `bind`, `execute`, `map`, `get`) have a `ContextView` that holds keys - `foo` and `baz`
+* `ConnectionInfo#getValueStore` for all methods (`create`, `createStatement`, `bind`, `execute`, `map`, `get`) has a `ContextView` containing keys `foo` and `baz`
 
 [[features_micrometer-observation-support]]
-== Micrometer Observation support
-R2DBC Proxy has an optional dependency on Micrometer to provide https://micrometer.io/docs/observation[Micrometer Observation] support.
-The `ObservationProxyExecutionListener` creates observations for query executions.
+== Micrometer Observation Support
 
-.Configuration Sample
+R2DBC Proxy has an optional dependency on Micrometer to provide https://micrometer.io/docs/observation[Micrometer Observation] support.
+The `ObservationProxyExecutionListener` creates observations for query execution.
+
+.Configuration sample
 [source,java]
 ----
 ConnectionFactory connectionFactory = ...
@@ -83,16 +84,18 @@ String r2dbcUrl = ...
 
 ObservationProxyExecutionListener listener = new ObservationProxyExecutionListener(
 observationRegistry, connectionFactory, r2dbcUrl);
-listener.setIncludeParameterValues(true);  // to include binding params (default is false)
+listener.setIncludeParameterValues(true);  // include binding params (default is false)
 
 ConnectionFactory proxyConnectionFactory = ProxyConnectionFactory.builder(connectionFactory)
-.listener(listener).build();
+    .listener(listener)
+    .build();
 ----
 
-All https://micrometer.io/docs/observation[Micrometer Observation] implementation classes are located under the `io.r2dbc.proxy.observation` package.
-Since the dependency is optional, users need to explicit add the `micrometer-observation` dependency.
+All https://micrometer.io/docs/observation[Micrometer Observation] implementation classes live in the
+`io.r2dbc.proxy.observation` package. Because this dependency is optional, users must explicitly add the
+`micrometer-observation` dependency.
 
-For Spring Boot 3, a separate project, _TBD_, provides auto-configuration for this.
+For Spring Boot 3, a separate project, _TBD_, provides auto-configuration.
 
 include::../../../target/observation-docs//_conventions.adoc[]
 [IMPORTANT]
@@ -100,11 +103,11 @@ include::../../../target/observation-docs//_conventions.adoc[]
 ====
 The default `QueryObservationConvention` includes the thread name as a low-cardinality tag in spans.
 
-In a virtual thread environment, each thread has a unique name.
-As a result, tagging thread names as a low-cardinality key-value can lead to cardinality explosion in tracing backends.
+In a virtual-thread environment, each thread has a unique name. As a result, tagging thread names as a
+low-cardinality key-value pair can lead to cardinality explosion in tracing backends.
 
-To avoid this, use `VirtualThreadQueryObservationConvention`, a subclass of `QueryObservationConvention`, which omits the thread name tag.
-This convention is recommended when running in a virtual thread environment.
+To avoid this, use `VirtualThreadQueryObservationConvention`, a subclass of `QueryObservationConvention`,
+which omits the thread-name tag. This convention is recommended when running in a virtual-thread environment.
 ====
 
 include::../../../target/observation-docs/_metrics.adoc[]

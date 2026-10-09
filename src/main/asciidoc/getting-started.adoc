@@ -15,7 +15,8 @@ Artifacts are available on https://search.maven.org/search?q=r2dbc-proxy[Maven C
 </dependency>
 ----
 
-If you'd rather like the latest snapshots of the upcoming major version, use the Maven snapshot repository and declare the appropriate dependency version.
+If you prefer to use the latest snapshot of the upcoming major version, add the Maven snapshot repository
+and declare the appropriate dependency version.
 
 [source,xml]
 ----
@@ -35,13 +36,13 @@ If you'd rather like the latest snapshots of the upcoming major version, use the
 [[getting-started_native-image]]
 == Native Image Support
 
-R2DBC Proxy supports https://www.graalvm.org/reference-manual/native-image/[GraalVM native-image].
-The proxy creation uses the JDK dynamic proxy by default.
-They need a configuration in the native image environment.
+R2DBC Proxy supports https://www.graalvm.org/reference-manual/native-image/[GraalVM native image].
+Proxy creation uses the JDK dynamic proxy by default, and this requires appropriate configuration in the
+native-image environment.
 
-R2DBC proxy jar ships with the following configuration files:
+The R2DBC Proxy JAR ships with the following configuration files:
 
 * `META-INF/native-image/io.r2dbc/r2dbc-proxy/native-image.properties`
 * `META-INF/native-image/io.r2dbc/r2dbc-proxy/proxy-config.json`
 
-The native image build automatically detects these https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file[embedded configuration files] and sets up the dynamic proxy usage for R2DBC Proxy.
+The native-image build automatically detects these https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file[embedded configuration files] and configures dynamic proxy support for R2DBC Proxy.

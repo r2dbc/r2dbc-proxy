@@ -1,62 +1,56 @@
 [[overview]]
 = Overview
 
-R2DBC Proxy is a framework that generates proxies to R2DBC SPI objects via `ProxyConnectionFactory`
-and provides callbacks to the method and query invocations.
+R2DBC Proxy is a framework that generates proxies for R2DBC SPI objects through `ProxyConnectionFactory`
+and provides callbacks for method and query invocations.
 
-R2DBC Proxy is a thin transparent layer.
-From callers(application or another library), proxies are simply viewed as R2DBC SPI objects.
-This is similar to how connection pooling is viewed from upper layer.
+R2DBC Proxy is a thin, transparent layer. To callers (applications or other libraries), the proxies
+look like ordinary R2DBC SPI objects. This is similar to how connection pooling appears to the upper layer.
 
-This section describes the key concepts of the R2DBC Proxy:
+This section describes the key concepts of R2DBC Proxy:
 
 - <<overview_proxies>>
 - <<overview_listeners>>
 - <<overview_formatters>>
 - <<overview_converters>>
 
-
 [[overview_proxies]]
 == Proxies
 
-Each SPI object(`Connection`, `Statement`, `Batch`, `Result`, and `Row`) created by `ProxyConnectionFactory`
+Each SPI object (`Connection`, `Statement`, `Batch`, `Result`, and `Row`) created by `ProxyConnectionFactory`
 is wrapped by a proxy.
 
-When a caller invokes a method on the proxy, it triggers corresponding callback methods on the registered listeners.
-
+When a caller invokes a method on the proxy, it triggers the corresponding callback methods on the
+registered listeners.
 
 [[overview_listeners]]
 == Listeners
 
-Listeners are the callback implementation.
-Each listener implements the `ProxyExecutionListener` interface, which defines
-`[before|after]Query`, `[before|after]Method`, and `eachQueryResult` methods.
+Listeners are callback implementations. Each listener implements the `ProxyExecutionListener` interface,
+which defines `beforeQuery`, `afterQuery`, `beforeMethod`, `afterMethod`, and `eachQueryResult` methods.
 
-When triggered, these callback methods receive contextual information as a parameter.
-The `MethodExecutionInfo` is a parameter that contains the information about the invoked method, and the
-`QueryExecutionInfo` holds the information of the query execution.
+When triggered, these callback methods receive contextual information as parameters. `MethodExecutionInfo`
+contains details about the invoked method, while `QueryExecutionInfo` contains details about the query
+execution.
 
-Users would write a listener implementation to perform custom actions.
-
+Applications can implement custom listeners to perform specific actions.
 
 [[overview_formatters]]
 == Formatters
 
-One of the main action performed by a listener is logging.
-When a listener received a callback, the passed contextual information
-requires a transformation to a `String` in order to be an entry for the logging.
+One of the primary uses of a listener is logging. When a listener receives a callback, the contextual
+information must be transformed into a `String` that can be written to a log.
 
-Formatters are utility classes that covert `MethodExecutionInfo` and `QueryExecutionInfo` to `String`.
+Formatters are utility classes that convert `MethodExecutionInfo` and `QueryExecutionInfo` into strings.
 
-`QueryExecutionInfoFormatter` and `MethodExecutionInfoFormatter` are available out of the box
-to transform `QueryExecutionInfo` and `MethodExecutionInfo`, respectively.
+`QueryExecutionInfoFormatter` and `MethodExecutionInfoFormatter` are available out of the box to transform
+`QueryExecutionInfo` and `MethodExecutionInfo`, respectively.
 
 [[overview_converters]]
 == Converters
 
-Converters are the callbacks that could alter the original invocation.
+Converters are callback hooks that can alter the original invocation.
 
-Currently, `BindParameterConverter` and `ResultRowConverter` are available.
-They represent bind operations(`Statement#[bind|bindNull]`) and result row get operations(`Row#get`), respectively.
-The converters can change the result, call alternative methods, or even not invoke the originally
-called method.
+Currently, `BindParameterConverter` and `ResultRowConverter` are available. They represent bind
+operations (`Statement#[bind|bindNull]`) and result-row access operations (`Row#get`), respectively.
+The converters can change the result, call alternative methods, or even skip invoking the original method.

@@ -9,22 +9,21 @@ To obtain a proxy `ConnectionFactory`, R2DBC Proxy provides two mechanisms:
 [[setup_connection-factory-discovery]]
 == Connection Factory Discovery
 
-R2DBC specifies two types of connection factory discovery, <<setup_connection-factory-discovery_url-based>> and
-<<setup_connection-factory-discovery_programmatic>>.
-R2DBC Proxy supports both with `proxy` as the driver identifier.
+R2DBC defines two connection-factory discovery mechanisms: <<setup_connection-factory-discovery_url-based>>
+and <<setup_connection-factory-discovery_programmatic>>. R2DBC Proxy supports both, using `proxy` as the
+driver identifier.
 
 [[setup_connection-factory-discovery_url-based]]
 === URL-based
 
-When a connection URL contains `proxy` in its driver segment, `ConnectionFactories`
-delegates the `protocol` segment(required) to the another connection
-discovery.(pass-through) Then, it wraps the returned `ConnectionFactory` with a proxy.
+When a connection URL contains `proxy` in its driver segment, `ConnectionFactories` delegates the required
+`protocol` segment to another connection-factory discovery mechanism (a pass-through). It then wraps the
+returned `ConnectionFactory` in a proxy.
 
 [source]
 ----
 r2dbc:proxy:<my-driver>://<host>:<port>/<database>[?proxyListener=<fqdn>]
 ----
-
 
 [source]
 .Examples
@@ -39,11 +38,11 @@ r2dbc:proxy:pool:postgresql://localhost:5432/myDB?proxyListener=com.example.MyLi
 [[setup_connection-factory-discovery_programmatic]]
 === Programmatic
 
-Another variant of the `ConnectionFactory` discovery is a programmatic creation of the `ConnectionFactoryOptions`.
+Another way to discover a `ConnectionFactory` is to construct `ConnectionFactoryOptions` programmatically.
 
-Same as URL based discovery, when the DRIVER Option is `proxy`, it delegates PROTOCOL Option(required)
-to another connection factory discovery request. The result of delegated discovery
-request is wrapped by a proxy.
+As with URL-based discovery, when the `DRIVER` option is `proxy`, it delegates the required `PROTOCOL`
+option to another connection-factory discovery request. The resulting `ConnectionFactory` is then wrapped
+by a proxy.
 
 [source,java]
 ----
@@ -64,23 +63,22 @@ Mono<Connection> connection = connectionFactory.create();
 | Option | Description
 
 | `driver` | Must be `proxy`
-| `protocol` | Delegating connection factory driver
-| `proxyListener` | Comma separated list of fully qualified proxy listener class names  _(Optional)_
+| `protocol` | Delegating connection-factory driver
+| `proxyListener` | Comma-separated list of fully qualified proxy listener class names _(optional)_
 |===
 
-When programmatically construct `ConnectionFactoryOptions`, in addition to the "comma separated listener class FQDN",
-`proxyListener` option allows following values:
+When constructing `ConnectionFactoryOptions` programmatically, the `proxyListener` option supports the
+following values in addition to a comma-separated list of fully qualified listener class names:
 
-- Proxy listener class (java `Class` object)
-- Proxy listener instance
-- `Collection` of above
-
+- A proxy listener class (`java.lang.Class`)
+- A proxy listener instance
+- A `Collection` containing either of the above
 
 [[setup_programmatic-proxy-construction]]
 == Programmatic Proxy Construction
 
-`ProxyConnectionFactory` provides a builder to construct a proxy `ConnectionFactory`.
-The builder has methods to register concrete and adhoc listeners.
+`ProxyConnectionFactory` provides a builder for constructing a proxy `ConnectionFactory`. The builder can
+register concrete and ad-hoc listeners.
 
 [source,java]
 ----
@@ -88,12 +86,11 @@ ConnectionFactory original = ...
 
 ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
     .onAfterQuery(queryInfo ->
-        ...  // after query callback logic
+        ...  // after-query callback logic
     )
     .onBeforeMethod(methodInfo ->
-        ...  // before method callback logic
+        ...  // before-method callback logic
     )
     .listener(...)  // add listener
     .build();
-
 ----

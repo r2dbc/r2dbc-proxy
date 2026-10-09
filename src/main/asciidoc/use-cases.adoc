@@ -1,5 +1,5 @@
 [[use-cases]]
-= Use cases
+= Use Cases
 :datasource-proxy: https://github.com/ttddyy/datasource-proxy
 :slow-query-doc: https://jdbc-observations.github.io/datasource-proxy/docs/current/user-guide/index.html#_slow_query_logging_listener
 :r2dbc-proxy-samples: https://github.com/ttddyy/r2dbc-proxy-examples
@@ -7,16 +7,16 @@
 :MetricsExecutionListener: https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java
 
 [[use-cases_query-logging]]
-== Query logging
+== Query Logging
 
-At the query executions, registered proxy listeners receive query callbacks,
-`[before|after]Query` methods with `QueryExecutionInfo` parameter.
-This parameter contains contextual information about the query execution, such as query string, execution type, bindings, execution time, etc.
+At query execution time, registered proxy listeners receive query callbacks via the `[before|after]Query`
+methods with a `QueryExecutionInfo` parameter. This object contains contextual information about the query,
+including the SQL text, execution type, bindings, execution time, and more.
 
-With the `QueryExecutionInfoFormatter`, which converts `QueryExecutionInfo` to `String`, users can easily
-perform query logging.
+With `QueryExecutionInfoFormatter`, which converts `QueryExecutionInfo` to a `String`, users can easily perform
+query logging.
 
-.Sample Output (wrapped for display purpose)
+.Sample output (wrapped for display purposes)
 [source,sql]
 ----
 # Statement with no bindings
@@ -49,74 +49,72 @@ Query:["INSERT INTO test VALUES ($1,$2)"], Bindings:[(100,101),(200,null(int))]
 
 To perform query logging:
 
-. Create a `QueryExecutionInfoFormatter`
-. Use the formatter in after-query callback to convert `QueryExecutionInfo` to a `String` log entry.
-. Pass it to the logger.
+. Create a `QueryExecutionInfoFormatter`.
+. Use the formatter in the after-query callback to convert `QueryExecutionInfo` into a log entry.
+. Pass the formatted value to your logger.
 
-The **before** query callback(`beforeQuery`) can also perform query logging; however, some attributes are only
-available in the **after** query callback(`afterQuery`) such as execution time, success or failure,
-result count, etc.
+The **before** query callback (`beforeQuery`) can also log queries, but some attributes are only available in
+the **after** query callback (`afterQuery`), such as execution time, success/failure status, and result count.
 
 [source,java]
 ----
 QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
 
 ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)    // wrap original ConnectionFactory
+  ProxyConnectionFactory.builder(connectionFactory)    // wrap the original ConnectionFactory
                                                        // on every query execution
     .onAfterQuery(execInfo ->
-      logger.info(formatter.format(execInfo));         // convert & log
+        logger.info(formatter.format(execInfo))         // convert and log
+    )
     .build();
 ----
-
 
 [[use-cases_slow-query-detection]]
 == Slow Query Detection
 
-There are two approaches to detect slow queries:
+There are two common approaches to detect slow queries:
 
 During execution::
-Detect slow queries *while* they are running. A watcher can notify when a query has run longer than the threshold,
-even if it has not finished yet. This approach is sometimes called _preemptive_, but it only notifies about the query;
-the running query is not interrupted or cancelled.
-In {datasource-proxy}[datasource-proxy], {slow-query-doc}[`SlowQueryListener`] uses this approach.
+Detect slow queries *while* they are running. A watcher can notify when a query exceeds the threshold,
+even if it has not finished yet. This approach is sometimes called _preemptive_, but it only reports the
+query; the running query is not interrupted or canceled. In {datasource-proxy}[datasource-proxy],
+{slow-query-doc}[`SlowQueryListener`] follows this approach.
 
 After execution::
-Detect slow queries *after* they have finished. The `onAfterQuery` callback can compare the query execution time with
-the threshold. This is a simple approach that can be implemented with a `QueryExecutionListener`. This approach is
-sometimes called _non-preemptive_.
+Detect slow queries *after* they complete. The `onAfterQuery` callback can compare query execution time with
+a threshold. This is a simple and effective approach for many applications. It is sometimes called
+_non-preemptive_.
 
-Both approaches can be used together: use a watcher for an early notice of long-running queries and an `onAfterQuery`
-callback to record their actual execution time.
+Both approaches can be used together: use a watcher for early notice of long-running queries and an
+`onAfterQuery` callback to record the actual execution time.
 
 [[use-cases_slow-query-detection_sample-configuration]]
 === Sample Configuration (After Execution)
 
-After query execution, check whether the query execution time has exceeded the threshold, then perform an action.
+After a query completes, check whether the execution time exceeds the threshold and then perform an action.
 
 [source,java]
 ----
 Duration threshold = Duration.of(...);
 
 ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
+  ProxyConnectionFactory.builder(connectionFactory)  // wrap the original ConnectionFactory
     .onAfterQuery(execInfo -> {
-       if(threshold.minus(execInfo.getExecuteDuration()).isNegative()) {
-         // slow query logic
+       if (threshold.minus(execInfo.getExecuteDuration()).isNegative()) {
+         // slow-query logic
        }
     })
     .build();
 ----
 
-
 [[use-cases_method-tracing]]
 == Method Tracing
 
-When a caller invokes a method on the proxy classes(`ConnectionFactory`, `Connection`, `Batch`, `Statement`, or `Result`),
-the registered listeners receive callbacks before and after the target method invocation.
+When a caller invokes a method on the proxy classes (`ConnectionFactory`, `Connection`, `Batch`, `Statement`,
+or `Result`), the registered listeners receive callbacks before and after the target method invocation.
 
-By logging each contextual information of the invoked method, essentially this shows the caller's interactions
-with R2DBC SPI objects.
+By logging the contextual information of each invoked method, you can effectively observe the caller's
+interaction with the R2DBC SPI objects.
 
 .Sample: Method tracing with transactional calls
 [source,sql]
@@ -134,48 +132,48 @@ with R2DBC SPI objects.
 [[use-cases_sample-configuration]]
 === Sample Configuration
 
-At `[before|after]Method` callbacks, perform an action such as printing out the invoked method,
+In `[before|after]Method` callbacks, you can perform actions such as printing the invoked method,
 creating a span, or updating metrics.
 
-`MethodExecutionInfoFormatter` converts the `MethodExecutionInfo` to `String` for creating a logging entry.
+`MethodExecutionInfoFormatter` converts `MethodExecutionInfo` into a `String` for log entries.
 
 [source,java]
 ----
 MethodExecutionInfoFormatter methodExecutionFormatter = MethodExecutionInfoFormatter.withDefault();
 
 ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
+  ProxyConnectionFactory.builder(connectionFactory)  // wrap the original ConnectionFactory
     // on every method invocation
     .onAfterMethod(execInfo ->
-      System.out.println(formatter.format(execInfo)))  // print out method execution (method tracing)
+      System.out.println(methodExecutionFormatter.format(execInfo))  // print method execution details
+    )
     .build();
-```
 ----
 
 [[use-cases_metrics]]
 == Metrics
 
-On method or query callbacks, update the metrics with the provided contextual information.
+In method or query callbacks, you can update metrics using the provided contextual information.
 
-For example:
+Examples include:
 
 - Number of opened connections
 - Number of rollbacks
 - Method execution time
 - Number of queries
-- Type of query (SELECT, DELETE, ...)
+- Query type (SELECT, DELETE, ...)
 - Query execution time
 - etc.
 
 [[use-cases_metrics_sample-implementation]]
 === Sample Implementation
 
-This sample {MetricsExecutionListener}[MetricsExecutionListener] implementation populates following metrics:
+This sample {MetricsExecutionListener}[MetricsExecutionListener] implementation populates the following metrics:
 
-- Time took to create a connection
+- Time taken to create a connection
 - Commit and rollback counts
 - Executed query count
-- Slow query count
+- Slow-query count
 
 In addition, this listener logs slow queries.
 
@@ -185,14 +183,13 @@ image::images/metrics-jmx-connection.png[Connection JMX]
 .Query metrics on JMX
 image::images/metrics-jmx-query.png[Query JMX]
 
-.Transaction metrics on Spring Boot actuator(`/actuator/metrics/r2dbc.transaction`)
+.Transaction metrics on Spring Boot actuator (`/actuator/metrics/r2dbc.transaction`)
 image::images/metrics-actuator-connection.png[Transaction Actuator]
-
 
 [[use-cases_distributed-tracing]]
 == Distributed Tracing
 
-Construct tracing spans in appropriate callbacks.
+Construct tracing spans in the appropriate callbacks.
 
 [[use-cases_distributed-tracing_sample-implementation]]
 === Sample implementation
@@ -202,66 +199,66 @@ This sample {TracingExecutionListener}[TracingExecutionListener] implementation 
 .Tracing
 image::images/zipkin-tracing-rollback.png[Tracing]
 
-.Connection Span
+.Connection span
 image::images/zipkin-span-connection.png[Connection Span]
 
-.Query Span
+.Query span
 image::images/zipkin-span-batch-query.png[Query Span]
 
 [[use-cases_assertion-verification]]
 == Assertion/Verification
 
-By inspecting invoked methods and/or executed queries, you can verify whether the logic you inspect has performed
-as expected.
+By inspecting invoked methods and/or executed queries, you can verify whether the logic under inspection has
+performed as expected.
 
-For example, by keeping track of connection open/close method calls, connection leaks can be
-detected or verified.
+For example, by tracking connection open/close calls, connection leaks can be detected or verified.
 
-Another example is to check the group of queries is executed on the same connection.
-This verifies the premise of the transaction - same connection needs to perform the queries in
-order for them to be in the same transaction.
-
+Another example is to check that a group of queries is executed on the same connection. This verifies the
+transaction assumption that the same connection must execute all of the queries in order for them to belong to
+one transaction.
 
 [[use-cases_own-action]]
 == Own Action (Custom Listener)
 
-Users can write own callback logic that performs any actions, such as audit logging, sending
-notifications, calling external system, etc.
+You can write custom callback logic to perform actions such as audit logging, sending notifications, or
+calling external systems.
 
 [[use-cases_own-action_implementing-custom-listener]]
-=== Implementing custom listener
+=== Implementing a Custom Listener
 
-In order to create a custom listener, simply implement `ProxyExecutionListener` or `ProxyMethodExecutionListener`
+To create a custom listener, implement the `ProxyExecutionListener` or `ProxyMethodExecutionListener`
 interface.
 
 [source,java]
 ----
 static class MyListener implements ProxyMethodExecutionListener {
-	@Override
-	public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
-		System.out.println("connection created");
-	}
+    @Override
+    public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+        System.out.println("connection created");
+    }
 }
 ----
 
 [[use-cases_support-primitive-and-null-in-result-mapping]]
-== Support Primitive and Null in Result Mapping
+== Support for Primitive and Null Values in Result Mapping
 
-To consume query results, `Result#map` method accepts a mapping function(`BiFunction`) that takes `Row` and `RowMetadata`.
+To consume query results, the `Result#map` method accepts a mapping function (`BiFunction`) that takes a `Row`
+and a `RowMetadata`.
 
 [source,java]
 ----
 result.map((row, rowMetadata) -> row.get("name", String.class));
 ----
 
-The `Row#get` method takes a `Class` in the second argument to represent the returning value type(data type).
-R2DBC spec does not support primitive types for this data type. Only boxed(wrapper) types are supported.
+The `Row#get` method accepts a `Class` as the second argument to represent the return value type (data type).
+The R2DBC specification does not support primitive types for this value type; only boxed (wrapper) types are
+supported.
 
-`ResultRowConverter` can provide support for primitive types by modifying the `Row#get` behavior.
+`ResultRowConverter` can provide support for primitive values by modifying the behavior of `Row#get`.
 
-The following converter transforms a primitive to a corresponding wrapper data type.
-(e.g. `row.get(0, int.class)` to `row.get(0, Integer.class)`) +
-Also, this converter handles `null` return value.
+The following converter transforms a primitive into the corresponding wrapper type.
+For example, `row.get(0, int.class)` becomes `row.get(0, Integer.class)`. This converter also handles a
+`null` return value.
 
 [source,java]
 ----
@@ -276,18 +273,19 @@ ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
     }
     return getOperation.proceed();
 };
-// implement `getWrapperType()` and `getDefaultValue()` with own strategy
+// implement `getWrapperType()` and `getDefaultValue()` with your own strategy
 
-// register to the ProxyConfig
+// register to ProxyConfig
 ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();
 ----
 
 [[use-cases_call-different-methods-in-result-mapping]]
-== Call different methods in Result Mapping
+== Calling Different Methods in Result Mapping
 
-By modifying the `Row#get` behavior with `ResultRowConverter`, the following converters support column names that do not exist.
+By modifying `Row#get` behavior with `ResultRowConverter`, you can support column names that do not exist or
+map them to derived values.
 
-.Support virtual/derived column
+.Support a virtual/derived column
 [source,java]
 ----
 ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
@@ -296,11 +294,11 @@ ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
        String lastName = proxyRow.get("last_name", String.class);
        return firstName + " " + lastName;
    }
-   return getOperation.proceed();   // invoke original method
-);
+   return getOperation.proceed();   // invoke the original method
+};
 ----
 
-.Support column name change
+.Support a renamed column
 [source,java]
 ----
 ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
@@ -308,8 +306,8 @@ ResultRowConverter converter = (proxyRow, method, args, getOperation) -> {
         if (args.length == 1) {
             return proxyRow.get("column_new");
         }
-        return proxyRow.get("column_new", (Class<?>)args[1]);
+        return proxyRow.get("column_new", (Class<?>) args[1]);
     }
-    return getOperation.proceed();   // invoke original method
-);
+    return getOperation.proceed();   // invoke the original method
+};
 ----

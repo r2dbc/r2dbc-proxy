@@ -6,10 +6,10 @@ This section explains the main components of R2DBC Proxy.
 [[components_proxyconnectionfactory]]
 == ProxyConnectionFactory
 
-This is the entry point to create a `ConnectionFactory` proxy.
+This is the entry point for creating a proxy `ConnectionFactory`.
 
-The `ProxyConnectionFactory#builder` static method creates a `Builder` instance, which provides
-methods to register listeners, configures the proxy, and generates a proxy `ConnectionFactory`.
+The static `ProxyConnectionFactory#builder` method creates a `Builder` instance, which provides methods to
+register listeners, configure the proxy, and generate a proxy `ConnectionFactory`.
 
 [source,java]
 ----
@@ -17,27 +17,28 @@ ConnectionFactory original = ...
 
 ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
     .onAfterQuery(queryInfo ->
-        ...  // after query callback logic
+        ...  // after-query callback logic
     )
     .onBeforeMethod(methodInfo ->
-        ...  // before method callback logic
+        ...  // before-method callback logic
     )
     .listener(...)  // add listener
     .build();
 ----
 
-Alternatively, the connection factory discovery can create a proxy when driver name is the `proxy`.
+Alternatively, connection-factory discovery can create a proxy when the driver name is `proxy`.
 
 [[components_proxyconfig]]
 == ProxyConfig
 
-Central configuration object for creating proxies.
+`ProxyConfig` is the central configuration object for creating proxies.
 
-A `ProxyConfig` instance holds the proxy related configurations, such as `ProxyExecutionListener`, `ProxyFactory`, or `BindParameterConverter`.
-Any proxy objects created by a proxy `ConnectionFactory` share the same `ProxyConfig` instance.
+A `ProxyConfig` instance holds proxy-related configuration, such as `ProxyExecutionListener`, `ProxyFactory`,
+and `BindParameterConverter`. Any proxy objects created by a proxy `ConnectionFactory` share the same
+`ProxyConfig` instance.
 
-`ProxyConnectionFactory.Builder` automatically creates a `ProxyConfig` internally.
-It also takes a custom `ProxyConfig` in case you need a customization.
+`ProxyConnectionFactory.Builder` automatically creates a `ProxyConfig` internally. It also accepts a custom
+`ProxyConfig` when you need to override or extend the defaults.
 
 [source,java]
 ----
@@ -51,15 +52,14 @@ ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original, p
 [[components_proxyfactory]]
 == ProxyFactory
 
-Strategy interface to create each proxy.
+`ProxyFactory` is the strategy interface used to create each proxy.
 
-The default proxy factory implementation(`JdkProxyFactory`) uses JDK dynamic proxy for creating proxy objects.
+The default implementation, `JdkProxyFactory`, uses the JDK dynamic proxy to create proxy objects.
 
-Providing a custom `ProxyFactory` allows different proxy mechanism for constructing proxies. For example,
-https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/java-agent-example/common/src/main/java/io/r2dbc/examples/agent/ByteBuddyProxyFactory.java[here is a sample code to
- use ByteBuddy for proxy creation].
+Providing a custom `ProxyFactory` allows a different proxy mechanism for constructing proxies. For example,
+https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/java-agent-example/common/src/main/java/io/r2dbc/examples/agent/ByteBuddyProxyFactory.java[here is a sample of using ByteBuddy for proxy creation].
 
-When you have a custom `ProxyFactory` implementation, `ProxyConfig` has a method to register it.
+When you provide a custom `ProxyFactory` implementation, `ProxyConfig` includes a method to register it.
 
 [source,java]
 ----
@@ -73,42 +73,42 @@ ProxyConfig proxyConfig = ProxyConfig.builder()
 [[components_proxyexecutionlistener]]
 == ProxyExecutionListener
 
-`ProxyExecutionListener` is the root listener interface which defines callbacks
-for method invocation, query execution, and query result processing.
+`ProxyExecutionListener` is the root listener interface that defines callbacks for method invocation,
+query execution, and query-result processing.
 
 [source,java]
-.Method defined on ProxyExecutionListener
+.Methods defined on ProxyExecutionListener
 ----
-// invoked before any method on proxy is called
+// invoked before any method on a proxy is called
 void beforeMethod(MethodExecutionInfo executionInfo);
 
-// invoked after any method on proxy is called
+// invoked after any method on a proxy is called
 void afterMethod(MethodExecutionInfo executionInfo);
 
-// invoked before query gets executed
+// invoked before a query is executed
 void beforeQuery(QueryExecutionInfo execInfo);
 
-// invoked after query is executed
+// invoked after a query is executed
 void afterQuery(QueryExecutionInfo execInfo);
 
-// invoked on processing(subscribing) each query result
+// invoked when each query result is processed (subscribed)
 void eachQueryResult(QueryExecutionInfo execInfo);
 ----
 
-Anytime a caller invokes a method on a proxy, it triggers method callbacks,`beforeMethod()` and `afterMethod()`.
-They receive a `QueryExecutionInfo` parameter which contains the contextual information about the invoked method.
+Whenever a caller invokes a method on a proxy, it triggers the method callbacks `beforeMethod()` and
+`afterMethod()`. They receive a `MethodExecutionInfo` parameter that contains contextual information about the
+invoked method.
 
-The query execution methods, `Batch#execute()` and `Statement#execute()`, trigger query callbacks, `beforeQuery()`
-and `afterQuery()`. (Specifically, it is called when returned result-publisher is subscribed.)
-They receive `QueryExecutionInfo` parameter which holds the executing query information such as the query strings,
-bound parameter values, duration of the query execution, etc.
+The query-execution methods, `Batch#execute()` and `Statement#execute()`, trigger the query callbacks
+`beforeQuery()` and `afterQuery()`. (Specifically, they are invoked when the returned result publisher is
+subscribed.) They receive a `QueryExecutionInfo` parameter that contains query details such as the SQL text,
+bound parameter values, and query duration.
 
-While processing a `Result` object, `eachQueryResult()` receives a callback on each mapped query result at the
-subscription of `Result#map()`.
+While processing a `Result`, `eachQueryResult()` is invoked for each mapped query result when `Result#map()`
+is subscribed.
 
-When a user has a custom `ProxyExecutionListener` implementation,
-`ProxyConnectionFactory.Builder` has a method to register the listener.
-In addition, the builder provides methods to directly register adhoc listeners.
+When you implement a custom `ProxyExecutionListener`, `ProxyConnectionFactory.Builder` provides a method to
+register it. In addition, the builder offers convenience methods for registering ad-hoc listeners.
 
 [source,java]
 ----
@@ -116,10 +116,10 @@ ConnectionFactory original = ...
 
 ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
     .onAfterQuery(queryInfo ->
-        ...  // after query callback logic
+        ...  // after-query callback logic
     )
     .onBeforeMethod(methodInfo ->
-        ...  // before method callback logic
+        ...  // before-method callback logic
     )
     .listener(...)  // add listener
     .build();
@@ -128,14 +128,13 @@ ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
 [[components_proxymethodexecutionlistener]]
 == ProxyMethodExecutionListener
 
-`ProxyMethodExecutionListener` is an extension of `ProxyExecutionListener`.
-In addition to the methods defined in `ProxyExecutionListener`, `ProxyMethodExecutionListener` has explicit
-before/after methods for all methods defined on `ConnectionFactory`, `Connection`, `Batch`,
-`Statement`, and `Result`.
+`ProxyMethodExecutionListener` is an extension of `ProxyExecutionListener`. In addition to the methods
+defined in `ProxyExecutionListener`, it adds explicit before/after methods for all methods on
+`ConnectionFactory`, `Connection`, `Batch`, `Statement`, and `Result`.
 
-Method names are based on the rule: _"[before|after]<method-name>On<class-name>"_.
+Method names follow the pattern: _"[before|after]<MethodName>On<ClassName>"_.
 
-For example, if you want to perform an action at the creation or close of a connection:
+For example, if you want to perform an action when a connection is created or closed:
 
 [source,java]
 ----
@@ -148,34 +147,32 @@ public class ConnectionStartToEndListener implements ProxyMethodExecutionListene
 
   @Override
   public void afterCloseOnConnection(MethodExecutionInfo methodExecutionInfo) {
-    // called after  Connection#close()
+    // called after Connection#close()
   }
-
 }
 ----
 
 [[components_formatters]]
 == Formatters
 
-One of the typical usages of the proxy listener is logging a contextual information.
-For example, when a query runs, logs the query string, parameters, success/failure result,
-query execution time, thread, etc.
+One common use of proxy listeners is logging contextual information. For example, when a query runs, a
+listener can log the SQL text, parameters, success/failure state, execution time, and thread information.
 
-Each callback method on `ProxyExecutionListener` receives contextual information - `QueryExecutionInfo` and `MethodExecutionInfo`.
-To perform logging, you need to transform `[Method|Query]ExecutionInfo` to the logging entries in a format of the `String`.
+Each callback method on `ProxyExecutionListener` receives contextual information such as `QueryExecutionInfo`
+and `MethodExecutionInfo`. To create log entries, you transform this data into a `String`.
 
-Formatter classes fill this gap. `QueryExecutionInfoFormatter` and `MethodExecutionInfoFormatter` are available out of the box.
-They provide user-friendly conversion methods, which transform selectively or all data in
-the `[Method|Query]ExecutionInfo` to a `String` with a default or customized format.
+Formatter classes fill this gap. `QueryExecutionInfoFormatter` and `MethodExecutionInfoFormatter` are
+available out of the box. They provide user-friendly conversion methods to transform all or selected parts of
+`[Method|Query]ExecutionInfo` into a `String` using default or custom formatting.
 
 [[components_formatters_queryexecutioninfoformatter]]
 === QueryExecutionInfoFormatter
 
-This class converts `QueryExecutionInfo` to `String`.
+This class converts `QueryExecutionInfo` to a `String`.
 
 [source,java]
 ----
-// convert all info
+// convert all information
 QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
 String str = formatter.format(queryExecutionInfo);
 
@@ -186,27 +183,27 @@ String str = formatter.format(queryExecutionInfo);
 [[components_formatters_methodexecutioninfoformatter]]
 === MethodExecutionInfoFormatter
 
-This class  converts `MethodExecutionInfo` to `String`.
+This class converts `MethodExecutionInfo` to a `String`.
 
 [source,java]
 ----
 MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
 
-// register as adhoc listener
-ProxyConnectionFactoryBuilder.create(connectionFactory)
+// register as an ad-hoc listener
+ProxyConnectionFactory.builder(connectionFactory)
   .onAfterMethod(execInfo ->
-     System.out.println(formatter.format(execInfo)))  // convert & print out to sysout
+     System.out.println(formatter.format(execInfo)))  // convert and print to stdout
   .build();
 ----
 
 [[components_formatters_customizing-formatter]]
 === Customizing Formatter
 
-`QueryExecutionInfoFormatter` and `MethodExecutionInfoFormatter` hold a list of consumers internally and loop
+`QueryExecutionInfoFormatter` and `MethodExecutionInfoFormatter` internally hold a list of consumers and loop
 through them to populate the output `StringBuilder`.
 
-Each consumer simply converts a portion of the `[Query|Method]ExecutionInfo` to `StringBuilder`.
-Formatting is customizable by toggling builtin converters and registering new consumers.
+Each consumer converts a portion of the `[Query|Method]ExecutionInfo` into a `StringBuilder`.
+Formatting is customizable by enabling or disabling built-in converters and by registering new consumers.
 
 [source,java]
 ----
@@ -214,12 +211,12 @@ Formatting is customizable by toggling builtin converters and registering new co
 QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
 formatter.addConsumer((execInfo, sb) -> {
   sb.append("MY-QUERY-EXECUTION="); // add prefix
-};
+});
 formatter.newLine();  // new line
 formatter.showSuccess();
-formatter.addConsumer((execInfo, sb)  -> {
+formatter.addConsumer((execInfo, sb) -> {
     // custom conversion
-    sb.append("MY-ID=" + executionInfo.getConnectionInfo().getConnectionId());
+    sb.append("MY-ID=" + execInfo.getConnectionInfo().getConnectionId());
 });
 formatter.showQuery();
 
@@ -230,25 +227,23 @@ String str = formatter.format(queryExecutionInfo);
 [[components_bindparameterconverter]]
 == BindParameterConverter
 
-`BindParameterConverter` is a callback interface for bind parameter related operations - `Statement#bind` and `Statement#bindNull`.
+`BindParameterConverter` is a callback interface for bind-parameter operations such as `Statement#bind` and
+`Statement#bindNull`.
 
-The callback is performed *before* calling the actual bind parameter operations.
-This converter can change the actual behavior of the bind parameter operations.
-For example, a converter can transform the bind markers.
+The callback is invoked *before* the actual bind-parameter operation. It can modify the behavior of the
+bind operation. For example, a converter can rewrite bind markers.
 
-Please see more details on the
-https://github.com/r2dbc/r2dbc-proxy/issues/26["gh-26: Proxy mechanism to support converting bind marker"] github issue.
-
+See more details in the
+https://github.com/r2dbc/r2dbc-proxy/issues/26["gh-26: Proxy mechanism to support converting bind marker"] issue.
 
 [[components_resultrowconverter]]
 == ResultRowConverter
 
-`ResultRowConverter` is a callback interface for result row get(`Row#get`) operations.
+`ResultRowConverter` is a callback interface for result-row access via `Row#get`.
 
-The callback is performed *before* calling the actual `Row#get` operation.
-This converter can alter the actual behavior of the invoked `Row#get` method.
+The callback is invoked *before* the actual `Row#get` call. It can alter the behavior of the invoked method.
 
-To use the converter, register it to the `ProxyConfig`.
+To use the converter, register it with `ProxyConfig`.
 
 [source,java]
 ----
@@ -258,8 +253,3 @@ ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).bu
 // create a proxy ConnectionFactory
 ConnectionFactory proxy = ProxyConnectionFactory.builder(connectionFactory, proxyConfig).build();
 ----
-
-Sample usages:
-
-* <<use-cases_support-primitive-and-null-in-result-mapping>>
-* <<use-cases_call-different-methods-in-result-mapping>>

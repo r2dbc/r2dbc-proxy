@@ -1,28 +1,27 @@
 [[introduction]]
 = Introduction
 
-R2DBC Proxy is a proxy framework providing callbacks for query executions,
-method invocations, and parameter bindings.
+R2DBC Proxy is a proxy framework that provides callbacks for query execution,
+method invocation, and parameter binding.
 
-The proxy holds proxy listeners.
-When a caller(application or upper layer library) interacts with the proxy, the registered
-proxy listeners receive callbacks.
+The proxy maintains a set of listener implementations. When an application or an upper-layer library
+interacts with the proxy, the registered listeners receive callbacks.
 
-Followings are the sample usages of the proxy listeners:
+The following are common use cases for proxy listeners:
 
-- Logging on each query execution
-- Detect slow queries
+- Query logging
+- Slow-query detection
 - Method tracing
-- Metrics
+- Metrics collection
 - Distributed tracing
 - Assertion and verification
-- Own action
+- Custom application actions
 
-The proxy is a thin transparent layer which suits to implement cross-cutting concerns, agnostic to
-the underlying implementation such as drivers; yet, it is viewed as R2DBC SPI from the above layer.
+The proxy is a thin, transparent layer that is well-suited for implementing cross-cutting concerns
+without coupling to the underlying database driver. From the caller's perspective, it still behaves
+like a standard R2DBC SPI object.
 
 image::images/r2dbc-proxy-diagram.png[R2DBC Proxy diagram]
-
 
 [[introduction_project-metadata]]
 == Project Metadata
