@@ -15,7 +15,7 @@
  */
 
 /**
- * Proxy related classes
+ * Proxy implementation classes and callback machinery.
  */
 
 @NonNullApi

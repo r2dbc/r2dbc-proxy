@@ -24,30 +24,30 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 
 /**
- * Hold method execution related information.
+ * Holds information about a method invocation.
  *
  * @author Tadaya Tsuyukubo
  */
 public interface MethodExecutionInfo {
 
     /**
-     * Get the invoked object.
+     * Returns the object on which the method was invoked.
      *
      * @return the proxy instance that the method was invoked on
      */
     Object getTarget();
 
     /**
-     * Get the invoked {@code Method}.
+     * Returns the invoked {@code Method}.
      *
      * @return invoked method
      */
     Method getMethod();
 
     /**
-     * Get the arguments of the invocation.
+     * Returns the arguments passed to the invocation.
      *
-     * This can be {@code null} when method is invoked with no argument.
+     * This value may be {@code null} when the method is invoked without any arguments.
      *
      * @return argument lists or {@code null} if the invoked method did not take any arguments
      */
@@ -55,7 +55,7 @@ public interface MethodExecutionInfo {
     Object[] getMethodArgs();
 
     /**
-     * Get the result of invocation.
+     * Returns the result of the invocation.
      * For {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback, this returns {@code null}.
      *
      * @return result
@@ -64,9 +64,9 @@ public interface MethodExecutionInfo {
     Object getResult();
 
     /**
-     * Get the thrown exception.
-     * For {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback or when the invocation
-     * did't throw any error, this returns {@code null}.
+     * Returns the exception thrown by the invocation.
+     * For the {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback, or when the invocation
+     * did not throw any error, this returns {@code null}.
      *
      * @return thrown exception
      */
@@ -74,8 +74,8 @@ public interface MethodExecutionInfo {
     Throwable getThrown();
 
     /**
-     * Get the {@link ConnectionInfo}.
-     * When invoked operation is not associated to the {@link Connection}, this returns {@code null}.
+     * Returns the associated {@link ConnectionInfo}.
+     * When the invoked operation is not associated with the {@link Connection}, this returns {@code null}.
      *
      * @return connection info
      */
@@ -83,7 +83,7 @@ public interface MethodExecutionInfo {
     ConnectionInfo getConnectionInfo();
 
     /**
-     * Get the duration of the method invocation.
+     * Returns the duration of the method invocation.
      * For {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} callback, this returns {@link Duration#ZERO}.
      *
      * @return execution duration
@@ -91,28 +91,28 @@ public interface MethodExecutionInfo {
     Duration getExecuteDuration();
 
     /**
-     * Get the thread name.
+     * Returns the thread name.
      *
      * @return thread name
      */
     String getThreadName();
 
     /**
-     * Get the thread ID.
+     * Returns the thread ID.
      *
      * @return thread ID
      */
     long getThreadId();
 
     /**
-     * Get the proxy event type.
+     * Returns the proxy event type.
      *
      * @return proxy event type; either {@link ProxyEventType#BEFORE_METHOD} or {@link ProxyEventType#AFTER_METHOD}
      */
     ProxyEventType getProxyEventType();
 
     /**
-     * Retrieve {@link ValueStore} which is associated to the scope of before/after method execution.
+     * Returns the {@link ValueStore} associated with the scope of the before/after method execution.
      *
      * Mainly used for passing values between {@link ProxyExecutionListener#beforeMethod(MethodExecutionInfo)} and
      * {@link ProxyExecutionListener#afterMethod(MethodExecutionInfo)}.

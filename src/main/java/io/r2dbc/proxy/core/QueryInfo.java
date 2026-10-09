@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Hold each query related info.
+ * Holds information about each query.
  *
  * @author Tadaya Tsuyukubo
  */
@@ -33,7 +33,7 @@ public class QueryInfo {
     private final List<Bindings> bindingsList = new ArrayList<>();
 
     /**
-     * Construct the {@code QueryInfo} with query.
+     * Creates a new {@code QueryInfo} instance for the supplied query.
      *
      * @param query query
      * @throws IllegalArgumentException if {@code query} is {@code null}
@@ -43,7 +43,7 @@ public class QueryInfo {
     }
 
     /**
-     * Get the query.
+     * Returns the query text.
      *
      * @return query; never {@code null}
      */
@@ -52,7 +52,7 @@ public class QueryInfo {
     }
 
     /**
-     * Get the list of {@link Bindings}.
+     * Returns the list of {@link Bindings}.
      *
      * @return list of bindings; never {@code null}
      */

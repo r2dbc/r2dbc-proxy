@@ -26,14 +26,14 @@ package io.r2dbc.proxy.core;
 public interface Binding {
 
     /**
-     * Get a key which represents index or name of the binding.
+     * Returns the key that represents the binding index or name.
      *
      * @return an index or name
      */
     Object getKey();
 
     /**
-     * Get a {@link BoundValue}.
+     * Returns the {@link BoundValue}.
      *
      * @return a bound value
      */

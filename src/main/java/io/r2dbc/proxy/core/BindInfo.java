@@ -21,7 +21,7 @@ import io.r2dbc.proxy.listener.BindParameterConverter;
 import io.r2dbc.spi.Statement;
 
 /**
- * Hold contextual information for bind operations({@code bind} and {@code bindNull}).
+ * Holds contextual information for bind operations ({@code bind} and {@code bindNull}).
  *
  * @author Tadaya Tsuyukubo
  * @see BindParameterConverter

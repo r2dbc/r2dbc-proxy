@@ -23,16 +23,16 @@ import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Hooks;
 
 /**
- * Listener interface that is called when proxy is invoked.
+ * Listener interface invoked when a proxy method or query is executed.
  *
  * @author Tadaya Tsuyukubo
  */
 public interface ProxyExecutionListener {
 
     /**
-     * Called before every invocation of methods.
+     * Called before every method invocation.
      * <p>
-     * Exception Handling:
+     * Exception handling:
      * Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
      * Such exceptions are reported to {@link Hooks#onErrorDropped(java.util.function.Consumer)}.
      *
@@ -42,9 +42,9 @@ public interface ProxyExecutionListener {
     }
 
     /**
-     * Called after every invocation of methods.
+     * Called after every method invocation.
      * <p>
-     * Exception Handling:
+     * Exception handling:
      * Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
      * Such exceptions are reported to {@link Hooks#onErrorDropped(java.util.function.Consumer)}.
      *
@@ -56,10 +56,10 @@ public interface ProxyExecutionListener {
     /**
      * Called before executing a query ({@link Batch#execute()} or {@link Statement#execute()}).
      * <p>
-     * Note: this callback is called when the publisher, result of the {@code execute()}, is being
-     * subscribed. Not at the time of {@code execute()} is called,
+     * Note: this callback is invoked when the publisher produced by {@code execute()} is subscribed,
+     * not when {@code execute()} itself is called.
      * <p>
-     * Exception Handling:
+     * Exception handling:
      * Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
      * Such exceptions are reported to {@link Hooks#onErrorDropped(java.util.function.Consumer)}.
      *
@@ -74,19 +74,19 @@ public interface ProxyExecutionListener {
      * The callback order is:
      * <ul>
      *     <li>{@link #beforeQuery(QueryExecutionInfo)}
-     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for 1st result
-     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for 2nd result
+     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for the first result
+     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for the second result
      *     <li>...
-     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for Nth result
+     *     <li>{@link #eachQueryResult(QueryExecutionInfo)} for the Nth result
      *     <li>{@link #afterQuery(QueryExecutionInfo)}
      * </ul>
-     * {@link QueryExecutionInfo#getExecuteDuration()} is available in this callback and it holds
-     * the duration since {@link #beforeQuery(QueryExecutionInfo)}.
+     * {@link QueryExecutionInfo#getExecuteDuration()} is available in this callback and contains the
+     * duration since {@link #beforeQuery(QueryExecutionInfo)}.
      * <p>
-     * Note: this callback is called when the publisher, result of the {@code execute()}, is being
-     * subscribed. Not at the time of {@code execute()} is called,
+     * Note: this callback is invoked when the publisher produced by {@code execute()} is subscribed,
+     * not when {@code execute()} itself is called.
      * <p>
-     * Exception Handling:
+     * Exception handling:
      * Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
      * Such exceptions are reported to {@link Hooks#onErrorDropped(java.util.function.Consumer)}.
      *
@@ -96,14 +96,13 @@ public interface ProxyExecutionListener {
     }
 
     /**
-     * Called on processing each query {@link io.r2dbc.spi.Result}.
+     * Called while processing each query {@link io.r2dbc.spi.Result}.
      * <p>
-     * While processing query results {@link io.r2dbc.spi.Result}, this callback
-     * is called per result.
+     * This callback is invoked once per result while query results are being processed.
      * <p>
      * {@link QueryExecutionInfo#getCurrentMappedResult()} contains the mapped result.
      * <p>
-     * Exception Handling:
+     * Exception handling:
      * Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
      * Such exceptions are reported to {@link Hooks#onErrorDropped(java.util.function.Consumer)}.
      *

@@ -15,7 +15,7 @@
  */
 
 /**
- * Domain classes
+ * Core domain model types for the proxy API.
  */
 
 @NonNullApi

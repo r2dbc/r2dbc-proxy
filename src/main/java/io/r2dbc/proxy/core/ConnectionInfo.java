@@ -23,13 +23,13 @@ import io.r2dbc.spi.ConnectionFactory;
 import reactor.util.annotation.Nullable;
 
 /**
- * Hold {@link Connection} related information.
+ * Holds information about the associated {@link Connection}.
  *
  * @author Tadaya Tsuyukubo
  */
 public interface ConnectionInfo {
     /**
-     * Retrieve original {@link Connection}.
+     * Returns the original {@link Connection}.
      *
      * @return connection; {@code null} is returned when {@link ConnectionInfo} is evaluated
      * before it is associated with an actual connection, for example, during
@@ -40,7 +40,7 @@ public interface ConnectionInfo {
     Connection getOriginalConnection();
 
     /**
-     * Get ID for the connection.
+     * Returns the connection ID.
      *
      * @return connection ID; {@code null} is returned when {@link ConnectionInfo} is evaluated
      * before it is associated with an actual connection, for example, during
@@ -102,7 +102,7 @@ public interface ConnectionInfo {
     void setClosed(boolean closed);
 
     /**
-     * Retrieve {@link ValueStore} which is associated to the scope of logical connection.
+     * Returns the {@link ValueStore} associated with the scope of the logical connection.
      *
      * <p>Values can be stored or retrieved from this store while connection is available.
      *

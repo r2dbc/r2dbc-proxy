@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Central configuration object for proxy.
+ * Central configuration object for the proxy.
  *
  * @author Tadaya Tsuyukubo
  */
@@ -56,7 +56,7 @@ public class ProxyConfig {
     private ResultRowConverter resultRowConverter = DEFAULT_RESULT_ROW_CONVERTER;
 
     /**
-     * Create a new {@link Builder}.
+     * Creates a new {@link Builder}.
      *
      * @return builder
      */
@@ -77,7 +77,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Set {@link ProxyFactoryFactory}.
+     * Sets the {@link ProxyFactoryFactory}.
      *
      * When {@link ProxyFactoryFactory} is set, {@link ProxyFactoryFactory#create(ProxyConfig)} method
      * is called once to generate {@link ProxyFactory}. The generated {@link ProxyFactory} instance is
@@ -94,7 +94,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Get {@link ProxyFactory} which is generated from the specified {@link ProxyFactoryFactory}.
+     * Returns the {@link ProxyFactory} generated from the specified {@link ProxyFactoryFactory}.
      *
      * Always same instance of {@link ProxyFactory} is returned.
      *
@@ -126,7 +126,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Get {@link ConnectionIdManager}.
+     * Returns the {@link ConnectionIdManager}.
      *
      * @return connection id manager
      */
@@ -135,7 +135,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Set {@link ConnectionIdManager}.
+     * Sets the {@link ConnectionIdManager}.
      *
      * @param connectionIdManager connection id manager
      * @throws IllegalArgumentException if {@code connectionIdManager} is {@code null}
@@ -145,7 +145,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Get {@link Clock}.
+     * Returns the {@link Clock}.
      *
      * @return clock to use
      */
@@ -154,7 +154,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Set {@link Clock} to use to calculate the elapsed time.
+     * Sets the {@link Clock} used to calculate elapsed time.
      *
      * @param clock clock to use
      * @throws IllegalArgumentException if {@code clock} is {@code null}
@@ -165,7 +165,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Get {@link BindParameterConverter}.
+     * Returns the {@link BindParameterConverter}.
      *
      * @return bindParameterConverter to use
      */
@@ -174,7 +174,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Set {@link BindParameterConverter}.
+     * Sets the {@link BindParameterConverter}.
      *
      * @param bindParameterConverter bind parameter converter
      * @throws IllegalArgumentException if {@code bindParameterConverter} is {@code null}
@@ -184,7 +184,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Get {@link ResultRowConverter}.
+     * Returns the {@link ResultRowConverter}.
      *
      * @return resultRowConverter to use
      * @since 0.9.0
@@ -194,7 +194,7 @@ public class ProxyConfig {
     }
 
     /**
-     * Set {@link ResultRowConverter}.
+     * Sets the {@link ResultRowConverter}.
      *
      * @param resultRowConverter the result row converter
      * @throws IllegalArgumentException if {@code resultRowConverter} is {@code null}
@@ -205,9 +205,9 @@ public class ProxyConfig {
     }
 
     /**
-     * Builder to create a {@link ProxyConfig}.
+     * Builder for creating a {@link ProxyConfig}.
      *
-     * For attributes that are not specified, default values will be used.
+     * For attributes not specified explicitly, default values are used.
      */
     public static final class Builder {
 
@@ -236,7 +236,7 @@ public class ProxyConfig {
         }
 
         /**
-         * Set {@link ConnectionIdManager}.
+         * Sets the {@link ConnectionIdManager}.
          *
          * @param connectionIdManager connectionIdManager to be used
          * @return builder
@@ -248,7 +248,7 @@ public class ProxyConfig {
         }
 
         /**
-         * Set {@link ProxyFactoryFactory}.
+         * Sets the {@link ProxyFactoryFactory}.
          *
          * @param proxyFactoryFactory proxyFactoryFactory to be used
          * @return builder
@@ -272,7 +272,7 @@ public class ProxyConfig {
         }
 
         /**
-         * Set {@link BindParameterConverter}.
+         * Sets the {@link BindParameterConverter}.
          *
          * @param bindParameterConverter bindParameterConverter to be used
          * @return builder
@@ -284,7 +284,7 @@ public class ProxyConfig {
         }
 
         /**
-         * Set {@link ResultRowConverter}.
+         * Sets the {@link ResultRowConverter}.
          *
          * @param resultRowConverter resultRowConverter to be used
          * @return builder

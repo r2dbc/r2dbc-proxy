@@ -27,23 +27,23 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * Hold query execution related information.
+ * Holds information about a query execution.
  *
  * @author Tadaya Tsuyukubo
  */
 public interface QueryExecutionInfo {
 
     /**
-     * Get the invoked query execution {@code Method}.
+     * Returns the method used for the query execution.
      *
      * @return invoked method
      */
     Method getMethod();
 
     /**
-     * Get the arguments of the invocation.
+     * Returns the arguments passed to the invocation.
      *
-     * This can be {@code null} when method is invoked with no argument.
+     * This value may be {@code null} when the method is invoked without any arguments.
      *
      * @return argument lists or {@code null} if the invoked method did not take any arguments
      */
@@ -51,9 +51,9 @@ public interface QueryExecutionInfo {
     Object[] getMethodArgs();
 
     /**
-     * Get the thrown exception.
-     * For {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)} callback or query execution
-     * did't throw any error, this returns {@code null}.
+     * Returns the exception thrown by the invocation.
+     * For the {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)} callback, or when the query execution
+     * did not throw any error, this returns {@code null}.
      *
      * @return thrown exception
      */
@@ -61,17 +61,17 @@ public interface QueryExecutionInfo {
     Throwable getThrowable();
 
     /**
-     * Get the associated {@link ConnectionInfo}.
+     * Returns the associated {@link ConnectionInfo}.
      *
      * @return connection info
      */
     ConnectionInfo getConnectionInfo();
 
     /**
-     * Indicate whether the query execution was successful or not.
-     * Contains valid value only after the query execution.
+     * Returns whether the query execution was successful.
+     * This value is populated only after the query execution completes.
      *
-     * Query execution is considered successful when the {@link org.reactivestreams.Publisher}
+     * A query execution is considered successful when the {@link org.reactivestreams.Publisher}
      * returned from {@link Statement#execute()} either received completion
      * or at least one element is emitted regardless of it has received cancellation.
      *
@@ -80,39 +80,39 @@ public interface QueryExecutionInfo {
     boolean isSuccess();
 
     /**
-     * Get the size of the batch query.
+     * Returns the size of the batch query.
      *
-     * i.e. Number of the calls of {@link Batch#add(String)}.
+     * In other words, this is the number of calls to {@link Batch#add(String)}.
      *
      * @return batch size
      */
     int getBatchSize();
 
     /**
-     * Get the list of {@link QueryInfo}.
+     * Returns the list of {@link QueryInfo}.
      *
-     * @return list of queries. This will NOT return {@code null}.
+     * @return the list of queries; never {@code null}
      */
     List<QueryInfo> getQueries();
 
     /**
-     * Get the type of query execution.
+     * Returns the type of query execution.
      *
      * @return type of query execution
      */
     ExecutionType getType();
 
     /**
-     * Get the number of the binding.
+     * Returns the number of bindings.
      *
-     * i.e. Number of the calls of {@link Statement#add()}.
+     * In other words, this is the number of calls to {@link Statement#add()}.
      *
      * @return size of the binding
      */
     int getBindingsSize();
 
     /**
-     * Get the time that took queries to execute.
+     * Returns the time spent executing the query.
      * <p>
      * Duration is only populated in appropriate phase.
      * (e.g.: {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)})
@@ -123,14 +123,14 @@ public interface QueryExecutionInfo {
 
 
     /**
-     * Get the currently executed thread name.
+     * Returns the name of the thread executing the query.
      *
      * @return thread name
      */
     String getThreadName();
 
     /**
-     * Get the currently executed thread ID.
+     * Returns the ID of the thread executing the query.
      *
      * @return thread ID
      */
@@ -138,7 +138,7 @@ public interface QueryExecutionInfo {
 
 
     /**
-     * Get the proxy event type for query execution.
+     * Returns the proxy event type for the query execution.
      *
      * @return proxy event type; one of {@link ProxyEventType#BEFORE_QUERY}, {@link ProxyEventType#AFTER_QUERY},
      * or {@link ProxyEventType#EACH_QUERY_RESULT}
@@ -146,15 +146,14 @@ public interface QueryExecutionInfo {
     ProxyEventType getProxyEventType();
 
     /**
-     * Represent Nth {@link io.r2dbc.spi.Result}.
+     * Represents the Nth {@link io.r2dbc.spi.Result}.
      *
-     * On each query result callback({@link ProxyExecutionListener#eachQueryResult(QueryExecutionInfo)}),
-     * this value indicates Nth {@link Result} starting from 1.
-     * (1st query result, 2nd query result, 3rd, 4th,...).
+     * For each query-result callback ({@link ProxyExecutionListener#eachQueryResult(QueryExecutionInfo)}),
+     * this value indicates the Nth {@link Result}, starting from 1 (first, second, third, and so on).
      *
-     * This returns 0 for before query execution({@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)}).
-     * For after query execution({@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}), this returns
-     * total number of {@link io.r2dbc.spi.Result} returned by this query execution.
+     * This returns 0 before query execution ({@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)}).
+     * For after-query execution ({@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}), it returns the
+     * total number of {@link io.r2dbc.spi.Result} objects returned by this query execution.
      *
      * @return Nth number of query result
      */
@@ -162,9 +161,9 @@ public interface QueryExecutionInfo {
 
 
     /**
-     * Mapped query result available for each-query-result-callback({@link ProxyExecutionListener#eachQueryResult(QueryExecutionInfo)}).
+     * The mapped query result available for each query-result callback ({@link ProxyExecutionListener#eachQueryResult(QueryExecutionInfo)}).
      *
-     * For before and after query execution({@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)}
+     * For the before- and after-query execution callbacks ({@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)}
      * and {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}), this returns {@code null}.
      *
      * @return currently mapped result
@@ -173,7 +172,7 @@ public interface QueryExecutionInfo {
     Object getCurrentMappedResult();
 
     /**
-     * Retrieve {@link ValueStore} which is associated to the scope of before/after method execution.
+     * Returns the {@link ValueStore} associated with the scope of the before/after query execution.
      *
      * Mainly used for passing values between {@link ProxyExecutionListener#beforeQuery(QueryExecutionInfo)} and
      * {@link ProxyExecutionListener#afterQuery(QueryExecutionInfo)}.

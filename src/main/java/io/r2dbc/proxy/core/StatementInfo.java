@@ -22,35 +22,35 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Statement;
 
 /**
- * Hold {@link Statement} related information.
+ * Holds information about the associated {@link Statement}.
  *
  * @author Tadaya Tsuyukubo
  */
 public interface StatementInfo {
 
     /**
-     * Get {@link ConnectionInfo} associated to this {@link Statement}.
+     * Returns the {@link ConnectionInfo} associated with this {@link Statement}.
      *
      * @return connection info
      */
     ConnectionInfo getConnectionInfo();
 
     /**
-     * Get the sql statement that has originally specified on {@link Connection#createStatement(String)}.
+     * Returns the SQL statement originally provided to {@link Connection#createStatement(String)}.
      *
      * @return original sql statement
      */
     String getOriginalQuery();
 
     /**
-     * Get the updated sql statement by {@link BindParameterConverter#onCreateStatement(String, StatementInfo)}.
+     * Returns the SQL statement updated by {@link BindParameterConverter#onCreateStatement(String, StatementInfo)}.
      *
      * @return updated sql statement
      */
     String getUpdatedQuery();
 
     /**
-     * Retrieve {@link ValueStore} which is associated to the scope of logical statement.
+     * Returns the {@link ValueStore} associated with the scope of the logical statement.
      *
      * <p>Values can be stored or retrieved from this store while statement is available.
      *

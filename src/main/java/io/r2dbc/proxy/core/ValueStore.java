@@ -31,7 +31,7 @@ import java.util.Map;
 public interface ValueStore {
 
     /**
-     * Create default {@link ValueStore}.
+     * Creates a default {@link ValueStore}.
      *
      * @return value store
      */
@@ -40,7 +40,7 @@ public interface ValueStore {
     }
 
     /**
-     * Get the value associated to the key.
+     * Returns the value associated with the key.
      *
      * @param key key
      * @return value; can be {@code null}
@@ -50,7 +50,7 @@ public interface ValueStore {
     Object get(Object key);
 
     /**
-     * Get the value associated to the key and cast to the type.
+     * Returns the value associated with the key and casts it to the specified type.
      *
      * @param key  key
      * @param type value type to cast
@@ -63,7 +63,7 @@ public interface ValueStore {
     <T> T get(Object key, Class<T> type);
 
     /**
-     * Get the value associated to the key; otherwise returns specified value.
+     * Returns the value associated with the key, or the specified default value if none exists.
      *
      * @param key          key
      * @param defaultValue default value
@@ -74,7 +74,7 @@ public interface ValueStore {
     <T> T getOrDefault(Object key, T defaultValue);
 
     /**
-     * Store a value associating the provided key.
+     * Stores the provided value under the provided key.
      *
      * @param key   key
      * @param value value
@@ -84,7 +84,7 @@ public interface ValueStore {
     void put(Object key, Object value);
 
     /**
-     * Store all key value pairs from provided map.
+     * Stores all key/value pairs from the provided map.
      *
      * @param map map
      * @throws IllegalArgumentException if {@code map} is {@code null}
@@ -92,7 +92,7 @@ public interface ValueStore {
     void putAll(Map<Object, Object> map);
 
     /**
-     * Remove the value associated to the provided key.
+     * Removes the value associated with the provided key.
      *
      * @param key key
      * @return previously associated value or {@code null} if key did not exist

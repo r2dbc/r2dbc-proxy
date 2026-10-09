@@ -39,7 +39,7 @@ import java.util.function.Function;
 import static java.util.stream.Collectors.joining;
 
 /**
- * Convert {@link QueryExecutionInfo} to {@code String}.
+ * Converts a {@link QueryExecutionInfo} to a {@code String}.
  *
  * <p>Sample usage:
  * <pre>{@code
@@ -90,7 +90,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     };
 
     /**
-     * Default implementation for formatting transaction releated info.
+     * Default implementation for formatting transaction-related information.
      */
     private final BiConsumer<QueryExecutionInfo, StringBuilder> onTransactionInfo = (executionInfo, sb) -> {
         sb.append("Transaction:");
@@ -137,7 +137,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     };
 
     /**
-     * Default implementation for formatting size of bindings.
+     * Default implementation for formatting binding size.
      */
     private final BiConsumer<QueryExecutionInfo, StringBuilder> onBindingsSize = (executionInfo, sb) -> {
         sb.append("BindingsSize:");
@@ -181,7 +181,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     };
 
     /**
-     * Default implementation for formatting actual value of bound value.
+     * Default implementation for formatting the actual bound value.
      *
      * <p> Example: "100", "Foo", "&lt;clob&gt;".
      */
@@ -196,7 +196,7 @@ public class QueryExecutionInfoFormatter implements Function<QueryExecutionInfo,
     };
 
     /**
-     * Default implementation for formatting {@link Parameter} value.
+     * Default implementation for formatting a {@link Parameter} value.
      *
      * <p> Example: "null(in,INTEGER)", "Foo(out,String)".
      */

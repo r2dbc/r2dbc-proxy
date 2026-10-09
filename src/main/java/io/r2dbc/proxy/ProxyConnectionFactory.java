@@ -37,7 +37,7 @@ public final class ProxyConnectionFactory {
     }
 
     /**
-     * Create a new {@link Builder}.
+     * Creates a new {@link Builder}.
      *
      * @param connectionFactory actual {@link ConnectionFactory}
      * @return builder
@@ -50,7 +50,7 @@ public final class ProxyConnectionFactory {
     }
 
     /**
-     * Create a new {@link Builder}.
+     * Creates a new {@link Builder}.
      *
      * @param connectionFactory actual {@link ConnectionFactory}
      * @param proxyConfig       {@link ProxyConfig} to use
@@ -91,7 +91,7 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Build a proxy {@link ConnectionFactory}.
+         * Builds a proxy {@link ConnectionFactory}.
          *
          * @return a proxy {@link ConnectionFactory}
          */
@@ -100,7 +100,7 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Set a {@link ProxyConfig} to use.
+         * Sets the {@link ProxyConfig} to use.
          *
          * @param proxyConfig proxy config
          * @return builder
@@ -113,7 +113,7 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Register a callback consumer for before method execution
+         * Registers a callback consumer for before-method execution
          *
          * @param consumer a consumer for before method execution
          * @return builder
@@ -133,7 +133,7 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Register a callback consumer for after method execution.
+         * Registers a callback consumer for after-method execution.
          *
          * @param consumer a consumer for after method execution
          * @return builder
@@ -153,7 +153,7 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Register a callback consumer for before query execution.
+         * Registers a callback consumer for before-query execution.
          *
          * @param consumer a consumer for before query execution
          * @return builder
@@ -173,7 +173,7 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Register a callback consumer for after query execution.
+         * Registers a callback consumer for after-query execution.
          *
          * @param consumer a consumer for after query execution
          * @return builder
@@ -193,7 +193,7 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Register a callback consumer for processing each query result.
+         * Registers a callback consumer for processing each query result.
          *
          * @param consumer a consumer for each query result
          * @return builder
@@ -213,7 +213,7 @@ public final class ProxyConnectionFactory {
         }
 
         /**
-         * Register a {@link ProxyExecutionListener}.
+         * Registers a {@link ProxyExecutionListener}.
          *
          * @param listener a listener to register
          * @return builder
