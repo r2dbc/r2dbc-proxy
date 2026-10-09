@@ -1,7 +1,7 @@
 [[use-cases]]
 = Use cases
 :datasource-proxy: https://github.com/ttddyy/datasource-proxy
-:slow-query-doc: https://ttddyy.github.io/datasource-proxy/docs/current/user-guide/#_slow_query_logging_listener
+:slow-query-doc: https://jdbc-observations.github.io/datasource-proxy/docs/current/user-guide/index.html#_slow_query_logging_listener
 :r2dbc-proxy-samples: https://github.com/ttddyy/r2dbc-proxy-examples
 :TracingExecutionListener: https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/TracingExecutionListener.java
 :MetricsExecutionListener: https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java
@@ -73,23 +73,26 @@ ConnectionFactory proxyConnectionFactory =
 [[use-cases_slow-query-detection]]
 == Slow Query Detection
 
-There are two types of slow query detections - `preemptive` and `non-preemptive`.
+There are two approaches to detect slow queries:
 
-- _Preemptive:_ detect slow queries *WHILE* they are running.
-- _Non-preemptive:_ detect slow queries *AFTER* they have executed.
+During execution::
+Detect slow queries *while* they are running. A watcher can notify when a query has run longer than the threshold,
+even if it has not finished yet. This approach is sometimes called _preemptive_, but it only notifies about the query;
+the running query is not interrupted or cancelled.
+In {datasource-proxy}[datasource-proxy], {slow-query-doc}[`SlowQueryListener`] uses this approach.
 
-The "non-preemptive" slow query detection is simple. On `afterQuery` callback, check the query execution time.
-If it took more than your threshold, perform an action such as logging, send notification, etc.
+After execution::
+Detect slow queries *after* they have finished. The `onAfterQuery` callback can compare the query execution time with
+the threshold. This is a simple approach that can be implemented with a `QueryExecutionListener`. This approach is
+sometimes called _non-preemptive_.
 
-For the "preemptive" slow query detection, you may create a watcher that checks the running queries and notifies
-ones that have exceeded the threshold.
-In {datasource-proxy}[datasource-proxy], {slow-query-doc}[`SlowQueryListener` is implemented this way].
+Both approaches can be used together: use a watcher for an early notice of long-running queries and an `onAfterQuery`
+callback to record their actual execution time.
 
 [[use-cases_slow-query-detection_sample-configuration]]
-=== Sample Configuration (Non-preemptive)
+=== Sample Configuration (After Execution)
 
-On after query execution, check whether the query execution time has exceeded the threshold
-time, then perform an action.
+After query execution, check whether the query execution time has exceeded the threshold, then perform an action.
 
 [source,java]
 ----
