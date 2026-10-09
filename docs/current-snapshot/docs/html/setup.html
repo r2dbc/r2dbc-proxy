@@ -115,16 +115,16 @@
 <h2 id="setup_connection-factory-discovery"><a class="anchor" href="#setup_connection-factory-discovery"></a>1. Connection Factory Discovery</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>R2DBC specifies two types of connection factory discovery, <a href="#setup_connection-factory-discovery_url-based">URL-based</a> and
-<a href="#setup_connection-factory-discovery_programmatic">Programmatic</a>.
-R2DBC Proxy supports both with <code>proxy</code> as the driver identifier.</p>
+<p>R2DBC defines two connection-factory discovery mechanisms: <a href="#setup_connection-factory-discovery_url-based">URL-based</a>
+and <a href="#setup_connection-factory-discovery_programmatic">Programmatic</a>. R2DBC Proxy supports both, using <code>proxy</code> as the
+driver identifier.</p>
 </div>
 <div class="sect2">
 <h3 id="setup_connection-factory-discovery_url-based"><a class="anchor" href="#setup_connection-factory-discovery_url-based"></a>1.1. URL-based</h3>
 <div class="paragraph">
-<p>When a connection URL contains <code>proxy</code> in its driver segment, <code>ConnectionFactories</code>
-delegates the <code>protocol</code> segment(required) to the another connection
-discovery.(pass-through) Then, it wraps the returned <code>ConnectionFactory</code> with a proxy.</p>
+<p>When a connection URL contains <code>proxy</code> in its driver segment, <code>ConnectionFactories</code> delegates the required
+<code>protocol</code> segment to another connection-factory discovery mechanism (a pass-through). It then wraps the
+returned <code>ConnectionFactory</code> in a proxy.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -145,12 +145,12 @@ r2dbc:proxy:pool:postgresql://localhost:5432/myDB?proxyListener=com.example.MyLi
 <div class="sect2">
 <h3 id="setup_connection-factory-discovery_programmatic"><a class="anchor" href="#setup_connection-factory-discovery_programmatic"></a>1.2. Programmatic</h3>
 <div class="paragraph">
-<p>Another variant of the <code>ConnectionFactory</code> discovery is a programmatic creation of the <code>ConnectionFactoryOptions</code>.</p>
+<p>Another way to discover a <code>ConnectionFactory</code> is to construct <code>ConnectionFactoryOptions</code> programmatically.</p>
 </div>
 <div class="paragraph">
-<p>Same as URL based discovery, when the DRIVER Option is <code>proxy</code>, it delegates PROTOCOL Option(required)
-to another connection factory discovery request. The result of delegated discovery
-request is wrapped by a proxy.</p>
+<p>As with URL-based discovery, when the <code>DRIVER</code> option is <code>proxy</code>, it delegates the required <code>PROTOCOL</code>
+option to another connection-factory discovery request. The resulting <code>ConnectionFactory</code> is then wrapped
+by a proxy.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -185,28 +185,28 @@ Mono&lt;Connection&gt; connection = connectionFactory.create();</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>protocol</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegating connection factory driver</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegating connection-factory driver</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>proxyListener</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Comma separated list of fully qualified proxy listener class names  <em>(Optional)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma-separated list of fully qualified proxy listener class names <em>(optional)</em></p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>When programmatically construct <code>ConnectionFactoryOptions</code>, in addition to the "comma separated listener class FQDN",
-<code>proxyListener</code> option allows following values:</p>
+<p>When constructing <code>ConnectionFactoryOptions</code> programmatically, the <code>proxyListener</code> option supports the
+following values in addition to a comma-separated list of fully qualified listener class names:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Proxy listener class (java <code>Class</code> object)</p>
+<p>A proxy listener class (<code>java.lang.Class</code>)</p>
 </li>
 <li>
-<p>Proxy listener instance</p>
+<p>A proxy listener instance</p>
 </li>
 <li>
-<p><code>Collection</code> of above</p>
+<p>A <code>Collection</code> containing either of the above</p>
 </li>
 </ul>
 </div>
@@ -217,8 +217,8 @@ Mono&lt;Connection&gt; connection = connectionFactory.create();</code></pre>
 <h2 id="setup_programmatic-proxy-construction"><a class="anchor" href="#setup_programmatic-proxy-construction"></a>2. Programmatic Proxy Construction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>ProxyConnectionFactory</code> provides a builder to construct a proxy <code>ConnectionFactory</code>.
-The builder has methods to register concrete and adhoc listeners.</p>
+<p><code>ProxyConnectionFactory</code> provides a builder for constructing a proxy <code>ConnectionFactory</code>. The builder can
+register concrete and ad-hoc listeners.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -226,10 +226,10 @@ The builder has methods to register concrete and adhoc listeners.</p>
 
 ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
     .onAfterQuery(queryInfo -&gt;
-        ...  // after query callback logic
+        ...  // after-query callback logic
     )
     .onBeforeMethod(methodInfo -&gt;
-        ...  // before method callback logic
+        ...  // before-method callback logic
     )
     .listener(...)  // add listener
     .build();</code></pre>
@@ -240,7 +240,7 @@ ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-01 09:35:17 UTC
+Last updated 2026-10-09 03:30:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

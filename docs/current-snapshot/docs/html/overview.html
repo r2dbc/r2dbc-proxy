@@ -94,16 +94,15 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>R2DBC Proxy is a framework that generates proxies to R2DBC SPI objects via <code>ProxyConnectionFactory</code>
-and provides callbacks to the method and query invocations.</p>
+<p>R2DBC Proxy is a framework that generates proxies for R2DBC SPI objects through <code>ProxyConnectionFactory</code>
+and provides callbacks for method and query invocations.</p>
 </div>
 <div class="paragraph">
-<p>R2DBC Proxy is a thin transparent layer.
-From callers(application or another library), proxies are simply viewed as R2DBC SPI objects.
-This is similar to how connection pooling is viewed from upper layer.</p>
+<p>R2DBC Proxy is a thin, transparent layer. To callers (applications or other libraries), the proxies
+look like ordinary R2DBC SPI objects. This is similar to how connection pooling appears to the upper layer.</p>
 </div>
 <div class="paragraph">
-<p>This section describes the key concepts of the R2DBC Proxy:</p>
+<p>This section describes the key concepts of R2DBC Proxy:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -127,11 +126,12 @@ This is similar to how connection pooling is viewed from upper layer.</p>
 <h2 id="overview_proxies"><a class="anchor" href="#overview_proxies"></a>1. Proxies</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Each SPI object(<code>Connection</code>, <code>Statement</code>, <code>Batch</code>, <code>Result</code>, and <code>Row</code>) created by <code>ProxyConnectionFactory</code>
+<p>Each SPI object (<code>Connection</code>, <code>Statement</code>, <code>Batch</code>, <code>Result</code>, and <code>Row</code>) created by <code>ProxyConnectionFactory</code>
 is wrapped by a proxy.</p>
 </div>
 <div class="paragraph">
-<p>When a caller invokes a method on the proxy, it triggers corresponding callback methods on the registered listeners.</p>
+<p>When a caller invokes a method on the proxy, it triggers the corresponding callback methods on the
+registered listeners.</p>
 </div>
 </div>
 </div>
@@ -139,17 +139,16 @@ is wrapped by a proxy.</p>
 <h2 id="overview_listeners"><a class="anchor" href="#overview_listeners"></a>2. Listeners</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Listeners are the callback implementation.
-Each listener implements the <code>ProxyExecutionListener</code> interface, which defines
-<code>[before|after]Query</code>, <code>[before|after]Method</code>, and <code>eachQueryResult</code> methods.</p>
+<p>Listeners are callback implementations. Each listener implements the <code>ProxyExecutionListener</code> interface,
+which defines <code>beforeQuery</code>, <code>afterQuery</code>, <code>beforeMethod</code>, <code>afterMethod</code>, and <code>eachQueryResult</code> methods.</p>
 </div>
 <div class="paragraph">
-<p>When triggered, these callback methods receive contextual information as a parameter.
-The <code>MethodExecutionInfo</code> is a parameter that contains the information about the invoked method, and the
-<code>QueryExecutionInfo</code> holds the information of the query execution.</p>
+<p>When triggered, these callback methods receive contextual information as parameters. <code>MethodExecutionInfo</code>
+contains details about the invoked method, while <code>QueryExecutionInfo</code> contains details about the query
+execution.</p>
 </div>
 <div class="paragraph">
-<p>Users would write a listener implementation to perform custom actions.</p>
+<p>Applications can implement custom listeners to perform specific actions.</p>
 </div>
 </div>
 </div>
@@ -157,16 +156,15 @@ The <code>MethodExecutionInfo</code> is a parameter that contains the informatio
 <h2 id="overview_formatters"><a class="anchor" href="#overview_formatters"></a>3. Formatters</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>One of the main action performed by a listener is logging.
-When a listener received a callback, the passed contextual information
-requires a transformation to a <code>String</code> in order to be an entry for the logging.</p>
+<p>One of the primary uses of a listener is logging. When a listener receives a callback, the contextual
+information must be transformed into a <code>String</code> that can be written to a log.</p>
 </div>
 <div class="paragraph">
-<p>Formatters are utility classes that covert <code>MethodExecutionInfo</code> and <code>QueryExecutionInfo</code> to <code>String</code>.</p>
+<p>Formatters are utility classes that convert <code>MethodExecutionInfo</code> and <code>QueryExecutionInfo</code> into strings.</p>
 </div>
 <div class="paragraph">
-<p><code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> are available out of the box
-to transform <code>QueryExecutionInfo</code> and <code>MethodExecutionInfo</code>, respectively.</p>
+<p><code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> are available out of the box to transform
+<code>QueryExecutionInfo</code> and <code>MethodExecutionInfo</code>, respectively.</p>
 </div>
 </div>
 </div>
@@ -174,20 +172,19 @@ to transform <code>QueryExecutionInfo</code> and <code>MethodExecutionInfo</code
 <h2 id="overview_converters"><a class="anchor" href="#overview_converters"></a>4. Converters</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Converters are the callbacks that could alter the original invocation.</p>
+<p>Converters are callback hooks that can alter the original invocation.</p>
 </div>
 <div class="paragraph">
-<p>Currently, <code>BindParameterConverter</code> and <code>ResultRowConverter</code> are available.
-They represent bind operations(<code>Statement#[bind|bindNull]</code>) and result row get operations(<code>Row#get</code>), respectively.
-The converters can change the result, call alternative methods, or even not invoke the originally
-called method.</p>
+<p>Currently, <code>BindParameterConverter</code> and <code>ResultRowConverter</code> are available. They represent bind
+operations (<code>Statement#[bind|bindNull]</code>) and result-row access operations (<code>Row#get</code>), respectively.
+The converters can change the result, call alternative methods, or even skip invoking the original method.</p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-01 09:35:17 UTC
+Last updated 2026-10-09 03:30:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

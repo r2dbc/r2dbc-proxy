@@ -85,7 +85,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">StatementInfo</span></div>
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
 <dl class="notes">
 <dt>Author:</dt>
 <dd>Tadaya Tsuyukubo</dd>
@@ -108,22 +108,22 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getConnectionInfo()" class="member-name-link">getConnectionInfo</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Get <a href="ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a> associated to this <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
+<div class="block">Returns the <a href="ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a> associated with this <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getOriginalQuery()" class="member-name-link">getOriginalQuery</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Get the sql statement that has originally specified on <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html#createStatement-java.lang.String-" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection.createStatement(String)</code></a>.</div>
+<div class="block">Returns the SQL statement originally provided to <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html#createStatement-java.lang.String-" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection.createStatement(String)</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getUpdatedQuery()" class="member-name-link">getUpdatedQuery</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Get the updated sql statement by <a href="../listener/BindParameterConverter.html#onCreateStatement(java.lang.String,io.r2dbc.proxy.core.StatementInfo)"><code>BindParameterConverter.onCreateStatement(String, StatementInfo)</code></a>.</div>
+<div class="block">Returns the SQL statement updated by <a href="../listener/BindParameterConverter.html#onCreateStatement(java.lang.String,io.r2dbc.proxy.core.StatementInfo)"><code>BindParameterConverter.onCreateStatement(String, StatementInfo)</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getValueStore()" class="member-name-link">getValueStore</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Retrieve <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical statement.</div>
+<div class="block">Returns the <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> associated with the scope of the logical statement.</div>
 </div>
 </div>
 </div>
@@ -144,7 +144,7 @@ loadScripts(document, 'script');</script>
 <h3>getConnectionInfo</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a></span>&nbsp;<span class="element-name">getConnectionInfo</span>()</div>
-<div class="block">Get <a href="ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a> associated to this <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
+<div class="block">Returns the <a href="ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a> associated with this <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>connection info</dd>
@@ -157,7 +157,7 @@ loadScripts(document, 'script');</script>
 <h3>getOriginalQuery</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getOriginalQuery</span>()</div>
-<div class="block">Get the sql statement that has originally specified on <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html#createStatement-java.lang.String-" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection.createStatement(String)</code></a>.</div>
+<div class="block">Returns the SQL statement originally provided to <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html#createStatement-java.lang.String-" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection.createStatement(String)</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>original sql statement</dd>
@@ -170,7 +170,7 @@ loadScripts(document, 'script');</script>
 <h3>getUpdatedQuery</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getUpdatedQuery</span>()</div>
-<div class="block">Get the updated sql statement by <a href="../listener/BindParameterConverter.html#onCreateStatement(java.lang.String,io.r2dbc.proxy.core.StatementInfo)"><code>BindParameterConverter.onCreateStatement(String, StatementInfo)</code></a>.</div>
+<div class="block">Returns the SQL statement updated by <a href="../listener/BindParameterConverter.html#onCreateStatement(java.lang.String,io.r2dbc.proxy.core.StatementInfo)"><code>BindParameterConverter.onCreateStatement(String, StatementInfo)</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>updated sql statement</dd>
@@ -183,7 +183,7 @@ loadScripts(document, 'script');</script>
 <h3>getValueStore</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></span>&nbsp;<span class="element-name">getValueStore</span>()</div>
-<div class="block">Retrieve <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical statement.
+<div class="block">Returns the <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> associated with the scope of the logical statement.
 
  <p>Values can be stored or retrieved from this store while statement is available.</div>
 <dl class="notes">
@@ -201,7 +201,7 @@ loadScripts(document, 'script');</script>
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

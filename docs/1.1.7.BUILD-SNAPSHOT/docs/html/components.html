@@ -112,11 +112,11 @@
 <h2 id="components_proxyconnectionfactory"><a class="anchor" href="#components_proxyconnectionfactory"></a>1. ProxyConnectionFactory</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This is the entry point to create a <code>ConnectionFactory</code> proxy.</p>
+<p>This is the entry point for creating a proxy <code>ConnectionFactory</code>.</p>
 </div>
 <div class="paragraph">
-<p>The <code>ProxyConnectionFactory#builder</code> static method creates a <code>Builder</code> instance, which provides
-methods to register listeners, configures the proxy, and generates a proxy <code>ConnectionFactory</code>.</p>
+<p>The static <code>ProxyConnectionFactory#builder</code> method creates a <code>Builder</code> instance, which provides methods to
+register listeners, configure the proxy, and generate a proxy <code>ConnectionFactory</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -124,17 +124,17 @@ methods to register listeners, configures the proxy, and generates a proxy <code
 
 ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
     .onAfterQuery(queryInfo -&gt;
-        ...  // after query callback logic
+        ...  // after-query callback logic
     )
     .onBeforeMethod(methodInfo -&gt;
-        ...  // before method callback logic
+        ...  // before-method callback logic
     )
     .listener(...)  // add listener
     .build();</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Alternatively, the connection factory discovery can create a proxy when driver name is the <code>proxy</code>.</p>
+<p>Alternatively, connection-factory discovery can create a proxy when the driver name is <code>proxy</code>.</p>
 </div>
 </div>
 </div>
@@ -142,15 +142,16 @@ ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
 <h2 id="components_proxyconfig"><a class="anchor" href="#components_proxyconfig"></a>2. ProxyConfig</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Central configuration object for creating proxies.</p>
+<p><code>ProxyConfig</code> is the central configuration object for creating proxies.</p>
 </div>
 <div class="paragraph">
-<p>A <code>ProxyConfig</code> instance holds the proxy related configurations, such as <code>ProxyExecutionListener</code>, <code>ProxyFactory</code>, or <code>BindParameterConverter</code>.
-Any proxy objects created by a proxy <code>ConnectionFactory</code> share the same <code>ProxyConfig</code> instance.</p>
+<p>A <code>ProxyConfig</code> instance holds proxy-related configuration, such as <code>ProxyExecutionListener</code>, <code>ProxyFactory</code>,
+and <code>BindParameterConverter</code>. Any proxy objects created by a proxy <code>ConnectionFactory</code> share the same
+<code>ProxyConfig</code> instance.</p>
 </div>
 <div class="paragraph">
-<p><code>ProxyConnectionFactory.Builder</code> automatically creates a <code>ProxyConfig</code> internally.
-It also takes a custom <code>ProxyConfig</code> in case you need a customization.</p>
+<p><code>ProxyConnectionFactory.Builder</code> automatically creates a <code>ProxyConfig</code> internally. It also accepts a custom
+<code>ProxyConfig</code> when you need to override or extend the defaults.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -167,18 +168,17 @@ ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original, p
 <h2 id="components_proxyfactory"><a class="anchor" href="#components_proxyfactory"></a>3. ProxyFactory</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Strategy interface to create each proxy.</p>
+<p><code>ProxyFactory</code> is the strategy interface used to create each proxy.</p>
 </div>
 <div class="paragraph">
-<p>The default proxy factory implementation(<code>JdkProxyFactory</code>) uses JDK dynamic proxy for creating proxy objects.</p>
+<p>The default implementation, <code>JdkProxyFactory</code>, uses the JDK dynamic proxy to create proxy objects.</p>
 </div>
 <div class="paragraph">
-<p>Providing a custom <code>ProxyFactory</code> allows different proxy mechanism for constructing proxies. For example,
-<a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/java-agent-example/common/src/main/java/io/r2dbc/examples/agent/ByteBuddyProxyFactory.java">here is a sample code to
- use ByteBuddy for proxy creation</a>.</p>
+<p>Providing a custom <code>ProxyFactory</code> allows a different proxy mechanism for constructing proxies. For example,
+<a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/java-agent-example/common/src/main/java/io/r2dbc/examples/agent/ByteBuddyProxyFactory.java">here is a sample of using ByteBuddy for proxy creation</a>.</p>
 </div>
 <div class="paragraph">
-<p>When you have a custom <code>ProxyFactory</code> implementation, <code>ProxyConfig</code> has a method to register it.</p>
+<p>When you provide a custom <code>ProxyFactory</code> implementation, <code>ProxyConfig</code> includes a method to register it.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -195,46 +195,46 @@ ProxyConfig proxyConfig = ProxyConfig.builder()
 <h2 id="components_proxyexecutionlistener"><a class="anchor" href="#components_proxyexecutionlistener"></a>4. ProxyExecutionListener</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>ProxyExecutionListener</code> is the root listener interface which defines callbacks
-for method invocation, query execution, and query result processing.</p>
+<p><code>ProxyExecutionListener</code> is the root listener interface that defines callbacks for method invocation,
+query execution, and query-result processing.</p>
 </div>
 <div class="listingblock">
-<div class="title">Method defined on ProxyExecutionListener</div>
+<div class="title">Methods defined on ProxyExecutionListener</div>
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// invoked before any method on proxy is called
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// invoked before any method on a proxy is called
 void beforeMethod(MethodExecutionInfo executionInfo);
 
-// invoked after any method on proxy is called
+// invoked after any method on a proxy is called
 void afterMethod(MethodExecutionInfo executionInfo);
 
-// invoked before query gets executed
+// invoked before a query is executed
 void beforeQuery(QueryExecutionInfo execInfo);
 
-// invoked after query is executed
+// invoked after a query is executed
 void afterQuery(QueryExecutionInfo execInfo);
 
-// invoked on processing(subscribing) each query result
+// invoked when each query result is processed (subscribed)
 void eachQueryResult(QueryExecutionInfo execInfo);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Anytime a caller invokes a method on a proxy, it triggers method callbacks,<code>beforeMethod()</code> and <code>afterMethod()</code>.
-They receive a <code>QueryExecutionInfo</code> parameter which contains the contextual information about the invoked method.</p>
+<p>Whenever a caller invokes a method on a proxy, it triggers the method callbacks <code>beforeMethod()</code> and
+<code>afterMethod()</code>. They receive a <code>MethodExecutionInfo</code> parameter that contains contextual information about the
+invoked method.</p>
 </div>
 <div class="paragraph">
-<p>The query execution methods, <code>Batch#execute()</code> and <code>Statement#execute()</code>, trigger query callbacks, <code>beforeQuery()</code>
-and <code>afterQuery()</code>. (Specifically, it is called when returned result-publisher is subscribed.)
-They receive <code>QueryExecutionInfo</code> parameter which holds the executing query information such as the query strings,
-bound parameter values, duration of the query execution, etc.</p>
+<p>The query-execution methods, <code>Batch#execute()</code> and <code>Statement#execute()</code>, trigger the query callbacks
+<code>beforeQuery()</code> and <code>afterQuery()</code>. (Specifically, they are invoked when the returned result publisher is
+subscribed.) They receive a <code>QueryExecutionInfo</code> parameter that contains query details such as the SQL text,
+bound parameter values, and query duration.</p>
 </div>
 <div class="paragraph">
-<p>While processing a <code>Result</code> object, <code>eachQueryResult()</code> receives a callback on each mapped query result at the
-subscription of <code>Result#map()</code>.</p>
+<p>While processing a <code>Result</code>, <code>eachQueryResult()</code> is invoked for each mapped query result when <code>Result#map()</code>
+is subscribed.</p>
 </div>
 <div class="paragraph">
-<p>When a user has a custom <code>ProxyExecutionListener</code> implementation,
-<code>ProxyConnectionFactory.Builder</code> has a method to register the listener.
-In addition, the builder provides methods to directly register adhoc listeners.</p>
+<p>When you implement a custom <code>ProxyExecutionListener</code>, <code>ProxyConnectionFactory.Builder</code> provides a method to
+register it. In addition, the builder offers convenience methods for registering ad-hoc listeners.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -242,10 +242,10 @@ In addition, the builder provides methods to directly register adhoc listeners.<
 
 ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
     .onAfterQuery(queryInfo -&gt;
-        ...  // after query callback logic
+        ...  // after-query callback logic
     )
     .onBeforeMethod(methodInfo -&gt;
-        ...  // before method callback logic
+        ...  // before-method callback logic
     )
     .listener(...)  // add listener
     .build();</code></pre>
@@ -257,16 +257,15 @@ ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
 <h2 id="components_proxymethodexecutionlistener"><a class="anchor" href="#components_proxymethodexecutionlistener"></a>5. ProxyMethodExecutionListener</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>ProxyMethodExecutionListener</code> is an extension of <code>ProxyExecutionListener</code>.
-In addition to the methods defined in <code>ProxyExecutionListener</code>, <code>ProxyMethodExecutionListener</code> has explicit
-before/after methods for all methods defined on <code>ConnectionFactory</code>, <code>Connection</code>, <code>Batch</code>,
-<code>Statement</code>, and <code>Result</code>.</p>
+<p><code>ProxyMethodExecutionListener</code> is an extension of <code>ProxyExecutionListener</code>. In addition to the methods
+defined in <code>ProxyExecutionListener</code>, it adds explicit before/after methods for all methods on
+<code>ConnectionFactory</code>, <code>Connection</code>, <code>Batch</code>, <code>Statement</code>, and <code>Result</code>.</p>
 </div>
 <div class="paragraph">
-<p>Method names are based on the rule: <em>"[before|after]&lt;method-name&gt;On&lt;class-name&gt;"</em>.</p>
+<p>Method names follow the pattern: <em>"[before|after]&lt;MethodName&gt;On&lt;ClassName&gt;"</em>.</p>
 </div>
 <div class="paragraph">
-<p>For example, if you want to perform an action at the creation or close of a connection:</p>
+<p>For example, if you want to perform an action when a connection is created or closed:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -279,9 +278,8 @@ before/after methods for all methods defined on <code>ConnectionFactory</code>, 
 
   @Override
   public void afterCloseOnConnection(MethodExecutionInfo methodExecutionInfo) {
-    // called after  Connection#close()
+    // called after Connection#close()
   }
-
 }</code></pre>
 </div>
 </div>
@@ -291,27 +289,26 @@ before/after methods for all methods defined on <code>ConnectionFactory</code>, 
 <h2 id="components_formatters"><a class="anchor" href="#components_formatters"></a>6. Formatters</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>One of the typical usages of the proxy listener is logging a contextual information.
-For example, when a query runs, logs the query string, parameters, success/failure result,
-query execution time, thread, etc.</p>
+<p>One common use of proxy listeners is logging contextual information. For example, when a query runs, a
+listener can log the SQL text, parameters, success/failure state, execution time, and thread information.</p>
 </div>
 <div class="paragraph">
-<p>Each callback method on <code>ProxyExecutionListener</code> receives contextual information - <code>QueryExecutionInfo</code> and <code>MethodExecutionInfo</code>.
-To perform logging, you need to transform <code>[Method|Query]ExecutionInfo</code> to the logging entries in a format of the <code>String</code>.</p>
+<p>Each callback method on <code>ProxyExecutionListener</code> receives contextual information such as <code>QueryExecutionInfo</code>
+and <code>MethodExecutionInfo</code>. To create log entries, you transform this data into a <code>String</code>.</p>
 </div>
 <div class="paragraph">
-<p>Formatter classes fill this gap. <code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> are available out of the box.
-They provide user-friendly conversion methods, which transform selectively or all data in
-the <code>[Method|Query]ExecutionInfo</code> to a <code>String</code> with a default or customized format.</p>
+<p>Formatter classes fill this gap. <code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> are
+available out of the box. They provide user-friendly conversion methods to transform all or selected parts of
+<code>[Method|Query]ExecutionInfo</code> into a <code>String</code> using default or custom formatting.</p>
 </div>
 <div class="sect2">
 <h3 id="components_formatters_queryexecutioninfoformatter"><a class="anchor" href="#components_formatters_queryexecutioninfoformatter"></a>6.1. QueryExecutionInfoFormatter</h3>
 <div class="paragraph">
-<p>This class converts <code>QueryExecutionInfo</code> to <code>String</code>.</p>
+<p>This class converts <code>QueryExecutionInfo</code> to a <code>String</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// convert all info
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// convert all information
 QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
 String str = formatter.format(queryExecutionInfo);
 
@@ -323,16 +320,16 @@ String str = formatter.format(queryExecutionInfo);</code></pre>
 <div class="sect2">
 <h3 id="components_formatters_methodexecutioninfoformatter"><a class="anchor" href="#components_formatters_methodexecutioninfoformatter"></a>6.2. MethodExecutionInfoFormatter</h3>
 <div class="paragraph">
-<p>This class  converts <code>MethodExecutionInfo</code> to <code>String</code>.</p>
+<p>This class converts <code>MethodExecutionInfo</code> to a <code>String</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
 
-// register as adhoc listener
-ProxyConnectionFactoryBuilder.create(connectionFactory)
+// register as an ad-hoc listener
+ProxyConnectionFactory.builder(connectionFactory)
   .onAfterMethod(execInfo -&gt;
-     System.out.println(formatter.format(execInfo)))  // convert &amp; print out to sysout
+     System.out.println(formatter.format(execInfo)))  // convert and print to stdout
   .build();</code></pre>
 </div>
 </div>
@@ -340,12 +337,12 @@ ProxyConnectionFactoryBuilder.create(connectionFactory)
 <div class="sect2">
 <h3 id="components_formatters_customizing-formatter"><a class="anchor" href="#components_formatters_customizing-formatter"></a>6.3. Customizing Formatter</h3>
 <div class="paragraph">
-<p><code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> hold a list of consumers internally and loop
+<p><code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> internally hold a list of consumers and loop
 through them to populate the output <code>StringBuilder</code>.</p>
 </div>
 <div class="paragraph">
-<p>Each consumer simply converts a portion of the <code>[Query|Method]ExecutionInfo</code> to <code>StringBuilder</code>.
-Formatting is customizable by toggling builtin converters and registering new consumers.</p>
+<p>Each consumer converts a portion of the <code>[Query|Method]ExecutionInfo</code> into a <code>StringBuilder</code>.
+Formatting is customizable by enabling or disabling built-in converters and by registering new consumers.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -353,12 +350,12 @@ Formatting is customizable by toggling builtin converters and registering new co
 QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
 formatter.addConsumer((execInfo, sb) -&gt; {
   sb.append("MY-QUERY-EXECUTION="); // add prefix
-};
+});
 formatter.newLine();  // new line
 formatter.showSuccess();
-formatter.addConsumer((execInfo, sb)  -&gt; {
+formatter.addConsumer((execInfo, sb) -&gt; {
     // custom conversion
-    sb.append("MY-ID=" + executionInfo.getConnectionInfo().getConnectionId());
+    sb.append("MY-ID=" + execInfo.getConnectionInfo().getConnectionId());
 });
 formatter.showQuery();
 
@@ -373,16 +370,16 @@ String str = formatter.format(queryExecutionInfo);</code></pre>
 <h2 id="components_bindparameterconverter"><a class="anchor" href="#components_bindparameterconverter"></a>7. BindParameterConverter</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>BindParameterConverter</code> is a callback interface for bind parameter related operations - <code>Statement#bind</code> and <code>Statement#bindNull</code>.</p>
+<p><code>BindParameterConverter</code> is a callback interface for bind-parameter operations such as <code>Statement#bind</code> and
+<code>Statement#bindNull</code>.</p>
 </div>
 <div class="paragraph">
-<p>The callback is performed <strong>before</strong> calling the actual bind parameter operations.
-This converter can change the actual behavior of the bind parameter operations.
-For example, a converter can transform the bind markers.</p>
+<p>The callback is invoked <strong>before</strong> the actual bind-parameter operation. It can modify the behavior of the
+bind operation. For example, a converter can rewrite bind markers.</p>
 </div>
 <div class="paragraph">
-<p>Please see more details on the
-<a href="https://github.com/r2dbc/r2dbc-proxy/issues/26">"gh-26: Proxy mechanism to support converting bind marker"</a> github issue.</p>
+<p>See more details in the
+<a href="https://github.com/r2dbc/r2dbc-proxy/issues/26">"gh-26: Proxy mechanism to support converting bind marker"</a> issue.</p>
 </div>
 </div>
 </div>
@@ -390,14 +387,13 @@ For example, a converter can transform the bind markers.</p>
 <h2 id="components_resultrowconverter"><a class="anchor" href="#components_resultrowconverter"></a>8. ResultRowConverter</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>ResultRowConverter</code> is a callback interface for result row get(<code>Row#get</code>) operations.</p>
+<p><code>ResultRowConverter</code> is a callback interface for result-row access via <code>Row#get</code>.</p>
 </div>
 <div class="paragraph">
-<p>The callback is performed <strong>before</strong> calling the actual <code>Row#get</code> operation.
-This converter can alter the actual behavior of the invoked <code>Row#get</code> method.</p>
+<p>The callback is invoked <strong>before</strong> the actual <code>Row#get</code> call. It can alter the behavior of the invoked method.</p>
 </div>
 <div class="paragraph">
-<p>To use the converter, register it to the <code>ProxyConfig</code>.</p>
+<p>To use the converter, register it with <code>ProxyConfig</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -408,25 +404,12 @@ ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).bu
 ConnectionFactory proxy = ProxyConnectionFactory.builder(connectionFactory, proxyConfig).build();</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Sample usages:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="#use-cases_support-primitive-and-null-in-result-mapping">[use-cases_support-primitive-and-null-in-result-mapping]</a></p>
-</li>
-<li>
-<p><a href="#use-cases_call-different-methods-in-result-mapping">[use-cases_call-different-methods-in-result-mapping]</a></p>
-</li>
-</ul>
-</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-01 09:35:17 UTC
+Last updated 2026-10-09 03:30:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

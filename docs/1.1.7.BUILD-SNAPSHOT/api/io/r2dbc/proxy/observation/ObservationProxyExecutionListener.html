@@ -158,7 +158,7 @@ implements <a href="../listener/ProxyExecutionListener.html" title="interface in
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)" class="member-name-link">eachQueryResult</a><wbr>(<a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;executionInfo)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Called on processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.</div>
+<div class="block">Called while processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setIncludeParameterValues(boolean)" class="member-name-link">setIncludeParameterValues</a><wbr>(boolean&nbsp;includeParameterValues)</code></div>
@@ -246,12 +246,12 @@ implements <a href="../listener/ProxyExecutionListener.html" title="interface in
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)">ProxyExecutionListener</a></code></span></div>
 <div class="block">Called before executing a query (<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Batch.html#execute--" title="class or interface in io.r2dbc.spi" class="external-link"><code>Batch.execute()</code></a> or <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html#execute--" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement.execute()</code></a>).
  <p>
- Note: this callback is called when the publisher, result of the <code>execute()</code>, is being
- subscribed. Not at the time of <code>execute()</code> is called,
+ Note: this callback is invoked when the publisher produced by <code>execute()</code> is subscribed,
+ not when <code>execute()</code> itself is called.
  <p>
- Exception Handling:
+ Exception handling:
  Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
- Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped(java.util.function.Consumer)" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)">beforeQuery</a></code>&nbsp;in interface&nbsp;<code><a href="../listener/ProxyExecutionListener.html" title="interface in io.r2dbc.proxy.listener">ProxyExecutionListener</a></code></dd>
@@ -272,21 +272,21 @@ implements <a href="../listener/ProxyExecutionListener.html" title="interface in
  The callback order is:
  <ul>
      <li><a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a>
-     <li><a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a> for 1st result
-     <li><a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a> for 2nd result
+     <li><a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a> for the first result
+     <li><a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a> for the second result
      <li>...
-     <li><a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a> for Nth result
+     <li><a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a> for the Nth result
      <li><a href="../listener/ProxyExecutionListener.html#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.afterQuery(QueryExecutionInfo)</code></a>
  </ul>
- <a href="../core/QueryExecutionInfo.html#getExecuteDuration()"><code>QueryExecutionInfo.getExecuteDuration()</code></a> is available in this callback and it holds
- the duration since <a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a>.
+ <a href="../core/QueryExecutionInfo.html#getExecuteDuration()"><code>QueryExecutionInfo.getExecuteDuration()</code></a> is available in this callback and contains the
+ duration since <a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a>.
  <p>
- Note: this callback is called when the publisher, result of the <code>execute()</code>, is being
- subscribed. Not at the time of <code>execute()</code> is called,
+ Note: this callback is invoked when the publisher produced by <code>execute()</code> is subscribed,
+ not when <code>execute()</code> itself is called.
  <p>
- Exception Handling:
+ Exception handling:
  Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
- Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped(java.util.function.Consumer)" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../listener/ProxyExecutionListener.html#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)">afterQuery</a></code>&nbsp;in interface&nbsp;<code><a href="../listener/ProxyExecutionListener.html" title="interface in io.r2dbc.proxy.listener">ProxyExecutionListener</a></code></dd>
@@ -302,16 +302,15 @@ implements <a href="../listener/ProxyExecutionListener.html" title="interface in
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">eachQueryResult</span><wbr><span class="parameters">(<a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;executionInfo)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)">ProxyExecutionListener</a></code></span></div>
-<div class="block">Called on processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.
+<div class="block">Called while processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.
  <p>
- While processing query results <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>, this callback
- is called per result.
+ This callback is invoked once per result while query results are being processed.
  <p>
  <a href="../core/QueryExecutionInfo.html#getCurrentMappedResult()"><code>QueryExecutionInfo.getCurrentMappedResult()</code></a> contains the mapped result.
  <p>
- Exception Handling:
+ Exception handling:
  Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
- Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped(java.util.function.Consumer)" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)">eachQueryResult</a></code>&nbsp;in interface&nbsp;<code><a href="../listener/ProxyExecutionListener.html" title="interface in io.r2dbc.proxy.listener">ProxyExecutionListener</a></code></dd>
@@ -353,7 +352,7 @@ implements <a href="../listener/ProxyExecutionListener.html" title="interface in
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

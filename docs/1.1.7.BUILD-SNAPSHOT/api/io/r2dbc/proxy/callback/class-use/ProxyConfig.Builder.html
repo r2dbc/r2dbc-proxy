@@ -64,7 +64,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="#io.r2dbc.proxy.callback">io.r2dbc.proxy.callback</a></div>
 <div class="col-last even-row-color">
-<div class="block">Proxy related classes</div>
+<div class="block">Proxy implementation classes and callback machinery.</div>
 </div>
 </div>
 <section class="class-uses">
@@ -80,12 +80,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code><a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback">ProxyConfig.Builder</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ProxyConfig.Builder.</span><code><a href="../ProxyConfig.Builder.html#bindParameterConverter(io.r2dbc.proxy.listener.BindParameterConverter)" class="member-name-link">bindParameterConverter</a><wbr>(<a href="../../listener/BindParameterConverter.html" title="interface in io.r2dbc.proxy.listener">BindParameterConverter</a>&nbsp;bindParameterConverter)</code></div>
 <div class="col-last even-row-color">
-<div class="block">Set <a href="../../listener/BindParameterConverter.html" title="interface in io.r2dbc.proxy.listener"><code>BindParameterConverter</code></a>.</div>
+<div class="block">Sets the <a href="../../listener/BindParameterConverter.html" title="interface in io.r2dbc.proxy.listener"><code>BindParameterConverter</code></a>.</div>
 </div>
 <div class="col-first odd-row-color"><code>static <a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback">ProxyConfig.Builder</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ProxyConfig.</span><code><a href="../ProxyConfig.html#builder()" class="member-name-link">builder</a>()</code></div>
 <div class="col-last odd-row-color">
-<div class="block">Create a new <a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback"><code>ProxyConfig.Builder</code></a>.</div>
+<div class="block">Creates a new <a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback"><code>ProxyConfig.Builder</code></a>.</div>
 </div>
 <div class="col-first even-row-color"><code><a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback">ProxyConfig.Builder</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ProxyConfig.Builder.</span><code><a href="../ProxyConfig.Builder.html#clock(java.time.Clock)" class="member-name-link">clock</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/time/Clock.html" title="class or interface in java.time" class="external-link">Clock</a>&nbsp;clock)</code></div>
@@ -95,7 +95,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><code><a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback">ProxyConfig.Builder</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ProxyConfig.Builder.</span><code><a href="../ProxyConfig.Builder.html#connectionIdManager(io.r2dbc.proxy.callback.ConnectionIdManager)" class="member-name-link">connectionIdManager</a><wbr>(<a href="../ConnectionIdManager.html" title="interface in io.r2dbc.proxy.callback">ConnectionIdManager</a>&nbsp;connectionIdManager)</code></div>
 <div class="col-last odd-row-color">
-<div class="block">Set <a href="../ConnectionIdManager.html" title="interface in io.r2dbc.proxy.callback"><code>ConnectionIdManager</code></a>.</div>
+<div class="block">Sets the <a href="../ConnectionIdManager.html" title="interface in io.r2dbc.proxy.callback"><code>ConnectionIdManager</code></a>.</div>
 </div>
 <div class="col-first even-row-color"><code><a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback">ProxyConfig.Builder</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ProxyConfig.Builder.</span><code><a href="../ProxyConfig.Builder.html#listener(io.r2dbc.proxy.listener.ProxyExecutionListener)" class="member-name-link">listener</a><wbr>(<a href="../../listener/ProxyExecutionListener.html" title="interface in io.r2dbc.proxy.listener">ProxyExecutionListener</a>&nbsp;listener)</code></div>
@@ -105,12 +105,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><code><a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback">ProxyConfig.Builder</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ProxyConfig.Builder.</span><code><a href="../ProxyConfig.Builder.html#proxyFactoryFactory(io.r2dbc.proxy.callback.ProxyFactoryFactory)" class="member-name-link">proxyFactoryFactory</a><wbr>(<a href="../ProxyFactoryFactory.html" title="interface in io.r2dbc.proxy.callback">ProxyFactoryFactory</a>&nbsp;proxyFactoryFactory)</code></div>
 <div class="col-last odd-row-color">
-<div class="block">Set <a href="../ProxyFactoryFactory.html" title="interface in io.r2dbc.proxy.callback"><code>ProxyFactoryFactory</code></a>.</div>
+<div class="block">Sets the <a href="../ProxyFactoryFactory.html" title="interface in io.r2dbc.proxy.callback"><code>ProxyFactoryFactory</code></a>.</div>
 </div>
 <div class="col-first even-row-color"><code><a href="../ProxyConfig.Builder.html" title="class in io.r2dbc.proxy.callback">ProxyConfig.Builder</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ProxyConfig.Builder.</span><code><a href="../ProxyConfig.Builder.html#resultRowConverter(io.r2dbc.proxy.listener.ResultRowConverter)" class="member-name-link">resultRowConverter</a><wbr>(<a href="../../listener/ResultRowConverter.html" title="interface in io.r2dbc.proxy.listener">ResultRowConverter</a>&nbsp;resultRowConverter)</code></div>
 <div class="col-last even-row-color">
-<div class="block">Set <a href="../../listener/ResultRowConverter.html" title="interface in io.r2dbc.proxy.listener"><code>ResultRowConverter</code></a>.</div>
+<div class="block">Sets the <a href="../../listener/ResultRowConverter.html" title="interface in io.r2dbc.proxy.listener"><code>ResultRowConverter</code></a>.</div>
 </div>
 </div>
 </section>
@@ -119,7 +119,7 @@ loadScripts(document, 'script');</script>
 </section>
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

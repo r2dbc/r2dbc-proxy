@@ -153,82 +153,82 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getBatchSize()" class="member-name-link">getBatchSize</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the size of the batch query.</div>
+<div class="block">Returns the size of the batch query.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getBindingsSize()" class="member-name-link">getBindingsSize</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the number of the binding.</div>
+<div class="block">Returns the number of bindings.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getConnectionInfo()" class="member-name-link">getConnectionInfo</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the associated <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a>.</div>
+<div class="block">Returns the associated <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCurrentMappedResult()" class="member-name-link">getCurrentMappedResult</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Mapped query result available for each-query-result-callback(<a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a>).</div>
+<div class="block">The mapped query result available for each query-result callback (<a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a>).</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCurrentResultCount()" class="member-name-link">getCurrentResultCount</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Represent Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.</div>
+<div class="block">Represents the Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExecuteDuration()" class="member-name-link">getExecuteDuration</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the time that took queries to execute.</div>
+<div class="block">Returns the time spent executing the query.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html" title="class or interface in java.lang.reflect" class="external-link">Method</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMethod()" class="member-name-link">getMethod</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the invoked query execution <code>Method</code>.</div>
+<div class="block">Returns the method used for the query execution.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMethodArgs()" class="member-name-link">getMethodArgs</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the arguments of the invocation.</div>
+<div class="block">Returns the arguments passed to the invocation.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../core/ProxyEventType.html" title="enum class in io.r2dbc.proxy.core">ProxyEventType</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getProxyEventType()" class="member-name-link">getProxyEventType</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the proxy event type for query execution.</div>
+<div class="block">Returns the proxy event type for the query execution.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../core/QueryInfo.html" title="class in io.r2dbc.proxy.core">QueryInfo</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getQueries()" class="member-name-link">getQueries</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the list of <a href="../core/QueryInfo.html" title="class in io.r2dbc.proxy.core"><code>QueryInfo</code></a>.</div>
+<div class="block">Returns the list of <a href="../core/QueryInfo.html" title="class in io.r2dbc.proxy.core"><code>QueryInfo</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>long</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getThreadId()" class="member-name-link">getThreadId</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the currently executed thread ID.</div>
+<div class="block">Returns the ID of the thread executing the query.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getThreadName()" class="member-name-link">getThreadName</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the currently executed thread name.</div>
+<div class="block">Returns the name of the thread executing the query.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getThrowable()" class="member-name-link">getThrowable</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the thrown exception.</div>
+<div class="block">Returns the exception thrown by the invocation.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../core/ExecutionType.html" title="enum class in io.r2dbc.proxy.core">ExecutionType</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the type of query execution.</div>
+<div class="block">Returns the type of query execution.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValueStore()" class="member-name-link">getValueStore</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieve <a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of before/after method execution.</div>
+<div class="block">Returns the <a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> associated with the scope of the before/after query execution.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isSuccess()" class="member-name-link">isSuccess</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Indicate whether the query execution was successful or not.</div>
+<div class="block">Returns whether the query execution was successful.</div>
 </div>
 </div>
 </div>
@@ -279,7 +279,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html" title="class or interface in java.lang.reflect" class="external-link">Method</a></span>&nbsp;<span class="element-name">getMethod</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getMethod()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the invoked query execution <code>Method</code>.</div>
+<div class="block">Returns the method used for the query execution.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getMethod()">getMethod</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -295,9 +295,9 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]</span>&nbsp;<span class="element-name">getMethodArgs</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getMethodArgs()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the arguments of the invocation.
+<div class="block">Returns the arguments passed to the invocation.
 
- This can be <code>null</code> when method is invoked with no argument.</div>
+ This value may be <code>null</code> when the method is invoked without any arguments.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getMethodArgs()">getMethodArgs</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -313,9 +313,9 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a></span>&nbsp;<span class="element-name">getThrowable</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getThrowable()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the thrown exception.
- For <a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a> callback or query execution
- did't throw any error, this returns <code>null</code>.</div>
+<div class="block">Returns the exception thrown by the invocation.
+ For the <a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a> callback, or when the query execution
+ did not throw any error, this returns <code>null</code>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getThrowable()">getThrowable</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -331,7 +331,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a></span>&nbsp;<span class="element-name">getConnectionInfo</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getConnectionInfo()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the associated <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a>.</div>
+<div class="block">Returns the associated <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getConnectionInfo()">getConnectionInfo</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -347,10 +347,10 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isSuccess</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#isSuccess()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Indicate whether the query execution was successful or not.
- Contains valid value only after the query execution.
+<div class="block">Returns whether the query execution was successful.
+ This value is populated only after the query execution completes.
 
- Query execution is considered successful when the <a href="https://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/org/reactivestreams/Publisher.html" title="class or interface in org.reactivestreams" class="external-link"><code>Publisher</code></a>
+ A query execution is considered successful when the <a href="https://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/org/reactivestreams/Publisher.html" title="class or interface in org.reactivestreams" class="external-link"><code>Publisher</code></a>
  returned from <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html#execute--" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement.execute()</code></a> either received completion
  or at least one element is emitted regardless of it has received cancellation.</div>
 <dl class="notes">
@@ -368,9 +368,9 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getBatchSize</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getBatchSize()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the size of the batch query.
+<div class="block">Returns the size of the batch query.
 
- i.e. Number of the calls of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Batch.html#add-java.lang.String-" title="class or interface in io.r2dbc.spi" class="external-link"><code>Batch.add(String)</code></a>.</div>
+ In other words, this is the number of calls to <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Batch.html#add-java.lang.String-" title="class or interface in io.r2dbc.spi" class="external-link"><code>Batch.add(String)</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getBatchSize()">getBatchSize</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -386,12 +386,12 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../core/QueryInfo.html" title="class in io.r2dbc.proxy.core">QueryInfo</a>&gt;</span>&nbsp;<span class="element-name">getQueries</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getQueries()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the list of <a href="../core/QueryInfo.html" title="class in io.r2dbc.proxy.core"><code>QueryInfo</code></a>.</div>
+<div class="block">Returns the list of <a href="../core/QueryInfo.html" title="class in io.r2dbc.proxy.core"><code>QueryInfo</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getQueries()">getQueries</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
 <dt>Returns:</dt>
-<dd>list of queries. This will NOT return <code>null</code>.</dd>
+<dd>the list of queries; never <code>null</code></dd>
 </dl>
 </div>
 </section>
@@ -402,7 +402,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../core/ExecutionType.html" title="enum class in io.r2dbc.proxy.core">ExecutionType</a></span>&nbsp;<span class="element-name">getType</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getType()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the type of query execution.</div>
+<div class="block">Returns the type of query execution.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -418,9 +418,9 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getBindingsSize</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getBindingsSize()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the number of the binding.
+<div class="block">Returns the number of bindings.
 
- i.e. Number of the calls of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html#add--" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement.add()</code></a>.</div>
+ In other words, this is the number of calls to <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html#add--" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement.add()</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getBindingsSize()">getBindingsSize</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -436,7 +436,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></span>&nbsp;<span class="element-name">getExecuteDuration</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getExecuteDuration()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the time that took queries to execute.
+<div class="block">Returns the time spent executing the query.
  <p>
  Duration is only populated in appropriate phase.
  (e.g.: <a href="../listener/ProxyExecutionListener.html#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.afterQuery(QueryExecutionInfo)</code></a>)</div>
@@ -455,7 +455,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getThreadName</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getThreadName()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the currently executed thread name.</div>
+<div class="block">Returns the name of the thread executing the query.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getThreadName()">getThreadName</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -471,7 +471,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">long</span>&nbsp;<span class="element-name">getThreadId</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getThreadId()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the currently executed thread ID.</div>
+<div class="block">Returns the ID of the thread executing the query.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getThreadId()">getThreadId</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -487,7 +487,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../core/ProxyEventType.html" title="enum class in io.r2dbc.proxy.core">ProxyEventType</a></span>&nbsp;<span class="element-name">getProxyEventType</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getProxyEventType()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Get the proxy event type for query execution.</div>
+<div class="block">Returns the proxy event type for the query execution.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getProxyEventType()">getProxyEventType</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -504,15 +504,14 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getCurrentResultCount</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getCurrentResultCount()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Represent Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.
+<div class="block">Represents the Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.
 
- On each query result callback(<a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a>),
- this value indicates Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a> starting from 1.
- (1st query result, 2nd query result, 3rd, 4th,...).
+ For each query-result callback (<a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a>),
+ this value indicates the Nth <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>, starting from 1 (first, second, third, and so on).
 
- This returns 0 for before query execution(<a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a>).
- For after query execution(<a href="../listener/ProxyExecutionListener.html#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.afterQuery(QueryExecutionInfo)</code></a>), this returns
- total number of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a> returned by this query execution.</div>
+ This returns 0 before query execution (<a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a>).
+ For after-query execution (<a href="../listener/ProxyExecutionListener.html#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.afterQuery(QueryExecutionInfo)</code></a>), it returns the
+ total number of <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a> objects returned by this query execution.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/QueryExecutionInfo.html#getCurrentResultCount()">getCurrentResultCount</a></code>&nbsp;in interface&nbsp;<code><a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></code></dd>
@@ -528,9 +527,9 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">getCurrentMappedResult</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getCurrentMappedResult()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Mapped query result available for each-query-result-callback(<a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a>).
+<div class="block">The mapped query result available for each query-result callback (<a href="../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.eachQueryResult(QueryExecutionInfo)</code></a>).
 
- For before and after query execution(<a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a>
+ For the before- and after-query execution callbacks (<a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a>
  and <a href="../listener/ProxyExecutionListener.html#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.afterQuery(QueryExecutionInfo)</code></a>), this returns <code>null</code>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
@@ -547,7 +546,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></span>&nbsp;<span class="element-name">getValueStore</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/QueryExecutionInfo.html#getValueStore()">QueryExecutionInfo</a></code></span></div>
-<div class="block">Retrieve <a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of before/after method execution.
+<div class="block">Returns the <a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> associated with the scope of the before/after query execution.
 
  Mainly used for passing values between <a href="../listener/ProxyExecutionListener.html#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.beforeQuery(QueryExecutionInfo)</code></a> and
  <a href="../listener/ProxyExecutionListener.html#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>ProxyExecutionListener.afterQuery(QueryExecutionInfo)</code></a>.</div>
@@ -568,7 +567,7 @@ implements <a href="../core/QueryExecutionInfo.html" title="interface in io.r2db
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

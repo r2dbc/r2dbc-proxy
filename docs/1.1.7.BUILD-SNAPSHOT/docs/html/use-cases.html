@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>Use cases</title>
+<title>Use Cases</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <link rel="stylesheet" href="./asciidoctor.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -79,18 +79,18 @@
 </head>
 <body id="use-cases" class="book toc2 toc-left">
 <div id="header">
-<h1>Use cases</h1>
+<h1>Use Cases</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#use-cases_query-logging">1. Query logging</a>
+<li><a href="#use-cases_query-logging">1. Query Logging</a>
 <ul class="sectlevel2">
 <li><a href="#use-cases_query-logging_sample-configuration">1.1. Sample Configuration</a></li>
 </ul>
 </li>
 <li><a href="#use-cases_slow-query-detection">2. Slow Query Detection</a>
 <ul class="sectlevel2">
-<li><a href="#use-cases_slow-query-detection_sample-configuration">2.1. Sample Configuration (Non-preemptive)</a></li>
+<li><a href="#use-cases_slow-query-detection_sample-configuration">2.1. Sample Configuration (After Execution)</a></li>
 </ul>
 </li>
 <li><a href="#use-cases_method-tracing">3. Method Tracing</a>
@@ -111,29 +111,29 @@
 <li><a href="#use-cases_assertion-verification">6. Assertion/Verification</a></li>
 <li><a href="#use-cases_own-action">7. Own Action (Custom Listener)</a>
 <ul class="sectlevel2">
-<li><a href="#use-cases_own-action_implementing-custom-listener">7.1. Implementing custom listener</a></li>
+<li><a href="#use-cases_own-action_implementing-custom-listener">7.1. Implementing a Custom Listener</a></li>
 </ul>
 </li>
-<li><a href="#use-cases_support-primitive-and-null-in-result-mapping">8. Support Primitive and Null in Result Mapping</a></li>
-<li><a href="#use-cases_call-different-methods-in-result-mapping">9. Call different methods in Result Mapping</a></li>
+<li><a href="#use-cases_support-primitive-and-null-in-result-mapping">8. Support for Primitive and Null Values in Result Mapping</a></li>
+<li><a href="#use-cases_call-different-methods-in-result-mapping">9. Calling Different Methods in Result Mapping</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="use-cases_query-logging"><a class="anchor" href="#use-cases_query-logging"></a>1. Query logging</h2>
+<h2 id="use-cases_query-logging"><a class="anchor" href="#use-cases_query-logging"></a>1. Query Logging</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>At the query executions, registered proxy listeners receive query callbacks,
-<code>[before|after]Query</code> methods with <code>QueryExecutionInfo</code> parameter.
-This parameter contains contextual information about the query execution, such as query string, execution type, bindings, execution time, etc.</p>
+<p>At query execution time, registered proxy listeners receive query callbacks via the <code>[before|after]Query</code>
+methods with a <code>QueryExecutionInfo</code> parameter. This object contains contextual information about the query,
+including the SQL text, execution type, bindings, execution time, and more.</p>
 </div>
 <div class="paragraph">
-<p>With the <code>QueryExecutionInfoFormatter</code>, which converts <code>QueryExecutionInfo</code> to <code>String</code>, users can easily
-perform query logging.</p>
+<p>With <code>QueryExecutionInfoFormatter</code>, which converts <code>QueryExecutionInfo</code> to a <code>String</code>, users can easily perform
+query logging.</p>
 </div>
 <div class="listingblock">
-<div class="title">Sample Output (wrapped for display purpose)</div>
+<div class="title">Sample output (wrapped for display purposes)</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="sql" class="language-sql hljs"># Statement with no bindings
 #
@@ -168,30 +168,30 @@ Query:["INSERT INTO test VALUES ($1,$2)"], Bindings:[(100,101),(200,null(int))]<
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Create a <code>QueryExecutionInfoFormatter</code></p>
+<p>Create a <code>QueryExecutionInfoFormatter</code>.</p>
 </li>
 <li>
-<p>Use the formatter in after-query callback to convert <code>QueryExecutionInfo</code> to a <code>String</code> log entry.</p>
+<p>Use the formatter in the after-query callback to convert <code>QueryExecutionInfo</code> into a log entry.</p>
 </li>
 <li>
-<p>Pass it to the logger.</p>
+<p>Pass the formatted value to your logger.</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>The <strong>before</strong> query callback(<code>beforeQuery</code>) can also perform query logging; however, some attributes are only
-available in the <strong>after</strong> query callback(<code>afterQuery</code>) such as execution time, success or failure,
-result count, etc.</p>
+<p>The <strong>before</strong> query callback (<code>beforeQuery</code>) can also log queries, but some attributes are only available in
+the <strong>after</strong> query callback (<code>afterQuery</code>), such as execution time, success/failure status, and result count.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
 
 ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)    // wrap original ConnectionFactory
+  ProxyConnectionFactory.builder(connectionFactory)    // wrap the original ConnectionFactory
                                                        // on every query execution
     .onAfterQuery(execInfo -&gt;
-      logger.info(formatter.format(execInfo));         // convert &amp; log
+        logger.info(formatter.format(execInfo))         // convert and log
+    )
     .build();</code></pre>
 </div>
 </div>
@@ -202,42 +202,43 @@ ConnectionFactory proxyConnectionFactory =
 <h2 id="use-cases_slow-query-detection"><a class="anchor" href="#use-cases_slow-query-detection"></a>2. Slow Query Detection</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are two types of slow query detections - <code>preemptive</code> and <code>non-preemptive</code>.</p>
+<p>There are two common approaches to detect slow queries:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><em>Preemptive:</em> detect slow queries <strong>WHILE</strong> they are running.</p>
-</li>
-<li>
-<p><em>Non-preemptive:</em> detect slow queries <strong>AFTER</strong> they have executed.</p>
-</li>
-</ul>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">During execution</dt>
+<dd>
+<p>Detect slow queries <strong>while</strong> they are running. A watcher can notify when a query exceeds the threshold,
+even if it has not finished yet. This approach is sometimes called <em>preemptive</em>, but it only reports the
+query; the running query is not interrupted or canceled. In <a href="https://github.com/ttddyy/datasource-proxy">datasource-proxy</a>,
+<a href="https://jdbc-observations.github.io/datasource-proxy/docs/current/user-guide/index.html#_slow_query_logging_listener"><code>SlowQueryListener</code></a> follows this approach.</p>
+</dd>
+<dt class="hdlist1">After execution</dt>
+<dd>
+<p>Detect slow queries <strong>after</strong> they complete. The <code>onAfterQuery</code> callback can compare query execution time with
+a threshold. This is a simple and effective approach for many applications. It is sometimes called
+<em>non-preemptive</em>.</p>
+</dd>
+</dl>
 </div>
 <div class="paragraph">
-<p>The "non-preemptive" slow query detection is simple. On <code>afterQuery</code> callback, check the query execution time.
-If it took more than your threshold, perform an action such as logging, send notification, etc.</p>
-</div>
-<div class="paragraph">
-<p>For the "preemptive" slow query detection, you may create a watcher that checks the running queries and notifies
-ones that have exceeded the threshold.
-In <a href="https://github.com/ttddyy/datasource-proxy">datasource-proxy</a>, <a href="https://ttddyy.github.io/datasource-proxy/docs/current/user-guide/#_slow_query_logging_listener"><code>SlowQueryListener</code> is implemented this way</a>.</p>
+<p>Both approaches can be used together: use a watcher for early notice of long-running queries and an
+<code>onAfterQuery</code> callback to record the actual execution time.</p>
 </div>
 <div class="sect2">
-<h3 id="use-cases_slow-query-detection_sample-configuration"><a class="anchor" href="#use-cases_slow-query-detection_sample-configuration"></a>2.1. Sample Configuration (Non-preemptive)</h3>
+<h3 id="use-cases_slow-query-detection_sample-configuration"><a class="anchor" href="#use-cases_slow-query-detection_sample-configuration"></a>2.1. Sample Configuration (After Execution)</h3>
 <div class="paragraph">
-<p>On after query execution, check whether the query execution time has exceeded the threshold
-time, then perform an action.</p>
+<p>After a query completes, check whether the execution time exceeds the threshold and then perform an action.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">Duration threshold = Duration.of(...);
 
 ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
+  ProxyConnectionFactory.builder(connectionFactory)  // wrap the original ConnectionFactory
     .onAfterQuery(execInfo -&gt; {
-       if(threshold.minus(execInfo.getExecuteDuration()).isNegative()) {
-         // slow query logic
+       if (threshold.minus(execInfo.getExecuteDuration()).isNegative()) {
+         // slow-query logic
        }
     })
     .build();</code></pre>
@@ -250,12 +251,12 @@ ConnectionFactory proxyConnectionFactory =
 <h2 id="use-cases_method-tracing"><a class="anchor" href="#use-cases_method-tracing"></a>3. Method Tracing</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>When a caller invokes a method on the proxy classes(<code>ConnectionFactory</code>, <code>Connection</code>, <code>Batch</code>, <code>Statement</code>, or <code>Result</code>),
-the registered listeners receive callbacks before and after the target method invocation.</p>
+<p>When a caller invokes a method on the proxy classes (<code>ConnectionFactory</code>, <code>Connection</code>, <code>Batch</code>, <code>Statement</code>,
+or <code>Result</code>), the registered listeners receive callbacks before and after the target method invocation.</p>
 </div>
 <div class="paragraph">
-<p>By logging each contextual information of the invoked method, essentially this shows the caller&#8217;s interactions
-with R2DBC SPI objects.</p>
+<p>By logging the contextual information of each invoked method, you can effectively observe the caller&#8217;s
+interaction with the R2DBC SPI objects.</p>
 </div>
 <div class="listingblock">
 <div class="title">Sample: Method tracing with transactional calls</div>
@@ -273,23 +274,23 @@ with R2DBC SPI objects.</p>
 <div class="sect2">
 <h3 id="use-cases_sample-configuration"><a class="anchor" href="#use-cases_sample-configuration"></a>3.1. Sample Configuration</h3>
 <div class="paragraph">
-<p>At <code>[before|after]Method</code> callbacks, perform an action such as printing out the invoked method,
+<p>In <code>[before|after]Method</code> callbacks, you can perform actions such as printing the invoked method,
 creating a span, or updating metrics.</p>
 </div>
 <div class="paragraph">
-<p><code>MethodExecutionInfoFormatter</code> converts the <code>MethodExecutionInfo</code> to <code>String</code> for creating a logging entry.</p>
+<p><code>MethodExecutionInfoFormatter</code> converts <code>MethodExecutionInfo</code> into a <code>String</code> for log entries.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">MethodExecutionInfoFormatter methodExecutionFormatter = MethodExecutionInfoFormatter.withDefault();
 
 ConnectionFactory proxyConnectionFactory =
-  ProxyConnectionFactory.builder(connectionFactory)  // wrap original ConnectionFactory
+  ProxyConnectionFactory.builder(connectionFactory)  // wrap the original ConnectionFactory
     // on every method invocation
     .onAfterMethod(execInfo -&gt;
-      System.out.println(formatter.format(execInfo)))  // print out method execution (method tracing)
-    .build();
-```</code></pre>
+      System.out.println(methodExecutionFormatter.format(execInfo))  // print method execution details
+    )
+    .build();</code></pre>
 </div>
 </div>
 </div>
@@ -299,10 +300,10 @@ ConnectionFactory proxyConnectionFactory =
 <h2 id="use-cases_metrics"><a class="anchor" href="#use-cases_metrics"></a>4. Metrics</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>On method or query callbacks, update the metrics with the provided contextual information.</p>
+<p>In method or query callbacks, you can update metrics using the provided contextual information.</p>
 </div>
 <div class="paragraph">
-<p>For example:</p>
+<p>Examples include:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -319,7 +320,7 @@ ConnectionFactory proxyConnectionFactory =
 <p>Number of queries</p>
 </li>
 <li>
-<p>Type of query (SELECT, DELETE, &#8230;&#8203;)</p>
+<p>Query type (SELECT, DELETE, &#8230;&#8203;)</p>
 </li>
 <li>
 <p>Query execution time</p>
@@ -332,12 +333,12 @@ ConnectionFactory proxyConnectionFactory =
 <div class="sect2">
 <h3 id="use-cases_metrics_sample-implementation"><a class="anchor" href="#use-cases_metrics_sample-implementation"></a>4.1. Sample Implementation</h3>
 <div class="paragraph">
-<p>This sample <a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java">MetricsExecutionListener</a> implementation populates following metrics:</p>
+<p>This sample <a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java">MetricsExecutionListener</a> implementation populates the following metrics:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Time took to create a connection</p>
+<p>Time taken to create a connection</p>
 </li>
 <li>
 <p>Commit and rollback counts</p>
@@ -346,7 +347,7 @@ ConnectionFactory proxyConnectionFactory =
 <p>Executed query count</p>
 </li>
 <li>
-<p>Slow query count</p>
+<p>Slow-query count</p>
 </li>
 </ul>
 </div>
@@ -369,7 +370,7 @@ ConnectionFactory proxyConnectionFactory =
 <div class="content">
 <img src="images/metrics-actuator-connection.png" alt="Transaction Actuator">
 </div>
-<div class="title">Figure 3. Transaction metrics on Spring Boot actuator(<code>/actuator/metrics/r2dbc.transaction</code>)</div>
+<div class="title">Figure 3. Transaction metrics on Spring Boot actuator (<code>/actuator/metrics/r2dbc.transaction</code>)</div>
 </div>
 </div>
 </div>
@@ -378,7 +379,7 @@ ConnectionFactory proxyConnectionFactory =
 <h2 id="use-cases_distributed-tracing"><a class="anchor" href="#use-cases_distributed-tracing"></a>5. Distributed Tracing</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Construct tracing spans in appropriate callbacks.</p>
+<p>Construct tracing spans in the appropriate callbacks.</p>
 </div>
 <div class="sect2">
 <h3 id="use-cases_distributed-tracing_sample-implementation"><a class="anchor" href="#use-cases_distributed-tracing_sample-implementation"></a>5.1. Sample implementation</h3>
@@ -395,13 +396,13 @@ ConnectionFactory proxyConnectionFactory =
 <div class="content">
 <img src="images/zipkin-span-connection.png" alt="Connection Span">
 </div>
-<div class="title">Figure 5. Connection Span</div>
+<div class="title">Figure 5. Connection span</div>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="images/zipkin-span-batch-query.png" alt="Query Span">
 </div>
-<div class="title">Figure 6. Query Span</div>
+<div class="title">Figure 6. Query span</div>
 </div>
 </div>
 </div>
@@ -410,17 +411,16 @@ ConnectionFactory proxyConnectionFactory =
 <h2 id="use-cases_assertion-verification"><a class="anchor" href="#use-cases_assertion-verification"></a>6. Assertion/Verification</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By inspecting invoked methods and/or executed queries, you can verify whether the logic you inspect has performed
-as expected.</p>
+<p>By inspecting invoked methods and/or executed queries, you can verify whether the logic under inspection has
+performed as expected.</p>
 </div>
 <div class="paragraph">
-<p>For example, by keeping track of connection open/close method calls, connection leaks can be
-detected or verified.</p>
+<p>For example, by tracking connection open/close calls, connection leaks can be detected or verified.</p>
 </div>
 <div class="paragraph">
-<p>Another example is to check the group of queries is executed on the same connection.
-This verifies the premise of the transaction - same connection needs to perform the queries in
-order for them to be in the same transaction.</p>
+<p>Another example is to check that a group of queries is executed on the same connection. This verifies the
+transaction assumption that the same connection must execute all of the queries in order for them to belong to
+one transaction.</p>
 </div>
 </div>
 </div>
@@ -428,22 +428,22 @@ order for them to be in the same transaction.</p>
 <h2 id="use-cases_own-action"><a class="anchor" href="#use-cases_own-action"></a>7. Own Action (Custom Listener)</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Users can write own callback logic that performs any actions, such as audit logging, sending
-notifications, calling external system, etc.</p>
+<p>You can write custom callback logic to perform actions such as audit logging, sending notifications, or
+calling external systems.</p>
 </div>
 <div class="sect2">
-<h3 id="use-cases_own-action_implementing-custom-listener"><a class="anchor" href="#use-cases_own-action_implementing-custom-listener"></a>7.1. Implementing custom listener</h3>
+<h3 id="use-cases_own-action_implementing-custom-listener"><a class="anchor" href="#use-cases_own-action_implementing-custom-listener"></a>7.1. Implementing a Custom Listener</h3>
 <div class="paragraph">
-<p>In order to create a custom listener, simply implement <code>ProxyExecutionListener</code> or <code>ProxyMethodExecutionListener</code>
+<p>To create a custom listener, implement the <code>ProxyExecutionListener</code> or <code>ProxyMethodExecutionListener</code>
 interface.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">static class MyListener implements ProxyMethodExecutionListener {
-	@Override
-	public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
-		System.out.println("connection created");
-	}
+    @Override
+    public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+        System.out.println("connection created");
+    }
 }</code></pre>
 </div>
 </div>
@@ -451,10 +451,11 @@ interface.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="use-cases_support-primitive-and-null-in-result-mapping"><a class="anchor" href="#use-cases_support-primitive-and-null-in-result-mapping"></a>8. Support Primitive and Null in Result Mapping</h2>
+<h2 id="use-cases_support-primitive-and-null-in-result-mapping"><a class="anchor" href="#use-cases_support-primitive-and-null-in-result-mapping"></a>8. Support for Primitive and Null Values in Result Mapping</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To consume query results, <code>Result#map</code> method accepts a mapping function(<code>BiFunction</code>) that takes <code>Row</code> and <code>RowMetadata</code>.</p>
+<p>To consume query results, the <code>Result#map</code> method accepts a mapping function (<code>BiFunction</code>) that takes a <code>Row</code>
+and a <code>RowMetadata</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -462,16 +463,17 @@ interface.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>Row#get</code> method takes a <code>Class</code> in the second argument to represent the returning value type(data type).
-R2DBC spec does not support primitive types for this data type. Only boxed(wrapper) types are supported.</p>
+<p>The <code>Row#get</code> method accepts a <code>Class</code> as the second argument to represent the return value type (data type).
+The R2DBC specification does not support primitive types for this value type; only boxed (wrapper) types are
+supported.</p>
 </div>
 <div class="paragraph">
-<p><code>ResultRowConverter</code> can provide support for primitive types by modifying the <code>Row#get</code> behavior.</p>
+<p><code>ResultRowConverter</code> can provide support for primitive values by modifying the behavior of <code>Row#get</code>.</p>
 </div>
 <div class="paragraph">
-<p>The following converter transforms a primitive to a corresponding wrapper data type.
-(e.g. <code>row.get(0, int.class)</code> to <code>row.get(0, Integer.class)</code>)<br>
-Also, this converter handles <code>null</code> return value.</p>
+<p>The following converter transforms a primitive into the corresponding wrapper type.
+For example, <code>row.get(0, int.class)</code> becomes <code>row.get(0, Integer.class)</code>. This converter also handles a
+<code>null</code> return value.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -486,22 +488,23 @@ Also, this converter handles <code>null</code> return value.</p>
     }
     return getOperation.proceed();
 };
-// implement `getWrapperType()` and `getDefaultValue()` with own strategy
+// implement `getWrapperType()` and `getDefaultValue()` with your own strategy
 
-// register to the ProxyConfig
+// register to ProxyConfig
 ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="use-cases_call-different-methods-in-result-mapping"><a class="anchor" href="#use-cases_call-different-methods-in-result-mapping"></a>9. Call different methods in Result Mapping</h2>
+<h2 id="use-cases_call-different-methods-in-result-mapping"><a class="anchor" href="#use-cases_call-different-methods-in-result-mapping"></a>9. Calling Different Methods in Result Mapping</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By modifying the <code>Row#get</code> behavior with <code>ResultRowConverter</code>, the following converters support column names that do not exist.</p>
+<p>By modifying <code>Row#get</code> behavior with <code>ResultRowConverter</code>, you can support column names that do not exist or
+map them to derived values.</p>
 </div>
 <div class="listingblock">
-<div class="title">Support virtual/derived column</div>
+<div class="title">Support a virtual/derived column</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
    if ("full_name".equals(args[0])) {
@@ -509,22 +512,22 @@ ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).bu
        String lastName = proxyRow.get("last_name", String.class);
        return firstName + " " + lastName;
    }
-   return getOperation.proceed();   // invoke original method
-);</code></pre>
+   return getOperation.proceed();   // invoke the original method
+};</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Support column name change</div>
+<div class="title">Support a renamed column</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
     if ("column_old".equals(args[0])) {
         if (args.length == 1) {
             return proxyRow.get("column_new");
         }
-        return proxyRow.get("column_new", (Class&lt;?&gt;)args[1]);
+        return proxyRow.get("column_new", (Class&lt;?&gt;) args[1]);
     }
-    return getOperation.proceed();   // invoke original method
-);</code></pre>
+    return getOperation.proceed();   // invoke the original method
+};</code></pre>
 </div>
 </div>
 </div>
@@ -532,7 +535,7 @@ ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).bu
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-01 09:35:17 UTC
+Last updated 2026-10-09 03:30:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

@@ -155,7 +155,7 @@ implements <a href="https://projectreactor.io/docs/core/release/api/reactor/util
 <code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#clone--" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#equals-java.lang.Object-" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#finalize--" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#getClass--" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#hashCode--" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#notify--" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#notifyAll--" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait--" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait-long-" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait-long-int-" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-reactor.util.context.ContextView">Methods inherited from interface&nbsp;reactor.util.context.<a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></h3>
-<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#forEach-java.util.function.BiConsumer-" title="class or interface in reactor.util.context" class="external-link">forEach</a>, <a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#get-java.lang.Class-" title="class or interface in reactor.util.context" class="external-link">get</a>, <a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#getOrDefault-java.lang.Object-T-" title="class or interface in reactor.util.context" class="external-link">getOrDefault</a>, <a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#getOrEmpty-java.lang.Object-" title="class or interface in reactor.util.context" class="external-link">getOrEmpty</a>, <a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#isEmpty--" title="class or interface in reactor.util.context" class="external-link">isEmpty</a></code></div>
+<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#forEach(java.util.function.BiConsumer)" title="class or interface in reactor.util.context" class="external-link">forEach</a>, <a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#get(java.lang.Class)" title="class or interface in reactor.util.context" class="external-link">get</a>, <a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#getOrDefault(java.lang.Object,T)" title="class or interface in reactor.util.context" class="external-link">getOrDefault</a>, <a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#getOrEmpty(java.lang.Object)" title="class or interface in reactor.util.context" class="external-link">getOrEmpty</a>, <a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#isEmpty()" title="class or interface in reactor.util.context" class="external-link">isEmpty</a></code></div>
 </section>
 </li>
 </ul>
@@ -190,7 +190,7 @@ implements <a href="https://projectreactor.io/docs/core/release/api/reactor/util
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#get-java.lang.Object-" title="class or interface in reactor.util.context" class="external-link">get</a></code>&nbsp;in interface&nbsp;<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></code></dd>
+<dd><code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#get(java.lang.Object)" title="class or interface in reactor.util.context" class="external-link">get</a></code>&nbsp;in interface&nbsp;<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></code></dd>
 </dl>
 </div>
 </section>
@@ -202,7 +202,7 @@ implements <a href="https://projectreactor.io/docs/core/release/api/reactor/util
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">hasKey</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#hasKey-java.lang.Object-" title="class or interface in reactor.util.context" class="external-link">hasKey</a></code>&nbsp;in interface&nbsp;<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></code></dd>
+<dd><code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#hasKey(java.lang.Object)" title="class or interface in reactor.util.context" class="external-link">hasKey</a></code>&nbsp;in interface&nbsp;<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></code></dd>
 </dl>
 </div>
 </section>
@@ -214,7 +214,7 @@ implements <a href="https://projectreactor.io/docs/core/release/api/reactor/util
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">size</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#size--" title="class or interface in reactor.util.context" class="external-link">size</a></code>&nbsp;in interface&nbsp;<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></code></dd>
+<dd><code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#size()" title="class or interface in reactor.util.context" class="external-link">size</a></code>&nbsp;in interface&nbsp;<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></code></dd>
 </dl>
 </div>
 </section>
@@ -226,7 +226,7 @@ implements <a href="https://projectreactor.io/docs/core/release/api/reactor/util
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.Entry.html" title="class or interface in java.util" class="external-link">Map.Entry</a>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>,<wbr><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&gt;</span>&nbsp;<span class="element-name">stream</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#stream--" title="class or interface in reactor.util.context" class="external-link">stream</a></code>&nbsp;in interface&nbsp;<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></code></dd>
+<dd><code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html#stream()" title="class or interface in reactor.util.context" class="external-link">stream</a></code>&nbsp;in interface&nbsp;<code><a href="https://projectreactor.io/docs/core/release/api/reactor/util/context/ContextView.html" title="class or interface in reactor.util.context" class="external-link">ContextView</a></code></dd>
 </dl>
 </div>
 </section>
@@ -251,7 +251,7 @@ implements <a href="https://projectreactor.io/docs/core/release/api/reactor/util
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

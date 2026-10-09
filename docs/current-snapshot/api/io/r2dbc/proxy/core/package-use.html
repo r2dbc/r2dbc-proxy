@@ -64,11 +64,11 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#io.r2dbc.proxy.callback">io.r2dbc.proxy.callback</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Proxy related classes</div>
+<div class="block">Proxy implementation classes and callback machinery.</div>
 </div>
 <div class="col-first even-row-color"><a href="#io.r2dbc.proxy.core">io.r2dbc.proxy.core</a></div>
 <div class="col-last even-row-color">
-<div class="block">Domain classes</div>
+<div class="block">Core domain model types for the proxy API.</div>
 </div>
 <div class="col-first odd-row-color"><a href="#io.r2dbc.proxy.listener">io.r2dbc.proxy.listener</a></div>
 <div class="col-last odd-row-color">
@@ -95,11 +95,11 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="class-use/MethodExecutionInfo.html#io.r2dbc.proxy">MethodExecutionInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold method execution related information.</div>
+<div class="block">Holds information about a method invocation.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/QueryExecutionInfo.html#io.r2dbc.proxy">QueryExecutionInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold query execution related information.</div>
+<div class="block">Holds information about a query execution.</div>
 </div>
 </div>
 </section>
@@ -112,15 +112,15 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="class-use/ConnectionInfo.html#io.r2dbc.proxy.callback">ConnectionInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/QueryExecutionInfo.html#io.r2dbc.proxy.callback">QueryExecutionInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold query execution related information.</div>
+<div class="block">Holds information about a query execution.</div>
 </div>
 <div class="col-first even-row-color"><a href="class-use/StatementInfo.html#io.r2dbc.proxy.callback">StatementInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
 </div>
 </div>
 </section>
@@ -153,7 +153,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/ConnectionInfo.html#io.r2dbc.proxy.core">ConnectionInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
 </div>
 <div class="col-first even-row-color"><a href="class-use/ExecutionType.html#io.r2dbc.proxy.core">ExecutionType</a></div>
 <div class="col-last even-row-color">
@@ -165,11 +165,11 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color"><a href="class-use/QueryInfo.html#io.r2dbc.proxy.core">QueryInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold each query related info.</div>
+<div class="block">Holds information about each query.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/StatementInfo.html#io.r2dbc.proxy.core">StatementInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
 </div>
 <div class="col-first even-row-color"><a href="class-use/ValueStore.html#io.r2dbc.proxy.core">ValueStore</a></div>
 <div class="col-last even-row-color">
@@ -186,19 +186,19 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="class-use/BindInfo.html#io.r2dbc.proxy.listener">BindInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold contextual information for bind operations(<code>bind</code> and <code>bindNull</code>).</div>
+<div class="block">Holds contextual information for bind operations (<code>bind</code> and <code>bindNull</code>).</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/MethodExecutionInfo.html#io.r2dbc.proxy.listener">MethodExecutionInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold method execution related information.</div>
+<div class="block">Holds information about a method invocation.</div>
 </div>
 <div class="col-first even-row-color"><a href="class-use/QueryExecutionInfo.html#io.r2dbc.proxy.listener">QueryExecutionInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold query execution related information.</div>
+<div class="block">Holds information about a query execution.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/StatementInfo.html#io.r2dbc.proxy.listener">StatementInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
 </div>
 </div>
 </section>
@@ -215,7 +215,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/QueryExecutionInfo.html#io.r2dbc.proxy.observation">QueryExecutionInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold query execution related information.</div>
+<div class="block">Holds information about a query execution.</div>
 </div>
 </div>
 </section>
@@ -236,11 +236,11 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color"><a href="class-use/MethodExecutionInfo.html#io.r2dbc.proxy.support">MethodExecutionInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold method execution related information.</div>
+<div class="block">Holds information about a method invocation.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/QueryExecutionInfo.html#io.r2dbc.proxy.support">QueryExecutionInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold query execution related information.</div>
+<div class="block">Holds information about a query execution.</div>
 </div>
 </div>
 </section>
@@ -253,7 +253,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="class-use/ConnectionInfo.html#io.r2dbc.proxy.test">ConnectionInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/ExecutionType.html#io.r2dbc.proxy.test">ExecutionType</a></div>
 <div class="col-last odd-row-color">
@@ -261,7 +261,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color"><a href="class-use/MethodExecutionInfo.html#io.r2dbc.proxy.test">MethodExecutionInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold method execution related information.</div>
+<div class="block">Holds information about a method invocation.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/ProxyEventType.html#io.r2dbc.proxy.test">ProxyEventType</a></div>
 <div class="col-last odd-row-color">
@@ -269,15 +269,15 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color"><a href="class-use/QueryExecutionInfo.html#io.r2dbc.proxy.test">QueryExecutionInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold query execution related information.</div>
+<div class="block">Holds information about a query execution.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/QueryInfo.html#io.r2dbc.proxy.test">QueryInfo</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Hold each query related info.</div>
+<div class="block">Holds information about each query.</div>
 </div>
 <div class="col-first even-row-color"><a href="class-use/StatementInfo.html#io.r2dbc.proxy.test">StatementInfo</a></div>
 <div class="col-last even-row-color">
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement</code></a>.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/ValueStore.html#io.r2dbc.proxy.test">ValueStore</a></div>
 <div class="col-last odd-row-color">
@@ -290,7 +290,7 @@ loadScripts(document, 'script');</script>
 </section>
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

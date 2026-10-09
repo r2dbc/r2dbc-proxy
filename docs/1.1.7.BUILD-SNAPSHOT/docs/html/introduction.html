@@ -91,30 +91,29 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>R2DBC Proxy is a proxy framework providing callbacks for query executions,
-method invocations, and parameter bindings.</p>
+<p>R2DBC Proxy is a proxy framework that provides callbacks for query execution,
+method invocation, and parameter binding.</p>
 </div>
 <div class="paragraph">
-<p>The proxy holds proxy listeners.
-When a caller(application or upper layer library) interacts with the proxy, the registered
-proxy listeners receive callbacks.</p>
+<p>The proxy maintains a set of listener implementations. When an application or an upper-layer library
+interacts with the proxy, the registered listeners receive callbacks.</p>
 </div>
 <div class="paragraph">
-<p>Followings are the sample usages of the proxy listeners:</p>
+<p>The following are common use cases for proxy listeners:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Logging on each query execution</p>
+<p>Query logging</p>
 </li>
 <li>
-<p>Detect slow queries</p>
+<p>Slow-query detection</p>
 </li>
 <li>
 <p>Method tracing</p>
 </li>
 <li>
-<p>Metrics</p>
+<p>Metrics collection</p>
 </li>
 <li>
 <p>Distributed tracing</p>
@@ -123,13 +122,14 @@ proxy listeners receive callbacks.</p>
 <p>Assertion and verification</p>
 </li>
 <li>
-<p>Own action</p>
+<p>Custom application actions</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The proxy is a thin transparent layer which suits to implement cross-cutting concerns, agnostic to
-the underlying implementation such as drivers; yet, it is viewed as R2DBC SPI from the above layer.</p>
+<p>The proxy is a thin, transparent layer that is well-suited for implementing cross-cutting concerns
+without coupling to the underlying database driver. From the caller&#8217;s perspective, it still behaves
+like a standard R2DBC SPI object.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -162,7 +162,7 @@ the underlying implementation such as drivers; yet, it is viewed as R2DBC SPI fr
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-01 09:35:17 UTC
+Last updated 2026-10-09 03:30:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

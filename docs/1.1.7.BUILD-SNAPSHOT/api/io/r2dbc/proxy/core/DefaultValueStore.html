@@ -138,35 +138,35 @@ implements <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">Va
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#get(java.lang.Object)" class="member-name-link">get</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the value associated to the key.</div>
+<div class="block">Returns the value associated with the key.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T&gt;&nbsp;T</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#get(java.lang.Object,java.lang.Class)" class="member-name-link">get</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key,
  <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the value associated to the key and cast to the type.</div>
+<div class="block">Returns the value associated with the key and casts it to the specified type.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T&gt;&nbsp;T</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOrDefault(java.lang.Object,T)" class="member-name-link">getOrDefault</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key,
  T&nbsp;defaultValue)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the value associated to the key; otherwise returns specified value.</div>
+<div class="block">Returns the value associated with the key, or the specified default value if none exists.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#put(java.lang.Object,java.lang.Object)" class="member-name-link">put</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key,
  <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Store a value associating the provided key.</div>
+<div class="block">Stores the provided value under the provided key.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putAll(java.util.Map)" class="member-name-link">putAll</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>,<wbr><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;map)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Store all key value pairs from provided map.</div>
+<div class="block">Stores all key/value pairs from the provided map.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remove(java.lang.Object)" class="member-name-link">remove</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Remove the value associated to the provided key.</div>
+<div class="block">Removes the value associated with the provided key.</div>
 </div>
 </div>
 </div>
@@ -207,7 +207,7 @@ implements <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">Va
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ValueStore.html#get(java.lang.Object)">ValueStore</a></code></span></div>
-<div class="block">Get the value associated to the key.</div>
+<div class="block">Returns the value associated with the key.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ValueStore.html#get(java.lang.Object)">get</a></code>&nbsp;in interface&nbsp;<code><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></dd>
@@ -226,7 +226,7 @@ implements <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">Va
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key,
  <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ValueStore.html#get(java.lang.Object,java.lang.Class)">ValueStore</a></code></span></div>
-<div class="block">Get the value associated to the key and cast to the type.</div>
+<div class="block">Returns the value associated with the key and casts it to the specified type.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ValueStore.html#get(java.lang.Object,java.lang.Class)">get</a></code>&nbsp;in interface&nbsp;<code><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></dd>
@@ -248,7 +248,7 @@ implements <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">Va
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">getOrDefault</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key,
  T&nbsp;defaultValue)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ValueStore.html#getOrDefault(java.lang.Object,T)">ValueStore</a></code></span></div>
-<div class="block">Get the value associated to the key; otherwise returns specified value.</div>
+<div class="block">Returns the value associated with the key, or the specified default value if none exists.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ValueStore.html#getOrDefault(java.lang.Object,T)">getOrDefault</a></code>&nbsp;in interface&nbsp;<code><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></dd>
@@ -270,7 +270,7 @@ implements <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">Va
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">put</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key,
  <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ValueStore.html#put(java.lang.Object,java.lang.Object)">ValueStore</a></code></span></div>
-<div class="block">Store a value associating the provided key.</div>
+<div class="block">Stores the provided value under the provided key.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ValueStore.html#put(java.lang.Object,java.lang.Object)">put</a></code>&nbsp;in interface&nbsp;<code><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></dd>
@@ -287,7 +287,7 @@ implements <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">Va
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">putAll</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>,<wbr><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;map)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ValueStore.html#putAll(java.util.Map)">ValueStore</a></code></span></div>
-<div class="block">Store all key value pairs from provided map.</div>
+<div class="block">Stores all key/value pairs from the provided map.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ValueStore.html#putAll(java.util.Map)">putAll</a></code>&nbsp;in interface&nbsp;<code><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></dd>
@@ -303,7 +303,7 @@ implements <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">Va
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">remove</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ValueStore.html#remove(java.lang.Object)">ValueStore</a></code></span></div>
-<div class="block">Remove the value associated to the provided key.</div>
+<div class="block">Removes the value associated with the provided key.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ValueStore.html#remove(java.lang.Object)">remove</a></code>&nbsp;in interface&nbsp;<code><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></dd>
@@ -323,7 +323,7 @@ implements <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">Va
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

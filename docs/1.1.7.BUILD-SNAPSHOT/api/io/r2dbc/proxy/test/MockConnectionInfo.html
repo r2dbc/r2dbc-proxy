@@ -153,12 +153,12 @@ implements <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.pr
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getConnectionId()" class="member-name-link">getConnectionId</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get ID for the connection.</div>
+<div class="block">Returns the connection ID.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link">Connection</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOriginalConnection()" class="member-name-link">getOriginalConnection</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieve original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
+<div class="block">Returns the original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRollbackCount()" class="member-name-link">getRollbackCount</a>()</code></div>
@@ -173,7 +173,7 @@ implements <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.pr
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValueStore()" class="member-name-link">getValueStore</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieve <a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical connection.</div>
+<div class="block">Returns the <a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> associated with the scope of the logical connection.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#incrementCommitCount()" class="member-name-link">incrementCommitCount</a>()</code></div>
@@ -249,7 +249,7 @@ implements <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.pr
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link">Connection</a></span>&nbsp;<span class="element-name">getOriginalConnection</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/ConnectionInfo.html#getOriginalConnection()">ConnectionInfo</a></code></span></div>
-<div class="block">Retrieve original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
+<div class="block">Returns the original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/ConnectionInfo.html#getOriginalConnection()">getOriginalConnection</a></code>&nbsp;in interface&nbsp;<code><a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a></code></dd>
@@ -268,7 +268,7 @@ implements <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.pr
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getConnectionId</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/ConnectionInfo.html#getConnectionId()">ConnectionInfo</a></code></span></div>
-<div class="block">Get ID for the connection.</div>
+<div class="block">Returns the connection ID.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../core/ConnectionInfo.html#getConnectionId()">getConnectionId</a></code>&nbsp;in interface&nbsp;<code><a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.proxy.core">ConnectionInfo</a></code></dd>
@@ -415,7 +415,7 @@ implements <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.pr
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></span>&nbsp;<span class="element-name">getValueStore</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../core/ConnectionInfo.html#getValueStore()">ConnectionInfo</a></code></span></div>
-<div class="block">Retrieve <a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical connection.
+<div class="block">Returns the <a href="../core/ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> associated with the scope of the logical connection.
 
  <p>Values can be stored or retrieved from this store while connection is available.</div>
 <dl class="notes">
@@ -435,7 +435,7 @@ implements <a href="../core/ConnectionInfo.html" title="interface in io.r2dbc.pr
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

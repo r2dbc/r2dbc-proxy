@@ -122,7 +122,7 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">QueryExecutionInfoFormatter</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span></div>
-<div class="block">Convert <a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core"><code>QueryExecutionInfo</code></a> to <code>String</code>.
+<div class="block">Converts a <a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core"><code>QueryExecutionInfo</code></a> to a <code>String</code>.
 
  <p>Sample usage:
  <pre><code>
@@ -176,12 +176,12 @@ implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function
 <div class="col-first even-row-color"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a><wbr>&lt;<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html" title="class or interface in io.r2dbc.spi" class="external-link">Parameter</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html" title="class or interface in java.lang" class="external-link">StringBuilder</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#onBoundValueParameter" class="member-name-link">onBoundValueParameter</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">Default implementation for formatting <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Parameter</code></a> value.</div>
+<div class="block">Default implementation for formatting a <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Parameter</code></a> value.</div>
 </div>
 <div class="col-first odd-row-color"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a><wbr>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html" title="class or interface in java.lang" class="external-link">StringBuilder</a>&gt;</code></div>
 <div class="col-second odd-row-color"><code><a href="#onBoundValueRaw" class="member-name-link">onBoundValueRaw</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">Default implementation for formatting actual value of bound value.</div>
+<div class="block">Default implementation for formatting the actual bound value.</div>
 </div>
 <div class="col-first even-row-color"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a><wbr>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedSet.html" title="class or interface in java.util" class="external-link">SortedSet</a>&lt;<a href="../core/Binding.html" title="interface in io.r2dbc.proxy.core">Binding</a>&gt;, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html" title="class or interface in java.lang" class="external-link">StringBuilder</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#onIndexBindings" class="member-name-link">onIndexBindings</a></code></div>
@@ -347,7 +347,7 @@ implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function
 <h3>onBoundValueRaw</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html" title="class or interface in java.lang" class="external-link">StringBuilder</a>&gt;</span>&nbsp;<span class="element-name">onBoundValueRaw</span></div>
-<div class="block">Default implementation for formatting actual value of bound value.
+<div class="block">Default implementation for formatting the actual bound value.
 
  <p> Example: "100", "Foo", "&lt;clob&gt;".</div>
 </div>
@@ -358,7 +358,7 @@ implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function
 <h3>onBoundValueParameter</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html" title="class or interface in io.r2dbc.spi" class="external-link">Parameter</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html" title="class or interface in java.lang" class="external-link">StringBuilder</a>&gt;</span>&nbsp;<span class="element-name">onBoundValueParameter</span></div>
-<div class="block">Default implementation for formatting <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Parameter</code></a> value.
+<div class="block">Default implementation for formatting a <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Parameter.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Parameter</code></a> value.
 
  <p> Example: "null(in,INTEGER)", "Foo(out,String)".</div>
 </div>
@@ -701,7 +701,7 @@ implements <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

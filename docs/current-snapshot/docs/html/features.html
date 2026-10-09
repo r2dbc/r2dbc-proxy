@@ -83,12 +83,12 @@
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#features_accessing-reactor-context-values">1. Accessing reactor context values</a>
+<li><a href="#features_accessing-reactor-context-values">1. Accessing Reactor Context Values</a>
 <ul class="sectlevel2">
-<li><a href="#">1.1. Available ContextView scopes</a></li>
+<li><a href="#">1.1. Available <code>ContextView</code> scopes</a></li>
 </ul>
 </li>
-<li><a href="#features_micrometer-observation-support">2. Micrometer Observation support</a>
+<li><a href="#features_micrometer-observation-support">2. Micrometer Observation Support</a>
 <ul class="sectlevel2">
 <li><a href="#observability-conventions">2.1. Observability - Conventions</a></li>
 <li><a href="#observability-metrics">2.2. Observability - Metrics</a>
@@ -112,11 +112,11 @@
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="features_accessing-reactor-context-values"><a class="anchor" href="#features_accessing-reactor-context-values"></a>1. Accessing reactor context values</h2>
+<h2 id="features_accessing-reactor-context-values"><a class="anchor" href="#features_accessing-reactor-context-values"></a>1. Accessing Reactor Context Values</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In the callbacks, <code>ValueSource</code> contains a reactor&#8217;s <code>ContextView</code> object under <code>ContextView.class</code> key.
-This provides a readonly access to the reactor context.</p>
+<p>In the callbacks, <code>ValueSource</code> contains a Reactor <code>ContextView</code> object under the <code>ContextView.class</code> key.
+This provides read-only access to the Reactor context.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -131,10 +131,10 @@ public void beforeQuery(QueryExecutionInfo execInfo) {
 </div>
 </div>
 <div class="sect2">
-<h3>1.1. Available ContextView scopes</h3>
+<h3>1.1. Available <code>ContextView</code> scopes</h3>
 <div class="paragraph">
-<p>While interacting with R2DBC APIs, there are multiple places that could put values into the reactor contexts.
-This example illustrates what context values are available in the corresponding callback APIs.</p>
+<p>As you interact with R2DBC APIs, values may be written to Reactor contexts in several places. The following
+example shows which context values are available in the corresponding callback APIs.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -155,7 +155,7 @@ This example illustrates what context values are available in the corresponding 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Context for connection</td>
+<td>Context for the connection</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -180,7 +180,7 @@ This example illustrates what context values are available in the corresponding 
 <p><code>StatementInfo#getValueStore</code> has no <code>ContextView</code></p>
 </li>
 <li>
-<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
 </li>
 </ul>
 </div>
@@ -193,7 +193,7 @@ This example illustrates what context values are available in the corresponding 
 <p><code>StatementInfo#getValueStore</code> has no <code>ContextView</code></p>
 </li>
 <li>
-<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
 </li>
 </ul>
 </div>
@@ -203,10 +203,10 @@ This example illustrates what context values are available in the corresponding 
 <div class="ulist">
 <ul>
 <li>
-<p><code>QueryExecutionInfo#getValueStore</code> has a <code>ContextView</code> that holds keys - <code>bar</code> and <code>baz</code></p>
+<p><code>QueryExecutionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>bar</code> and <code>baz</code></p>
 </li>
 <li>
-<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
 </li>
 </ul>
 </div>
@@ -216,7 +216,7 @@ This example illustrates what context values are available in the corresponding 
 <div class="ulist">
 <ul>
 <li>
-<p><code>MethodExecutionInfo#getValueStore</code> for <code>create</code> has a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>create</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
 </li>
 <li>
 <p><code>MethodExecutionInfo#getValueStore</code> for <code>createStatement</code> has no <code>ContextView</code></p>
@@ -225,16 +225,16 @@ This example illustrates what context values are available in the corresponding 
 <p><code>MethodExecutionInfo#getValueStore</code> for <code>bind</code> has no <code>ContextView</code></p>
 </li>
 <li>
-<p><code>MethodExecutionInfo#getValueStore</code> for <code>execute</code> has a <code>ContextView</code> that holds keys - <code>bar</code> and <code>baz</code></p>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>execute</code> has a <code>ContextView</code> containing keys <code>bar</code> and <code>baz</code></p>
 </li>
 <li>
-<p><code>MethodExecutionInfo#getValueStore</code> for <code>map</code> has a <code>ContextView</code> that holds keys - <code>baz</code> and <code>qux</code></p>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>map</code> has a <code>ContextView</code> containing keys <code>baz</code> and <code>qux</code></p>
 </li>
 <li>
 <p><code>MethodExecutionInfo#getValueStore</code> for <code>get</code> has no <code>ContextView</code></p>
 </li>
 <li>
-<p><code>ConnectionInfo#getValueStore</code> for all methods(<code>create</code>, <code>createStatement</code>, <code>bind</code>, <code>execute</code>, <code>map</code>, <code>get</code>) have a <code>ContextView</code> that holds keys - <code>foo</code> and <code>baz</code></p>
+<p><code>ConnectionInfo#getValueStore</code> for all methods (<code>create</code>, <code>createStatement</code>, <code>bind</code>, <code>execute</code>, <code>map</code>, <code>get</code>) has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
 </li>
 </ul>
 </div>
@@ -242,14 +242,14 @@ This example illustrates what context values are available in the corresponding 
 </div>
 </div>
 <div class="sect1">
-<h2 id="features_micrometer-observation-support"><a class="anchor" href="#features_micrometer-observation-support"></a>2. Micrometer Observation support</h2>
+<h2 id="features_micrometer-observation-support"><a class="anchor" href="#features_micrometer-observation-support"></a>2. Micrometer Observation Support</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>R2DBC Proxy has an optional dependency on Micrometer to provide <a href="https://micrometer.io/docs/observation">Micrometer Observation</a> support.
-The <code>ObservationProxyExecutionListener</code> creates observations for query executions.</p>
+The <code>ObservationProxyExecutionListener</code> creates observations for query execution.</p>
 </div>
 <div class="listingblock">
-<div class="title">Configuration Sample</div>
+<div class="title">Configuration sample</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory connectionFactory = ...
 ObservationRegistry observationRegistry = ...
@@ -257,18 +257,20 @@ String r2dbcUrl = ...
 
 ObservationProxyExecutionListener listener = new ObservationProxyExecutionListener(
 observationRegistry, connectionFactory, r2dbcUrl);
-listener.setIncludeParameterValues(true);  // to include binding params (default is false)
+listener.setIncludeParameterValues(true);  // include binding params (default is false)
 
 ConnectionFactory proxyConnectionFactory = ProxyConnectionFactory.builder(connectionFactory)
-.listener(listener).build();</code></pre>
+    .listener(listener)
+    .build();</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>All <a href="https://micrometer.io/docs/observation">Micrometer Observation</a> implementation classes are located under the <code>io.r2dbc.proxy.observation</code> package.
-Since the dependency is optional, users need to explicit add the <code>micrometer-observation</code> dependency.</p>
+<p>All <a href="https://micrometer.io/docs/observation">Micrometer Observation</a> implementation classes live in the
+<code>io.r2dbc.proxy.observation</code> package. Because this dependency is optional, users must explicitly add the
+<code>micrometer-observation</code> dependency.</p>
 </div>
 <div class="paragraph">
-<p>For Spring Boot 3, a separate project, <em>TBD</em>, provides auto-configuration for this.</p>
+<p>For Spring Boot 3, a separate project, <em>TBD</em>, provides auto-configuration.</p>
 </div>
 <div class="sect2">
 <h3 id="observability-conventions"><a class="anchor" href="#observability-conventions"></a>2.1. Observability - Conventions</h3>
@@ -308,12 +310,12 @@ Since the dependency is optional, users need to explicit add the <code>micromete
 <p>The default <code>QueryObservationConvention</code> includes the thread name as a low-cardinality tag in spans.</p>
 </div>
 <div class="paragraph">
-<p>In a virtual thread environment, each thread has a unique name.
-As a result, tagging thread names as a low-cardinality key-value can lead to cardinality explosion in tracing backends.</p>
+<p>In a virtual-thread environment, each thread has a unique name. As a result, tagging thread names as a
+low-cardinality key-value pair can lead to cardinality explosion in tracing backends.</p>
 </div>
 <div class="paragraph">
-<p>To avoid this, use <code>VirtualThreadQueryObservationConvention</code>, a subclass of <code>QueryObservationConvention</code>, which omits the thread name tag.
-This convention is recommended when running in a virtual thread environment.</p>
+<p>To avoid this, use <code>VirtualThreadQueryObservationConvention</code>, a subclass of <code>QueryObservationConvention</code>,
+which omits the thread-name tag. This convention is recommended when running in a virtual-thread environment.</p>
 </div>
 </td>
 </tr>
@@ -515,7 +517,7 @@ All tags must be prefixed with <code>r2dbc.</code> prefix!
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-01 09:35:17 UTC
+Last updated 2026-10-09 03:30:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

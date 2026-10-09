@@ -92,7 +92,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">ConnectionInfo</span></div>
-<div class="block">Hold <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a> related information.</div>
+<div class="block">Holds information about the associated <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
 <dl class="notes">
 <dt>Author:</dt>
 <dd>Tadaya Tsuyukubo</dd>
@@ -120,12 +120,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getConnectionId()" class="member-name-link">getConnectionId</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Get ID for the connection.</div>
+<div class="block">Returns the connection ID.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link">Connection</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getOriginalConnection()" class="member-name-link">getOriginalConnection</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Retrieve original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
+<div class="block">Returns the original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRollbackCount()" class="member-name-link">getRollbackCount</a>()</code></div>
@@ -140,7 +140,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getValueStore()" class="member-name-link">getValueStore</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Retrieve <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical connection.</div>
+<div class="block">Returns the <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> associated with the scope of the logical connection.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#incrementCommitCount()" class="member-name-link">incrementCommitCount</a>()</code></div>
@@ -187,7 +187,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations"><a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html" title="class or interface in reactor.util.annotation" class="external-link">@Nullable</a>
 </span><span class="return-type"><a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link">Connection</a></span>&nbsp;<span class="element-name">getOriginalConnection</span>()</div>
-<div class="block">Retrieve original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
+<div class="block">Returns the original <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Connection.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Connection</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>connection; <code>null</code> is returned when <a href="ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a> is evaluated
@@ -204,7 +204,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations"><a href="https://projectreactor.io/docs/core/release/api/reactor/util/annotation/Nullable.html" title="class or interface in reactor.util.annotation" class="external-link">@Nullable</a>
 </span><span class="return-type"><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getConnectionId</span>()</div>
-<div class="block">Get ID for the connection.</div>
+<div class="block">Returns the connection ID.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>connection ID; <code>null</code> is returned when <a href="ConnectionInfo.html" title="interface in io.r2dbc.proxy.core"><code>ConnectionInfo</code></a> is evaluated
@@ -318,7 +318,7 @@ loadScripts(document, 'script');</script>
 <h3>getValueStore</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="ValueStore.html" title="interface in io.r2dbc.proxy.core">ValueStore</a></span>&nbsp;<span class="element-name">getValueStore</span>()</div>
-<div class="block">Retrieve <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> which is associated to the scope of logical connection.
+<div class="block">Returns the <a href="ValueStore.html" title="interface in io.r2dbc.proxy.core"><code>ValueStore</code></a> associated with the scope of the logical connection.
 
  <p>Values can be stored or retrieved from this store while connection is available.</div>
 <dl class="notes">
@@ -336,7 +336,7 @@ loadScripts(document, 'script');</script>
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

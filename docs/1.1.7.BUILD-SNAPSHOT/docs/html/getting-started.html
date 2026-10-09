@@ -105,7 +105,8 @@
 </div>
 </div>
 <div class="paragraph">
-<p>If you&#8217;d rather like the latest snapshots of the upcoming major version, use the Maven snapshot repository and declare the appropriate dependency version.</p>
+<p>If you prefer to use the latest snapshot of the upcoming major version, add the Maven snapshot repository
+and declare the appropriate dependency version.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -128,12 +129,12 @@
 <h2 id="getting-started_native-image"><a class="anchor" href="#getting-started_native-image"></a>2. Native Image Support</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>R2DBC Proxy supports <a href="https://www.graalvm.org/reference-manual/native-image/">GraalVM native-image</a>.
-The proxy creation uses the JDK dynamic proxy by default.
-They need a configuration in the native image environment.</p>
+<p>R2DBC Proxy supports <a href="https://www.graalvm.org/reference-manual/native-image/">GraalVM native image</a>.
+Proxy creation uses the JDK dynamic proxy by default, and this requires appropriate configuration in the
+native-image environment.</p>
 </div>
 <div class="paragraph">
-<p>R2DBC proxy jar ships with the following configuration files:</p>
+<p>The R2DBC Proxy JAR ships with the following configuration files:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -146,14 +147,14 @@ They need a configuration in the native image environment.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The native image build automatically detects these <a href="https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file">embedded configuration files</a> and sets up the dynamic proxy usage for R2DBC Proxy.</p>
+<p>The native-image build automatically detects these <a href="https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file">embedded configuration files</a> and configures dynamic proxy support for R2DBC Proxy.</p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-01 09:35:17 UTC
+Last updated 2026-10-09 03:30:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">

@@ -65,7 +65,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#io.r2dbc.proxy.callback">io.r2dbc.proxy.callback</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Proxy related classes</div>
+<div class="block">Proxy implementation classes and callback machinery.</div>
 </div>
 <div class="col-first even-row-color"><a href="#io.r2dbc.proxy.listener">io.r2dbc.proxy.listener</a></div>
 <div class="col-last even-row-color">
@@ -95,17 +95,17 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code><a href="../../ProxyConnectionFactory.Builder.html" title="class in io.r2dbc.proxy">ProxyConnectionFactory.Builder</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ProxyConnectionFactory.Builder.</span><code><a href="../../ProxyConnectionFactory.Builder.html#onAfterQuery(java.util.function.Consumer)" class="member-name-link">onAfterQuery</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&gt;&nbsp;consumer)</code></div>
 <div class="col-last even-row-color">
-<div class="block">Register a callback consumer for after query execution.</div>
+<div class="block">Registers a callback consumer for after-query execution.</div>
 </div>
 <div class="col-first odd-row-color"><code><a href="../../ProxyConnectionFactory.Builder.html" title="class in io.r2dbc.proxy">ProxyConnectionFactory.Builder</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ProxyConnectionFactory.Builder.</span><code><a href="../../ProxyConnectionFactory.Builder.html#onBeforeQuery(java.util.function.Consumer)" class="member-name-link">onBeforeQuery</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&gt;&nbsp;consumer)</code></div>
 <div class="col-last odd-row-color">
-<div class="block">Register a callback consumer for before query execution.</div>
+<div class="block">Registers a callback consumer for before-query execution.</div>
 </div>
 <div class="col-first even-row-color"><code><a href="../../ProxyConnectionFactory.Builder.html" title="class in io.r2dbc.proxy">ProxyConnectionFactory.Builder</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ProxyConnectionFactory.Builder.</span><code><a href="../../ProxyConnectionFactory.Builder.html#onEachQueryResult(java.util.function.Consumer)" class="member-name-link">onEachQueryResult</a><wbr>(<a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&gt;&nbsp;consumer)</code></div>
 <div class="col-last even-row-color">
-<div class="block">Register a callback consumer for processing each query result.</div>
+<div class="block">Registers a callback consumer for processing each query result.</div>
 </div>
 </div>
 </section>
@@ -254,7 +254,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>default void</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ProxyExecutionListener.</span><code><a href="../../listener/ProxyExecutionListener.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)" class="member-name-link">eachQueryResult</a><wbr>(<a href="../QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;execInfo)</code></div>
 <div class="col-last even-row-color">
-<div class="block">Called on processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.</div>
+<div class="block">Called while processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.</div>
 </div>
 <div class="col-first odd-row-color"><code>void</code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ProxyMethodExecutionListenerAdapter.</span><code><a href="../../listener/ProxyMethodExecutionListenerAdapter.html#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)" class="member-name-link">eachQueryResult</a><wbr>(<a href="../QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;execInfo)</code></div>
@@ -293,7 +293,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="../../support/QueryExecutionInfoFormatter.html" class="type-name-link" title="class in io.r2dbc.proxy.support">QueryExecutionInfoFormatter</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">Convert <a href="../QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core"><code>QueryExecutionInfo</code></a> to <code>String</code>.</div>
+<div class="block">Converts a <a href="../QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core"><code>QueryExecutionInfo</code></a> to a <code>String</code>.</div>
 </div>
 </div>
 <div class="caption"><span>Fields in <a href="../../support/package-summary.html">io.r2dbc.proxy.support</a> with type parameters of type <a href="../QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a></span></div>
@@ -354,7 +354,7 @@ loadScripts(document, 'script');</script>
 </section>
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>

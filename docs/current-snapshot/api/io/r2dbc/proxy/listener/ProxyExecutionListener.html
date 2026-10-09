@@ -90,7 +90,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">ProxyExecutionListener</span></div>
-<div class="block">Listener interface that is called when proxy is invoked.</div>
+<div class="block">Listener interface invoked when a proxy method or query is executed.</div>
 <dl class="notes">
 <dt>Author:</dt>
 <dd>Tadaya Tsuyukubo</dd>
@@ -113,7 +113,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#afterMethod(io.r2dbc.proxy.core.MethodExecutionInfo)" class="member-name-link">afterMethod</a><wbr>(<a href="../core/MethodExecutionInfo.html" title="interface in io.r2dbc.proxy.core">MethodExecutionInfo</a>&nbsp;executionInfo)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Called after every invocation of methods.</div>
+<div class="block">Called after every method invocation.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)" class="member-name-link">afterQuery</a><wbr>(<a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;execInfo)</code></div>
@@ -123,7 +123,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#beforeMethod(io.r2dbc.proxy.core.MethodExecutionInfo)" class="member-name-link">beforeMethod</a><wbr>(<a href="../core/MethodExecutionInfo.html" title="interface in io.r2dbc.proxy.core">MethodExecutionInfo</a>&nbsp;executionInfo)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Called before every invocation of methods.</div>
+<div class="block">Called before every method invocation.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)" class="member-name-link">beforeQuery</a><wbr>(<a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;execInfo)</code></div>
@@ -133,7 +133,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)" class="member-name-link">eachQueryResult</a><wbr>(<a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;execInfo)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Called on processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.</div>
+<div class="block">Called while processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.</div>
 </div>
 </div>
 </div>
@@ -154,11 +154,11 @@ loadScripts(document, 'script');</script>
 <h3>beforeMethod</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">beforeMethod</span><wbr><span class="parameters">(<a href="../core/MethodExecutionInfo.html" title="interface in io.r2dbc.proxy.core">MethodExecutionInfo</a>&nbsp;executionInfo)</span></div>
-<div class="block">Called before every invocation of methods.
+<div class="block">Called before every method invocation.
  <p>
- Exception Handling:
+ Exception handling:
  Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
- Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped(java.util.function.Consumer)" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>executionInfo</code> - method execution context</dd>
@@ -171,11 +171,11 @@ loadScripts(document, 'script');</script>
 <h3>afterMethod</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">afterMethod</span><wbr><span class="parameters">(<a href="../core/MethodExecutionInfo.html" title="interface in io.r2dbc.proxy.core">MethodExecutionInfo</a>&nbsp;executionInfo)</span></div>
-<div class="block">Called after every invocation of methods.
+<div class="block">Called after every method invocation.
  <p>
- Exception Handling:
+ Exception handling:
  Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
- Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped(java.util.function.Consumer)" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>executionInfo</code> - method execution context</dd>
@@ -190,12 +190,12 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">beforeQuery</span><wbr><span class="parameters">(<a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;execInfo)</span></div>
 <div class="block">Called before executing a query (<a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Batch.html#execute--" title="class or interface in io.r2dbc.spi" class="external-link"><code>Batch.execute()</code></a> or <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Statement.html#execute--" title="class or interface in io.r2dbc.spi" class="external-link"><code>Statement.execute()</code></a>).
  <p>
- Note: this callback is called when the publisher, result of the <code>execute()</code>, is being
- subscribed. Not at the time of <code>execute()</code> is called,
+ Note: this callback is invoked when the publisher produced by <code>execute()</code> is subscribed,
+ not when <code>execute()</code> itself is called.
  <p>
- Exception Handling:
+ Exception handling:
  Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
- Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped(java.util.function.Consumer)" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>execInfo</code> - query execution context</dd>
@@ -213,21 +213,21 @@ loadScripts(document, 'script');</script>
  The callback order is:
  <ul>
      <li><a href="#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>beforeQuery(QueryExecutionInfo)</code></a>
-     <li><a href="#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>eachQueryResult(QueryExecutionInfo)</code></a> for 1st result
-     <li><a href="#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>eachQueryResult(QueryExecutionInfo)</code></a> for 2nd result
+     <li><a href="#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>eachQueryResult(QueryExecutionInfo)</code></a> for the first result
+     <li><a href="#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>eachQueryResult(QueryExecutionInfo)</code></a> for the second result
      <li>...
-     <li><a href="#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>eachQueryResult(QueryExecutionInfo)</code></a> for Nth result
+     <li><a href="#eachQueryResult(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>eachQueryResult(QueryExecutionInfo)</code></a> for the Nth result
      <li><a href="#afterQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>afterQuery(QueryExecutionInfo)</code></a>
  </ul>
- <a href="../core/QueryExecutionInfo.html#getExecuteDuration()"><code>QueryExecutionInfo.getExecuteDuration()</code></a> is available in this callback and it holds
- the duration since <a href="#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>beforeQuery(QueryExecutionInfo)</code></a>.
+ <a href="../core/QueryExecutionInfo.html#getExecuteDuration()"><code>QueryExecutionInfo.getExecuteDuration()</code></a> is available in this callback and contains the
+ duration since <a href="#beforeQuery(io.r2dbc.proxy.core.QueryExecutionInfo)"><code>beforeQuery(QueryExecutionInfo)</code></a>.
  <p>
- Note: this callback is called when the publisher, result of the <code>execute()</code>, is being
- subscribed. Not at the time of <code>execute()</code> is called,
+ Note: this callback is invoked when the publisher produced by <code>execute()</code> is subscribed,
+ not when <code>execute()</code> itself is called.
  <p>
- Exception Handling:
+ Exception handling:
  Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
- Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped(java.util.function.Consumer)" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>execInfo</code> - query execution context</dd>
@@ -240,16 +240,15 @@ loadScripts(document, 'script');</script>
 <h3>eachQueryResult</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">eachQueryResult</span><wbr><span class="parameters">(<a href="../core/QueryExecutionInfo.html" title="interface in io.r2dbc.proxy.core">QueryExecutionInfo</a>&nbsp;execInfo)</span></div>
-<div class="block">Called on processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.
+<div class="block">Called while processing each query <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>.
  <p>
- While processing query results <a href="https://r2dbc.io/spec/1.0.0.RELEASE/api/io/r2dbc/spi/Result.html" title="class or interface in io.r2dbc.spi" class="external-link"><code>Result</code></a>, this callback
- is called per result.
+ This callback is invoked once per result while query results are being processed.
  <p>
  <a href="../core/QueryExecutionInfo.html#getCurrentMappedResult()"><code>QueryExecutionInfo.getCurrentMappedResult()</code></a> contains the mapped result.
  <p>
- Exception Handling:
+ Exception handling:
  Exceptions thrown by this method are dropped and do not affect the original subscription's publisher flow.
- Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped-java.util.function.Consumer-" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
+ Such exceptions are reported to <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Hooks.html#onErrorDropped(java.util.function.Consumer)" title="class or interface in reactor.core.publisher" class="external-link"><code>Hooks.onErrorDropped(java.util.function.Consumer)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>execInfo</code> - query execution context</dd>
@@ -265,7 +264,7 @@ loadScripts(document, 'script');</script>
 <!-- ========= END OF CLASS DATA ========= -->
 <footer role="contentinfo">
 <hr>
-<p class="legal-copy"><small>Copyright &#169; 2025. All rights reserved.</small></p>
+<p class="legal-copy"><small>Copyright &#169; 2026. All rights reserved.</small></p>
 </footer>
 </main>
 </div>
