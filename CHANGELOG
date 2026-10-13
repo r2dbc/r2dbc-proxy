@@ -1,6 +1,10 @@
 R2DBC Proxy Changelog
 =============================
 
+1.1.7.RELEASE
+------------------
+* Fix query completion callbacks after filtering results #160
+
 1.1.6.RELEASE
 ------------------
 * Add VirtualThreadQueryObservationConvention #149
