@@ -1,4 +1,5 @@
-# Reactive Relational Database Connectivity Proxy Framework [![Java CI with Maven](https://github.com/r2dbc/r2dbc-proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/r2dbc/r2dbc-proxy/actions/workflows/ci.yml) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.r2dbc/r2dbc-proxy)
+# Reactive Relational Database Connectivity Proxy Framework [![Java CI with Maven](https://github.com/r2dbc/r2dbc-proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/r2dbc/r2dbc-proxy/actions/workflows/ci.yml) [![Maven Central](https://img.shields.io/maven-central/v/io.r2dbc/r2dbc-proxy)](https://central.sonatype.com/artifact/io.r2dbc/r2dbc-proxy)
+
 
 This project contains the proxy framework of the [R2DBC SPI][r]. R2DBC is a [Reactive Foundation][rf] project.
 
