@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Use Cases</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- Generate a nice TOC -->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>
+<!-- We do not need the tocify CSS because the asciidoc CSS already provides most of what we neeed -->
+
+<style>
+.tocify-subheader {
+		font-style: normal;
+		font-size: 95%;
+}
+.tocify ul {
+		margin: 0;
+}
+.tocify-focus {
+		background-color: #D3D3D3;
+}
+.tocify-focus > a {
+		color: black;
+}
+</style>
+
+<script type="text/javascript">
+		$(function () {
+				// Add a new container for the tocify toc into the existing toc so we can re-use its
+				// styling
+				$("#toc").append("<div id='generated-toc'></div>");
+				$("#generated-toc").tocify({
+						extendPage: true,
+						context: "#content",
+						highlightOnScroll: true,
+						hideEffect: "slideUp",
+						// Use the IDs that asciidoc already provides so that TOC links and intra-document
+						// links are the same. Anything else might confuse users when they create bookmarks.
+						hashGenerator: function(text, element) {
+								return $(element).attr("id");
+						},
+						// Smooth scrolling doesn't work properly if we use the asciidoc IDs
+						smoothScroll: false,
+						// Set to 'none' to use the tocify classes
+						theme: "none",
+						// Handle book (may contain h1) and article (only h2 deeper)
+						selectors: $( "#content" ).has( "h1" ).size() > 0 ? "h1,h2,h3,h4,h5" : "h2,h3,h4,h5",
+						ignoreSelector: ".discrete"
+				});
+				// Switch between static asciidoc toc and dynamic tocify toc based on browser size
+				// This is set to match the media selectors in the asciidoc CSS
+				// Without this, we keep the dynamic toc even if it is moved from the side to preamble
+				// position which will cause odd scrolling behavior
+				var handleTocOnResize = function() {
+						if ($(document).width() < 768) {
+								$("#generated-toc").hide();
+								$(".sectlevel0").show();
+								$(".sectlevel1").show();
+						}
+						else {
+								$("#generated-toc").show();
+								$(".sectlevel0").hide();
+								$(".sectlevel1").hide();
+						}
+				}
+				$(window).resize(handleTocOnResize);
+				handleTocOnResize();
+				// Hide level 4
+				$("ul.tocify-subheader[data-tag='4']").hide();
+		});
+</script>
+</head>
+<body id="use-cases" class="book toc2 toc-left">
+<div id="header">
+<h1>Use Cases</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#use-cases_query-logging">1. Query Logging</a>
+<ul class="sectlevel2">
+<li><a href="#use-cases_query-logging_sample-configuration">1.1. Sample Configuration</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_slow-query-detection">2. Slow Query Detection</a>
+<ul class="sectlevel2">
+<li><a href="#use-cases_slow-query-detection_sample-configuration">2.1. Sample Configuration (After Execution)</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_method-tracing">3. Method Tracing</a>
+<ul class="sectlevel2">
+<li><a href="#use-cases_sample-configuration">3.1. Sample Configuration</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_metrics">4. Metrics</a>
+<ul class="sectlevel2">
+<li><a href="#use-cases_metrics_sample-implementation">4.1. Sample Implementation</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_distributed-tracing">5. Distributed Tracing</a>
+<ul class="sectlevel2">
+<li><a href="#use-cases_distributed-tracing_sample-implementation">5.1. Sample implementation</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_assertion-verification">6. Assertion/Verification</a></li>
+<li><a href="#use-cases_own-action">7. Own Action (Custom Listener)</a>
+<ul class="sectlevel2">
+<li><a href="#use-cases_own-action_implementing-custom-listener">7.1. Implementing a Custom Listener</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_support-primitive-and-null-in-result-mapping">8. Support for Primitive and Null Values in Result Mapping</a></li>
+<li><a href="#use-cases_call-different-methods-in-result-mapping">9. Calling Different Methods in Result Mapping</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="use-cases_query-logging"><a class="anchor" href="#use-cases_query-logging"></a>1. Query Logging</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At query execution time, registered proxy listeners receive query callbacks via the <code>[before|after]Query</code>
+methods with a <code>QueryExecutionInfo</code> parameter. This object contains contextual information about the query,
+including the SQL text, execution type, bindings, execution time, and more.</p>
+</div>
+<div class="paragraph">
+<p>With <code>QueryExecutionInfoFormatter</code>, which converts <code>QueryExecutionInfo</code> to a <code>String</code>, users can easily perform
+query logging.</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample output (wrapped for display purposes)</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="sql" class="language-sql hljs"># Statement with no bindings
+#
+Thread:reactor-tcp-nio-1(30) Connection:1
+Transaction:{Create:1 Rollback:0 Commit:0}
+Success:True Time:34
+Type:Statement BatchSize:0 BindingsSize:0
+Query:["SELECT value FROM test"], Bindings:[]
+
+# Batch query
+#
+Thread:reactor-tcp-nio-3(32) Connection:2
+Transaction:{Create:1 Rollback:0 Commit:0}
+Success:True Time:4
+Type:Batch BatchSize:2 BindingsSize:0
+Query:["INSERT INTO test VALUES(200)","SELECT value FROM test"], Bindings:[]
+
+# Statement with multiple bindings
+#
+Thread:reactor-tcp-nio-1(30) Connection:3
+Transaction:{Create:1 Rollback:0 Commit:0}
+Success:True Time:21
+Type:Statement BatchSize:0 BindingsSize:2
+Query:["INSERT INTO test VALUES ($1,$2)"], Bindings:[(100,101),(200,null(int))]</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_query-logging_sample-configuration"><a class="anchor" href="#use-cases_query-logging_sample-configuration"></a>1.1. Sample Configuration</h3>
+<div class="paragraph">
+<p>To perform query logging:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a <code>QueryExecutionInfoFormatter</code>.</p>
+</li>
+<li>
+<p>Use the formatter in the after-query callback to convert <code>QueryExecutionInfo</code> into a log entry.</p>
+</li>
+<li>
+<p>Pass the formatted value to your logger.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The <strong>before</strong> query callback (<code>beforeQuery</code>) can also log queries, but some attributes are only available in
+the <strong>after</strong> query callback (<code>afterQuery</code>), such as execution time, success/failure status, and result count.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
+
+ConnectionFactory proxyConnectionFactory =
+  ProxyConnectionFactory.builder(connectionFactory)    // wrap the original ConnectionFactory
+                                                       // on every query execution
+    .onAfterQuery(execInfo -&gt;
+        logger.info(formatter.format(execInfo))         // convert and log
+    )
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_slow-query-detection"><a class="anchor" href="#use-cases_slow-query-detection"></a>2. Slow Query Detection</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are two common approaches to detect slow queries:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">During execution</dt>
+<dd>
+<p>Detect slow queries <strong>while</strong> they are running. A watcher can notify when a query exceeds the threshold,
+even if it has not finished yet. This approach is sometimes called <em>preemptive</em>, but it only reports the
+query; the running query is not interrupted or canceled. In <a href="https://github.com/ttddyy/datasource-proxy">datasource-proxy</a>,
+<a href="https://jdbc-observations.github.io/datasource-proxy/docs/current/user-guide/index.html#_slow_query_logging_listener"><code>SlowQueryListener</code></a> follows this approach.</p>
+</dd>
+<dt class="hdlist1">After execution</dt>
+<dd>
+<p>Detect slow queries <strong>after</strong> they complete. The <code>onAfterQuery</code> callback can compare query execution time with
+a threshold. This is a simple and effective approach for many applications. It is sometimes called
+<em>non-preemptive</em>.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Both approaches can be used together: use a watcher for early notice of long-running queries and an
+<code>onAfterQuery</code> callback to record the actual execution time.</p>
+</div>
+<div class="sect2">
+<h3 id="use-cases_slow-query-detection_sample-configuration"><a class="anchor" href="#use-cases_slow-query-detection_sample-configuration"></a>2.1. Sample Configuration (After Execution)</h3>
+<div class="paragraph">
+<p>After a query completes, check whether the execution time exceeds the threshold and then perform an action.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">Duration threshold = Duration.of(...);
+
+ConnectionFactory proxyConnectionFactory =
+  ProxyConnectionFactory.builder(connectionFactory)  // wrap the original ConnectionFactory
+    .onAfterQuery(execInfo -&gt; {
+       if (threshold.minus(execInfo.getExecuteDuration()).isNegative()) {
+         // slow-query logic
+       }
+    })
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_method-tracing"><a class="anchor" href="#use-cases_method-tracing"></a>3. Method Tracing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When a caller invokes a method on the proxy classes (<code>ConnectionFactory</code>, <code>Connection</code>, <code>Batch</code>, <code>Statement</code>,
+or <code>Result</code>), the registered listeners receive callbacks before and after the target method invocation.</p>
+</div>
+<div class="paragraph">
+<p>By logging the contextual information of each invoked method, you can effectively observe the caller&#8217;s
+interaction with the R2DBC SPI objects.</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample: Method tracing with transactional calls</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="sql" class="language-sql hljs">  1: Thread:34 Connection:1 Time:16  PostgresqlConnectionFactory#create()
+  2: Thread:34 Connection:1 Time:0  PostgresqlConnection#createStatement()
+  3: Thread:34 Connection:1 Time:0  ExtendedQueryPostgresqlStatement#bind()
+  4: Thread:34 Connection:1 Time:0  ExtendedQueryPostgresqlStatement#add()
+  5: Thread:34 Connection:1 Time:5  PostgresqlConnection#beginTransaction()
+  6: Thread:34 Connection:1 Time:5  ExtendedQueryPostgresqlStatement#execute()
+  7: Thread:34 Connection:1 Time:3  PostgresqlConnection#commitTransaction()
+  8: Thread:34 Connection:1 Time:4  PostgresqlConnection#close()</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_sample-configuration"><a class="anchor" href="#use-cases_sample-configuration"></a>3.1. Sample Configuration</h3>
+<div class="paragraph">
+<p>In <code>[before|after]Method</code> callbacks, you can perform actions such as printing the invoked method,
+creating a span, or updating metrics.</p>
+</div>
+<div class="paragraph">
+<p><code>MethodExecutionInfoFormatter</code> converts <code>MethodExecutionInfo</code> into a <code>String</code> for log entries.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">MethodExecutionInfoFormatter methodExecutionFormatter = MethodExecutionInfoFormatter.withDefault();
+
+ConnectionFactory proxyConnectionFactory =
+  ProxyConnectionFactory.builder(connectionFactory)  // wrap the original ConnectionFactory
+    // on every method invocation
+    .onAfterMethod(execInfo -&gt;
+      System.out.println(methodExecutionFormatter.format(execInfo))  // print method execution details
+    )
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_metrics"><a class="anchor" href="#use-cases_metrics"></a>4. Metrics</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In method or query callbacks, you can update metrics using the provided contextual information.</p>
+</div>
+<div class="paragraph">
+<p>Examples include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Number of opened connections</p>
+</li>
+<li>
+<p>Number of rollbacks</p>
+</li>
+<li>
+<p>Method execution time</p>
+</li>
+<li>
+<p>Number of queries</p>
+</li>
+<li>
+<p>Query type (SELECT, DELETE, &#8230;&#8203;)</p>
+</li>
+<li>
+<p>Query execution time</p>
+</li>
+<li>
+<p>etc.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="use-cases_metrics_sample-implementation"><a class="anchor" href="#use-cases_metrics_sample-implementation"></a>4.1. Sample Implementation</h3>
+<div class="paragraph">
+<p>This sample <a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java">MetricsExecutionListener</a> implementation populates the following metrics:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Time taken to create a connection</p>
+</li>
+<li>
+<p>Commit and rollback counts</p>
+</li>
+<li>
+<p>Executed query count</p>
+</li>
+<li>
+<p>Slow-query count</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition, this listener logs slow queries.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/metrics-jmx-connection.png" alt="Connection JMX">
+</div>
+<div class="title">Figure 1. Connection metrics on JMX</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/metrics-jmx-query.png" alt="Query JMX">
+</div>
+<div class="title">Figure 2. Query metrics on JMX</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/metrics-actuator-connection.png" alt="Transaction Actuator">
+</div>
+<div class="title">Figure 3. Transaction metrics on Spring Boot actuator (<code>/actuator/metrics/r2dbc.transaction</code>)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_distributed-tracing"><a class="anchor" href="#use-cases_distributed-tracing"></a>5. Distributed Tracing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Construct tracing spans in the appropriate callbacks.</p>
+</div>
+<div class="sect2">
+<h3 id="use-cases_distributed-tracing_sample-implementation"><a class="anchor" href="#use-cases_distributed-tracing_sample-implementation"></a>5.1. Sample implementation</h3>
+<div class="paragraph">
+<p>This sample <a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/TracingExecutionListener.java">TracingExecutionListener</a> implementation creates spans.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/zipkin-tracing-rollback.png" alt="Tracing">
+</div>
+<div class="title">Figure 4. Tracing</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/zipkin-span-connection.png" alt="Connection Span">
+</div>
+<div class="title">Figure 5. Connection span</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/zipkin-span-batch-query.png" alt="Query Span">
+</div>
+<div class="title">Figure 6. Query span</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_assertion-verification"><a class="anchor" href="#use-cases_assertion-verification"></a>6. Assertion/Verification</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By inspecting invoked methods and/or executed queries, you can verify whether the logic under inspection has
+performed as expected.</p>
+</div>
+<div class="paragraph">
+<p>For example, by tracking connection open/close calls, connection leaks can be detected or verified.</p>
+</div>
+<div class="paragraph">
+<p>Another example is to check that a group of queries is executed on the same connection. This verifies the
+transaction assumption that the same connection must execute all of the queries in order for them to belong to
+one transaction.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_own-action"><a class="anchor" href="#use-cases_own-action"></a>7. Own Action (Custom Listener)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can write custom callback logic to perform actions such as audit logging, sending notifications, or
+calling external systems.</p>
+</div>
+<div class="sect2">
+<h3 id="use-cases_own-action_implementing-custom-listener"><a class="anchor" href="#use-cases_own-action_implementing-custom-listener"></a>7.1. Implementing a Custom Listener</h3>
+<div class="paragraph">
+<p>To create a custom listener, implement the <code>ProxyExecutionListener</code> or <code>ProxyMethodExecutionListener</code>
+interface.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">static class MyListener implements ProxyMethodExecutionListener {
+    @Override
+    public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+        System.out.println("connection created");
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_support-primitive-and-null-in-result-mapping"><a class="anchor" href="#use-cases_support-primitive-and-null-in-result-mapping"></a>8. Support for Primitive and Null Values in Result Mapping</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To consume query results, the <code>Result#map</code> method accepts a mapping function (<code>BiFunction</code>) that takes a <code>Row</code>
+and a <code>RowMetadata</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">result.map((row, rowMetadata) -&gt; row.get("name", String.class));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>Row#get</code> method accepts a <code>Class</code> as the second argument to represent the return value type (data type).
+The R2DBC specification does not support primitive types for this value type; only boxed (wrapper) types are
+supported.</p>
+</div>
+<div class="paragraph">
+<p><code>ResultRowConverter</code> can provide support for primitive values by modifying the behavior of <code>Row#get</code>.</p>
+</div>
+<div class="paragraph">
+<p>The following converter transforms a primitive into the corresponding wrapper type.
+For example, <code>row.get(0, int.class)</code> becomes <code>row.get(0, Integer.class)</code>. This converter also handles a
+<code>null</code> return value.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+    if (args.length == 2 &amp;&amp; ((Class&lt;?&gt;) args[1]).isPrimitive()) {
+        Class&lt;?&gt; boxedType = getWrapperType(args[1]);
+        Object result = proxyRow.get((int) args[0], boxedType);
+        if (result == null) {
+            return getDefaultValue(boxedType);  // null handling
+        }
+        return result;
+    }
+    return getOperation.proceed();
+};
+// implement `getWrapperType()` and `getDefaultValue()` with your own strategy
+
+// register to ProxyConfig
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases_call-different-methods-in-result-mapping"><a class="anchor" href="#use-cases_call-different-methods-in-result-mapping"></a>9. Calling Different Methods in Result Mapping</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By modifying <code>Row#get</code> behavior with <code>ResultRowConverter</code>, you can support column names that do not exist or
+map them to derived values.</p>
+</div>
+<div class="listingblock">
+<div class="title">Support a virtual/derived column</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+   if ("full_name".equals(args[0])) {
+       String firstName = proxyRow.get("first_name", String.class);
+       String lastName = proxyRow.get("last_name", String.class);
+       return firstName + " " + lastName;
+   }
+   return getOperation.proceed();   // invoke the original method
+};</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Support a renamed column</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+    if ("column_old".equals(args[0])) {
+        if (args.length == 1) {
+            return proxyRow.get("column_new");
+        }
+        return proxyRow.get("column_new", (Class&lt;?&gt;) args[1]);
+    }
+    return getOperation.proceed();   // invoke the original method
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2026-10-14 01:39:56 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

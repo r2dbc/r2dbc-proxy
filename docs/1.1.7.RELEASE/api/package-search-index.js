@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"io.r2dbc.proxy"},{"l":"io.r2dbc.proxy.callback"},{"l":"io.r2dbc.proxy.core"},{"l":"io.r2dbc.proxy.listener"},{"l":"io.r2dbc.proxy.observation"},{"l":"io.r2dbc.proxy.support"},{"l":"io.r2dbc.proxy.test"},{"l":"io.r2dbc.proxy.util"}];updateSearchResults();

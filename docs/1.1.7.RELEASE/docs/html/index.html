@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<meta name="author" content="Tadaya Tsuyukubo &lt;tadaya@ttddyy.net&gt;">
+<title>R2DBC Proxy - R2DBC Proxying Framework</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- Generate a nice TOC -->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>
+<!-- We do not need the tocify CSS because the asciidoc CSS already provides most of what we neeed -->
+
+<style>
+.tocify-subheader {
+		font-style: normal;
+		font-size: 95%;
+}
+.tocify ul {
+		margin: 0;
+}
+.tocify-focus {
+		background-color: #D3D3D3;
+}
+.tocify-focus > a {
+		color: black;
+}
+</style>
+
+<script type="text/javascript">
+		$(function () {
+				// Add a new container for the tocify toc into the existing toc so we can re-use its
+				// styling
+				$("#toc").append("<div id='generated-toc'></div>");
+				$("#generated-toc").tocify({
+						extendPage: true,
+						context: "#content",
+						highlightOnScroll: true,
+						hideEffect: "slideUp",
+						// Use the IDs that asciidoc already provides so that TOC links and intra-document
+						// links are the same. Anything else might confuse users when they create bookmarks.
+						hashGenerator: function(text, element) {
+								return $(element).attr("id");
+						},
+						// Smooth scrolling doesn't work properly if we use the asciidoc IDs
+						smoothScroll: false,
+						// Set to 'none' to use the tocify classes
+						theme: "none",
+						// Handle book (may contain h1) and article (only h2 deeper)
+						selectors: $( "#content" ).has( "h1" ).size() > 0 ? "h1,h2,h3,h4,h5" : "h2,h3,h4,h5",
+						ignoreSelector: ".discrete"
+				});
+				// Switch between static asciidoc toc and dynamic tocify toc based on browser size
+				// This is set to match the media selectors in the asciidoc CSS
+				// Without this, we keep the dynamic toc even if it is moved from the side to preamble
+				// position which will cause odd scrolling behavior
+				var handleTocOnResize = function() {
+						if ($(document).width() < 768) {
+								$("#generated-toc").hide();
+								$(".sectlevel0").show();
+								$(".sectlevel1").show();
+						}
+						else {
+								$("#generated-toc").show();
+								$(".sectlevel0").hide();
+								$(".sectlevel1").hide();
+						}
+				}
+				$(window).resize(handleTocOnResize);
+				handleTocOnResize();
+				// Hide level 4
+				$("ul.tocify-subheader[data-tag='4']").hide();
+		});
+</script>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>R2DBC Proxy - R2DBC Proxying Framework</h1>
+<div class="details">
+<span id="author" class="author">Tadaya Tsuyukubo &lt;tadaya@ttddyy.net&gt;</span><br>
+<span id="revnumber">version 1.1.7.RELEASE,</span>
+<span id="revdate">2026-10-14</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#introduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#introduction_project-metadata">1.1. Project Metadata</a></li>
+</ul>
+</li>
+<li><a href="#overview">2. Overview</a>
+<ul class="sectlevel2">
+<li><a href="#overview_proxies">2.1. Proxies</a></li>
+<li><a href="#overview_listeners">2.2. Listeners</a></li>
+<li><a href="#overview_formatters">2.3. Formatters</a></li>
+<li><a href="#overview_converters">2.4. Converters</a></li>
+</ul>
+</li>
+<li><a href="#getting-started">3. Getting Started</a>
+<ul class="sectlevel2">
+<li><a href="#getting-started_dependencies">3.1. Dependencies</a></li>
+<li><a href="#getting-started_native-image">3.2. Native Image Support</a></li>
+</ul>
+</li>
+<li><a href="#setup">4. Setup</a>
+<ul class="sectlevel2">
+<li><a href="#setup_connection-factory-discovery">4.1. Connection Factory Discovery</a>
+<ul class="sectlevel3">
+<li><a href="#setup_connection-factory-discovery_url-based">4.1.1. URL-based</a></li>
+<li><a href="#setup_connection-factory-discovery_programmatic">4.1.2. Programmatic</a></li>
+</ul>
+</li>
+<li><a href="#setup_programmatic-proxy-construction">4.2. Programmatic Proxy Construction</a></li>
+</ul>
+</li>
+<li><a href="#components">5. Components</a>
+<ul class="sectlevel2">
+<li><a href="#components_proxyconnectionfactory">5.1. ProxyConnectionFactory</a></li>
+<li><a href="#components_proxyconfig">5.2. ProxyConfig</a></li>
+<li><a href="#components_proxyfactory">5.3. ProxyFactory</a></li>
+<li><a href="#components_proxyexecutionlistener">5.4. ProxyExecutionListener</a></li>
+<li><a href="#components_proxymethodexecutionlistener">5.5. ProxyMethodExecutionListener</a></li>
+<li><a href="#components_formatters">5.6. Formatters</a>
+<ul class="sectlevel3">
+<li><a href="#components_formatters_queryexecutioninfoformatter">5.6.1. QueryExecutionInfoFormatter</a></li>
+<li><a href="#components_formatters_methodexecutioninfoformatter">5.6.2. MethodExecutionInfoFormatter</a></li>
+<li><a href="#components_formatters_customizing-formatter">5.6.3. Customizing Formatter</a></li>
+</ul>
+</li>
+<li><a href="#components_bindparameterconverter">5.7. BindParameterConverter</a></li>
+<li><a href="#components_resultrowconverter">5.8. ResultRowConverter</a></li>
+</ul>
+</li>
+<li><a href="#use-cases">6. Use Cases</a>
+<ul class="sectlevel2">
+<li><a href="#use-cases_query-logging">6.1. Query Logging</a>
+<ul class="sectlevel3">
+<li><a href="#use-cases_query-logging_sample-configuration">6.1.1. Sample Configuration</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_slow-query-detection">6.2. Slow Query Detection</a>
+<ul class="sectlevel3">
+<li><a href="#use-cases_slow-query-detection_sample-configuration">6.2.1. Sample Configuration (After Execution)</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_method-tracing">6.3. Method Tracing</a>
+<ul class="sectlevel3">
+<li><a href="#use-cases_sample-configuration">6.3.1. Sample Configuration</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_metrics">6.4. Metrics</a>
+<ul class="sectlevel3">
+<li><a href="#use-cases_metrics_sample-implementation">6.4.1. Sample Implementation</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_distributed-tracing">6.5. Distributed Tracing</a>
+<ul class="sectlevel3">
+<li><a href="#use-cases_distributed-tracing_sample-implementation">6.5.1. Sample implementation</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_assertion-verification">6.6. Assertion/Verification</a></li>
+<li><a href="#use-cases_own-action">6.7. Own Action (Custom Listener)</a>
+<ul class="sectlevel3">
+<li><a href="#use-cases_own-action_implementing-custom-listener">6.7.1. Implementing a Custom Listener</a></li>
+</ul>
+</li>
+<li><a href="#use-cases_support-primitive-and-null-in-result-mapping">6.8. Support for Primitive and Null Values in Result Mapping</a></li>
+<li><a href="#use-cases_call-different-methods-in-result-mapping">6.9. Calling Different Methods in Result Mapping</a></li>
+</ul>
+</li>
+<li><a href="#features">7. Features</a>
+<ul class="sectlevel2">
+<li><a href="#features_accessing-reactor-context-values">7.1. Accessing Reactor Context Values</a>
+<ul class="sectlevel3">
+<li><a href="#">7.1.1. Available <code>ContextView</code> scopes</a></li>
+</ul>
+</li>
+<li><a href="#features_micrometer-observation-support">7.2. Micrometer Observation Support</a>
+<ul class="sectlevel3">
+<li><a href="#observability-conventions">7.2.1. Observability - Conventions</a></li>
+<li><a href="#observability-metrics">7.2.2. Observability - Metrics</a>
+<ul class="sectlevel4">
+<li><a href="#observability-metrics-rdbc-query-observation">R2dbc Query Observation</a></li>
+</ul>
+</li>
+<li><a href="#observability-spans">7.2.3. Observability - Spans</a>
+<ul class="sectlevel4">
+<li><a href="#observability-spans-rdbc-query-observation">R2dbc Query Observation Span</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>&#169; 2017-2022 The original authors.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this copyright notice, whether distributed in print or electronically.
+</td>
+</tr>
+</table>
+</div>
+<!-- toc disabled -->
+</div>
+</div>
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>1. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>R2DBC Proxy is a proxy framework that provides callbacks for query execution,
+method invocation, and parameter binding.</p>
+</div>
+<div class="paragraph">
+<p>The proxy maintains a set of listener implementations. When an application or an upper-layer library
+interacts with the proxy, the registered listeners receive callbacks.</p>
+</div>
+<div class="paragraph">
+<p>The following are common use cases for proxy listeners:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Query logging</p>
+</li>
+<li>
+<p>Slow-query detection</p>
+</li>
+<li>
+<p>Method tracing</p>
+</li>
+<li>
+<p>Metrics collection</p>
+</li>
+<li>
+<p>Distributed tracing</p>
+</li>
+<li>
+<p>Assertion and verification</p>
+</li>
+<li>
+<p>Custom application actions</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The proxy is a thin, transparent layer that is well-suited for implementing cross-cutting concerns
+without coupling to the underlying database driver. From the caller&#8217;s perspective, it still behaves
+like a standard R2DBC SPI object.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/r2dbc-proxy-diagram.png" alt="R2DBC Proxy diagram">
+</div>
+</div>
+<div class="sect2">
+<h3 id="introduction_project-metadata"><a class="anchor" href="#introduction_project-metadata"></a>1.1. Project Metadata</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Version control: <a href="https://github.com/r2dbc/r2dbc-proxy" class="bare">https://github.com/r2dbc/r2dbc-proxy</a></p>
+</li>
+<li>
+<p>Issue tracker: <a href="https://github.com/r2dbc/r2dbc-proxy/issues" class="bare">https://github.com/r2dbc/r2dbc-proxy/issues</a></p>
+</li>
+<li>
+<p>Release repository: <a href="https://repo1.maven.org/maven2" class="bare">https://repo1.maven.org/maven2</a></p>
+</li>
+<li>
+<p>Snapshot repository: <a href="https://oss.sonatype.org/content/repositories/snapshots" class="bare">https://oss.sonatype.org/content/repositories/snapshots</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>2. Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>R2DBC Proxy is a framework that generates proxies for R2DBC SPI objects through <code>ProxyConnectionFactory</code>
+and provides callbacks for method and query invocations.</p>
+</div>
+<div class="paragraph">
+<p>R2DBC Proxy is a thin, transparent layer. To callers (applications or other libraries), the proxies
+look like ordinary R2DBC SPI objects. This is similar to how connection pooling appears to the upper layer.</p>
+</div>
+<div class="paragraph">
+<p>This section describes the key concepts of R2DBC Proxy:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#overview_proxies">Proxies</a></p>
+</li>
+<li>
+<p><a href="#overview_listeners">Listeners</a></p>
+</li>
+<li>
+<p><a href="#overview_formatters">Formatters</a></p>
+</li>
+<li>
+<p><a href="#overview_converters">Converters</a></p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="overview_proxies"><a class="anchor" href="#overview_proxies"></a>2.1. Proxies</h3>
+<div class="paragraph">
+<p>Each SPI object (<code>Connection</code>, <code>Statement</code>, <code>Batch</code>, <code>Result</code>, and <code>Row</code>) created by <code>ProxyConnectionFactory</code>
+is wrapped by a proxy.</p>
+</div>
+<div class="paragraph">
+<p>When a caller invokes a method on the proxy, it triggers the corresponding callback methods on the
+registered listeners.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="overview_listeners"><a class="anchor" href="#overview_listeners"></a>2.2. Listeners</h3>
+<div class="paragraph">
+<p>Listeners are callback implementations. Each listener implements the <code>ProxyExecutionListener</code> interface,
+which defines <code>beforeQuery</code>, <code>afterQuery</code>, <code>beforeMethod</code>, <code>afterMethod</code>, and <code>eachQueryResult</code> methods.</p>
+</div>
+<div class="paragraph">
+<p>When triggered, these callback methods receive contextual information as parameters. <code>MethodExecutionInfo</code>
+contains details about the invoked method, while <code>QueryExecutionInfo</code> contains details about the query
+execution.</p>
+</div>
+<div class="paragraph">
+<p>Applications can implement custom listeners to perform specific actions.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="overview_formatters"><a class="anchor" href="#overview_formatters"></a>2.3. Formatters</h3>
+<div class="paragraph">
+<p>One of the primary uses of a listener is logging. When a listener receives a callback, the contextual
+information must be transformed into a <code>String</code> that can be written to a log.</p>
+</div>
+<div class="paragraph">
+<p>Formatters are utility classes that convert <code>MethodExecutionInfo</code> and <code>QueryExecutionInfo</code> into strings.</p>
+</div>
+<div class="paragraph">
+<p><code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> are available out of the box to transform
+<code>QueryExecutionInfo</code> and <code>MethodExecutionInfo</code>, respectively.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="overview_converters"><a class="anchor" href="#overview_converters"></a>2.4. Converters</h3>
+<div class="paragraph">
+<p>Converters are callback hooks that can alter the original invocation.</p>
+</div>
+<div class="paragraph">
+<p>Currently, <code>BindParameterConverter</code> and <code>ResultRowConverter</code> are available. They represent bind
+operations (<code>Statement#[bind|bindNull]</code>) and result-row access operations (<code>Row#get</code>), respectively.
+The converters can change the result, call alternative methods, or even skip invoking the original method.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started"><a class="anchor" href="#getting-started"></a>3. Getting Started</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="getting-started_dependencies"><a class="anchor" href="#getting-started_dependencies"></a>3.1. Dependencies</h3>
+<div class="paragraph">
+<p>Artifacts are available on <a href="https://search.maven.org/search?q=r2dbc-proxy">Maven Central</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="xml" class="language-xml hljs">&lt;dependency&gt;
+  &lt;groupId&gt;io.r2dbc&lt;/groupId&gt;
+  &lt;artifactId&gt;r2dbc-proxy&lt;/artifactId&gt;
+  &lt;version&gt;${version}&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you prefer to use the latest snapshot of the upcoming major version, add the Maven snapshot repository
+and declare the appropriate dependency version.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="xml" class="language-xml hljs">&lt;dependency&gt;
+  &lt;groupId&gt;io.r2dbc&lt;/groupId&gt;
+  &lt;artifactId&gt;r2dbc-proxy&lt;/artifactId&gt;
+  &lt;version&gt;${version}.BUILD-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;repository&gt;
+  &lt;id&gt;sonatype-nexus-snapshots&lt;/id&gt;
+  &lt;name&gt;Sonatype OSS Snapshot Repository&lt;/name&gt;
+  &lt;url&gt;https://oss.sonatype.org/content/repositories/snapshots&lt;/url&gt;
+&lt;/repository&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="getting-started_native-image"><a class="anchor" href="#getting-started_native-image"></a>3.2. Native Image Support</h3>
+<div class="paragraph">
+<p>R2DBC Proxy supports <a href="https://www.graalvm.org/reference-manual/native-image/">GraalVM native image</a>.
+Proxy creation uses the JDK dynamic proxy by default, and this requires appropriate configuration in the
+native-image environment.</p>
+</div>
+<div class="paragraph">
+<p>The R2DBC Proxy JAR ships with the following configuration files:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>META-INF/native-image/io.r2dbc/r2dbc-proxy/native-image.properties</code></p>
+</li>
+<li>
+<p><code>META-INF/native-image/io.r2dbc/r2dbc-proxy/proxy-config.json</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The native-image build automatically detects these <a href="https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file">embedded configuration files</a> and configures dynamic proxy support for R2DBC Proxy.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setup"><a class="anchor" href="#setup"></a>4. Setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To obtain a proxy <code>ConnectionFactory</code>, R2DBC Proxy provides two mechanisms:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#setup_connection-factory-discovery">Connection Factory Discovery</a></p>
+</li>
+<li>
+<p><a href="#setup_programmatic-proxy-construction">Programmatic Proxy Construction</a></p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="setup_connection-factory-discovery"><a class="anchor" href="#setup_connection-factory-discovery"></a>4.1. Connection Factory Discovery</h3>
+<div class="paragraph">
+<p>R2DBC defines two connection-factory discovery mechanisms: <a href="#setup_connection-factory-discovery_url-based">URL-based</a>
+and <a href="#setup_connection-factory-discovery_programmatic">Programmatic</a>. R2DBC Proxy supports both, using <code>proxy</code> as the
+driver identifier.</p>
+</div>
+<div class="sect3">
+<h4 id="setup_connection-factory-discovery_url-based"><a class="anchor" href="#setup_connection-factory-discovery_url-based"></a>4.1.1. URL-based</h4>
+<div class="paragraph">
+<p>When a connection URL contains <code>proxy</code> in its driver segment, <code>ConnectionFactories</code> delegates the required
+<code>protocol</code> segment to another connection-factory discovery mechanism (a pass-through). It then wraps the
+returned <code>ConnectionFactory</code> in a proxy.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">r2dbc:proxy:&lt;my-driver&gt;://&lt;host&gt;:&lt;port&gt;/&lt;database&gt;[?proxyListener=&lt;fqdn&gt;]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Examples</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs"># with driver
+r2dbc:proxy:postgresql://localhost:5432/myDB?proxyListener=com.example.MyListener
+
+# with pooling
+r2dbc:proxy:pool:postgresql://localhost:5432/myDB?proxyListener=com.example.MyListener&amp;maxIdleTime=PT60S</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="setup_connection-factory-discovery_programmatic"><a class="anchor" href="#setup_connection-factory-discovery_programmatic"></a>4.1.2. Programmatic</h4>
+<div class="paragraph">
+<p>Another way to discover a <code>ConnectionFactory</code> is to construct <code>ConnectionFactoryOptions</code> programmatically.</p>
+</div>
+<div class="paragraph">
+<p>As with URL-based discovery, when the <code>DRIVER</code> option is <code>proxy</code>, it delegates the required <code>PROTOCOL</code>
+option to another connection-factory discovery request. The resulting <code>ConnectionFactory</code> is then wrapped
+by a proxy.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder()
+   .option(ConnectionFactoryOptions.DRIVER, "proxy")
+   .option(ConnectionFactoryOptions.PROTOCOL, "postgresql")
+   .option(ConnectionFactoryOptions.HOST, "localhost")
+   .option(ConnectionFactoryOptions.PORT, 5432)
+   .option(ConnectionFactoryOptions.DATABASE, "myDB")
+   .option(ProxyConnectionFactoryProvider.PROXY_LISTENERS, myListener)
+   .build());
+
+Mono&lt;Connection&gt; connection = connectionFactory.create();</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Supported Connection Factory Discovery options</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>driver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Must be <code>proxy</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>protocol</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegating connection-factory driver</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>proxyListener</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma-separated list of fully qualified proxy listener class names <em>(optional)</em></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>When constructing <code>ConnectionFactoryOptions</code> programmatically, the <code>proxyListener</code> option supports the
+following values in addition to a comma-separated list of fully qualified listener class names:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A proxy listener class (<code>java.lang.Class</code>)</p>
+</li>
+<li>
+<p>A proxy listener instance</p>
+</li>
+<li>
+<p>A <code>Collection</code> containing either of the above</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="setup_programmatic-proxy-construction"><a class="anchor" href="#setup_programmatic-proxy-construction"></a>4.2. Programmatic Proxy Construction</h3>
+<div class="paragraph">
+<p><code>ProxyConnectionFactory</code> provides a builder for constructing a proxy <code>ConnectionFactory</code>. The builder can
+register concrete and ad-hoc listeners.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory original = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
+    .onAfterQuery(queryInfo -&gt;
+        ...  // after-query callback logic
+    )
+    .onBeforeMethod(methodInfo -&gt;
+        ...  // before-method callback logic
+    )
+    .listener(...)  // add listener
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="components"><a class="anchor" href="#components"></a>5. Components</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section explains the main components of R2DBC Proxy.</p>
+</div>
+<div class="sect2">
+<h3 id="components_proxyconnectionfactory"><a class="anchor" href="#components_proxyconnectionfactory"></a>5.1. ProxyConnectionFactory</h3>
+<div class="paragraph">
+<p>This is the entry point for creating a proxy <code>ConnectionFactory</code>.</p>
+</div>
+<div class="paragraph">
+<p>The static <code>ProxyConnectionFactory#builder</code> method creates a <code>Builder</code> instance, which provides methods to
+register listeners, configure the proxy, and generate a proxy <code>ConnectionFactory</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory original = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
+    .onAfterQuery(queryInfo -&gt;
+        ...  // after-query callback logic
+    )
+    .onBeforeMethod(methodInfo -&gt;
+        ...  // before-method callback logic
+    )
+    .listener(...)  // add listener
+    .build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, connection-factory discovery can create a proxy when the driver name is <code>proxy</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_proxyconfig"><a class="anchor" href="#components_proxyconfig"></a>5.2. ProxyConfig</h3>
+<div class="paragraph">
+<p><code>ProxyConfig</code> is the central configuration object for creating proxies.</p>
+</div>
+<div class="paragraph">
+<p>A <code>ProxyConfig</code> instance holds proxy-related configuration, such as <code>ProxyExecutionListener</code>, <code>ProxyFactory</code>,
+and <code>BindParameterConverter</code>. Any proxy objects created by a proxy <code>ConnectionFactory</code> share the same
+<code>ProxyConfig</code> instance.</p>
+</div>
+<div class="paragraph">
+<p><code>ProxyConnectionFactory.Builder</code> automatically creates a <code>ProxyConfig</code> internally. It also accepts a custom
+<code>ProxyConfig</code> when you need to override or extend the defaults.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ProxyConfig proxyConfig = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original, proxyConfig)
+    ...
+    .build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_proxyfactory"><a class="anchor" href="#components_proxyfactory"></a>5.3. ProxyFactory</h3>
+<div class="paragraph">
+<p><code>ProxyFactory</code> is the strategy interface used to create each proxy.</p>
+</div>
+<div class="paragraph">
+<p>The default implementation, <code>JdkProxyFactory</code>, uses the JDK dynamic proxy to create proxy objects.</p>
+</div>
+<div class="paragraph">
+<p>Providing a custom <code>ProxyFactory</code> allows a different proxy mechanism for constructing proxies. For example,
+<a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/java-agent-example/common/src/main/java/io/r2dbc/examples/agent/ByteBuddyProxyFactory.java">here is a sample of using ByteBuddy for proxy creation</a>.</p>
+</div>
+<div class="paragraph">
+<p>When you provide a custom <code>ProxyFactory</code> implementation, <code>ProxyConfig</code> includes a method to register it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ProxyFactory myProxyFactory = ...
+
+ProxyConfig proxyConfig = ProxyConfig.builder()
+    .proxyFactoryFactory(() -&gt; myProxyFactory)  // add ProxyFactory supplier
+    .build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_proxyexecutionlistener"><a class="anchor" href="#components_proxyexecutionlistener"></a>5.4. ProxyExecutionListener</h3>
+<div class="paragraph">
+<p><code>ProxyExecutionListener</code> is the root listener interface that defines callbacks for method invocation,
+query execution, and query-result processing.</p>
+</div>
+<div class="listingblock">
+<div class="title">Methods defined on ProxyExecutionListener</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// invoked before any method on a proxy is called
+void beforeMethod(MethodExecutionInfo executionInfo);
+
+// invoked after any method on a proxy is called
+void afterMethod(MethodExecutionInfo executionInfo);
+
+// invoked before a query is executed
+void beforeQuery(QueryExecutionInfo execInfo);
+
+// invoked after a query is executed
+void afterQuery(QueryExecutionInfo execInfo);
+
+// invoked when each query result is processed (subscribed)
+void eachQueryResult(QueryExecutionInfo execInfo);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Whenever a caller invokes a method on a proxy, it triggers the method callbacks <code>beforeMethod()</code> and
+<code>afterMethod()</code>. They receive a <code>MethodExecutionInfo</code> parameter that contains contextual information about the
+invoked method.</p>
+</div>
+<div class="paragraph">
+<p>The query-execution methods, <code>Batch#execute()</code> and <code>Statement#execute()</code>, trigger the query callbacks
+<code>beforeQuery()</code> and <code>afterQuery()</code>. (Specifically, they are invoked when the returned result publisher is
+subscribed.) They receive a <code>QueryExecutionInfo</code> parameter that contains query details such as the SQL text,
+bound parameter values, and query duration.</p>
+</div>
+<div class="paragraph">
+<p>While processing a <code>Result</code>, <code>eachQueryResult()</code> is invoked for each mapped query result when <code>Result#map()</code>
+is subscribed.</p>
+</div>
+<div class="paragraph">
+<p>When you implement a custom <code>ProxyExecutionListener</code>, <code>ProxyConnectionFactory.Builder</code> provides a method to
+register it. In addition, the builder offers convenience methods for registering ad-hoc listeners.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory original = ...
+
+ConnectionFactory connectionFactory = ProxyConnectionFactory.builder(original)
+    .onAfterQuery(queryInfo -&gt;
+        ...  // after-query callback logic
+    )
+    .onBeforeMethod(methodInfo -&gt;
+        ...  // before-method callback logic
+    )
+    .listener(...)  // add listener
+    .build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_proxymethodexecutionlistener"><a class="anchor" href="#components_proxymethodexecutionlistener"></a>5.5. ProxyMethodExecutionListener</h3>
+<div class="paragraph">
+<p><code>ProxyMethodExecutionListener</code> is an extension of <code>ProxyExecutionListener</code>. In addition to the methods
+defined in <code>ProxyExecutionListener</code>, it adds explicit before/after methods for all methods on
+<code>ConnectionFactory</code>, <code>Connection</code>, <code>Batch</code>, <code>Statement</code>, and <code>Result</code>.</p>
+</div>
+<div class="paragraph">
+<p>Method names follow the pattern: <em>"[before|after]&lt;MethodName&gt;On&lt;ClassName&gt;"</em>.</p>
+</div>
+<div class="paragraph">
+<p>For example, if you want to perform an action when a connection is created or closed:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">public class ConnectionStartToEndListener implements ProxyMethodExecutionListener {
+
+  @Override
+  public void beforeCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+    // called before ConnectionFactory#create()
+  }
+
+  @Override
+  public void afterCloseOnConnection(MethodExecutionInfo methodExecutionInfo) {
+    // called after Connection#close()
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_formatters"><a class="anchor" href="#components_formatters"></a>5.6. Formatters</h3>
+<div class="paragraph">
+<p>One common use of proxy listeners is logging contextual information. For example, when a query runs, a
+listener can log the SQL text, parameters, success/failure state, execution time, and thread information.</p>
+</div>
+<div class="paragraph">
+<p>Each callback method on <code>ProxyExecutionListener</code> receives contextual information such as <code>QueryExecutionInfo</code>
+and <code>MethodExecutionInfo</code>. To create log entries, you transform this data into a <code>String</code>.</p>
+</div>
+<div class="paragraph">
+<p>Formatter classes fill this gap. <code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> are
+available out of the box. They provide user-friendly conversion methods to transform all or selected parts of
+<code>[Method|Query]ExecutionInfo</code> into a <code>String</code> using default or custom formatting.</p>
+</div>
+<div class="sect3">
+<h4 id="components_formatters_queryexecutioninfoformatter"><a class="anchor" href="#components_formatters_queryexecutioninfoformatter"></a>5.6.1. QueryExecutionInfoFormatter</h4>
+<div class="paragraph">
+<p>This class converts <code>QueryExecutionInfo</code> to a <code>String</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// convert all information
+QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
+String str = formatter.format(queryExecutionInfo);
+
+// convert it
+String str = formatter.format(queryExecutionInfo);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="components_formatters_methodexecutioninfoformatter"><a class="anchor" href="#components_formatters_methodexecutioninfoformatter"></a>5.6.2. MethodExecutionInfoFormatter</h4>
+<div class="paragraph">
+<p>This class converts <code>MethodExecutionInfo</code> to a <code>String</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">MethodExecutionInfoFormatter formatter = MethodExecutionInfoFormatter.withDefault();
+
+// register as an ad-hoc listener
+ProxyConnectionFactory.builder(connectionFactory)
+  .onAfterMethod(execInfo -&gt;
+     System.out.println(formatter.format(execInfo)))  // convert and print to stdout
+  .build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="components_formatters_customizing-formatter"><a class="anchor" href="#components_formatters_customizing-formatter"></a>5.6.3. Customizing Formatter</h4>
+<div class="paragraph">
+<p><code>QueryExecutionInfoFormatter</code> and <code>MethodExecutionInfoFormatter</code> internally hold a list of consumers and loop
+through them to populate the output <code>StringBuilder</code>.</p>
+</div>
+<div class="paragraph">
+<p>Each consumer converts a portion of the <code>[Query|Method]ExecutionInfo</code> into a <code>StringBuilder</code>.
+Formatting is customizable by enabling or disabling built-in converters and by registering new consumers.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">// customize conversion
+QueryExecutionInfoFormatter formatter = new QueryExecutionInfoFormatter();
+formatter.addConsumer((execInfo, sb) -&gt; {
+  sb.append("MY-QUERY-EXECUTION="); // add prefix
+});
+formatter.newLine();  // new line
+formatter.showSuccess();
+formatter.addConsumer((execInfo, sb) -&gt; {
+    // custom conversion
+    sb.append("MY-ID=" + execInfo.getConnectionInfo().getConnectionId());
+});
+formatter.showQuery();
+
+// convert it
+String str = formatter.format(queryExecutionInfo);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_bindparameterconverter"><a class="anchor" href="#components_bindparameterconverter"></a>5.7. BindParameterConverter</h3>
+<div class="paragraph">
+<p><code>BindParameterConverter</code> is a callback interface for bind-parameter operations such as <code>Statement#bind</code> and
+<code>Statement#bindNull</code>.</p>
+</div>
+<div class="paragraph">
+<p>The callback is invoked <strong>before</strong> the actual bind-parameter operation. It can modify the behavior of the
+bind operation. For example, a converter can rewrite bind markers.</p>
+</div>
+<div class="paragraph">
+<p>See more details in the
+<a href="https://github.com/r2dbc/r2dbc-proxy/issues/26">"gh-26: Proxy mechanism to support converting bind marker"</a> issue.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components_resultrowconverter"><a class="anchor" href="#components_resultrowconverter"></a>5.8. ResultRowConverter</h3>
+<div class="paragraph">
+<p><code>ResultRowConverter</code> is a callback interface for result-row access via <code>Row#get</code>.</p>
+</div>
+<div class="paragraph">
+<p>The callback is invoked <strong>before</strong> the actual <code>Row#get</code> call. It can alter the behavior of the invoked method.</p>
+</div>
+<div class="paragraph">
+<p>To use the converter, register it with <code>ProxyConfig</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = ...
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();
+
+// create a proxy ConnectionFactory
+ConnectionFactory proxy = ProxyConnectionFactory.builder(connectionFactory, proxyConfig).build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="use-cases"><a class="anchor" href="#use-cases"></a>6. Use Cases</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="use-cases_query-logging"><a class="anchor" href="#use-cases_query-logging"></a>6.1. Query Logging</h3>
+<div class="paragraph">
+<p>At query execution time, registered proxy listeners receive query callbacks via the <code>[before|after]Query</code>
+methods with a <code>QueryExecutionInfo</code> parameter. This object contains contextual information about the query,
+including the SQL text, execution type, bindings, execution time, and more.</p>
+</div>
+<div class="paragraph">
+<p>With <code>QueryExecutionInfoFormatter</code>, which converts <code>QueryExecutionInfo</code> to a <code>String</code>, users can easily perform
+query logging.</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample output (wrapped for display purposes)</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="sql" class="language-sql hljs"># Statement with no bindings
+#
+Thread:reactor-tcp-nio-1(30) Connection:1
+Transaction:{Create:1 Rollback:0 Commit:0}
+Success:True Time:34
+Type:Statement BatchSize:0 BindingsSize:0
+Query:["SELECT value FROM test"], Bindings:[]
+
+# Batch query
+#
+Thread:reactor-tcp-nio-3(32) Connection:2
+Transaction:{Create:1 Rollback:0 Commit:0}
+Success:True Time:4
+Type:Batch BatchSize:2 BindingsSize:0
+Query:["INSERT INTO test VALUES(200)","SELECT value FROM test"], Bindings:[]
+
+# Statement with multiple bindings
+#
+Thread:reactor-tcp-nio-1(30) Connection:3
+Transaction:{Create:1 Rollback:0 Commit:0}
+Success:True Time:21
+Type:Statement BatchSize:0 BindingsSize:2
+Query:["INSERT INTO test VALUES ($1,$2)"], Bindings:[(100,101),(200,null(int))]</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="use-cases_query-logging_sample-configuration"><a class="anchor" href="#use-cases_query-logging_sample-configuration"></a>6.1.1. Sample Configuration</h4>
+<div class="paragraph">
+<p>To perform query logging:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a <code>QueryExecutionInfoFormatter</code>.</p>
+</li>
+<li>
+<p>Use the formatter in the after-query callback to convert <code>QueryExecutionInfo</code> into a log entry.</p>
+</li>
+<li>
+<p>Pass the formatted value to your logger.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The <strong>before</strong> query callback (<code>beforeQuery</code>) can also log queries, but some attributes are only available in
+the <strong>after</strong> query callback (<code>afterQuery</code>), such as execution time, success/failure status, and result count.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">QueryExecutionInfoFormatter formatter = QueryExecutionInfoFormatter.showAll();
+
+ConnectionFactory proxyConnectionFactory =
+  ProxyConnectionFactory.builder(connectionFactory)    // wrap the original ConnectionFactory
+                                                       // on every query execution
+    .onAfterQuery(execInfo -&gt;
+        logger.info(formatter.format(execInfo))         // convert and log
+    )
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_slow-query-detection"><a class="anchor" href="#use-cases_slow-query-detection"></a>6.2. Slow Query Detection</h3>
+<div class="paragraph">
+<p>There are two common approaches to detect slow queries:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">During execution</dt>
+<dd>
+<p>Detect slow queries <strong>while</strong> they are running. A watcher can notify when a query exceeds the threshold,
+even if it has not finished yet. This approach is sometimes called <em>preemptive</em>, but it only reports the
+query; the running query is not interrupted or canceled. In <a href="https://github.com/ttddyy/datasource-proxy">datasource-proxy</a>,
+<a href="https://jdbc-observations.github.io/datasource-proxy/docs/current/user-guide/index.html#_slow_query_logging_listener"><code>SlowQueryListener</code></a> follows this approach.</p>
+</dd>
+<dt class="hdlist1">After execution</dt>
+<dd>
+<p>Detect slow queries <strong>after</strong> they complete. The <code>onAfterQuery</code> callback can compare query execution time with
+a threshold. This is a simple and effective approach for many applications. It is sometimes called
+<em>non-preemptive</em>.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Both approaches can be used together: use a watcher for early notice of long-running queries and an
+<code>onAfterQuery</code> callback to record the actual execution time.</p>
+</div>
+<div class="sect3">
+<h4 id="use-cases_slow-query-detection_sample-configuration"><a class="anchor" href="#use-cases_slow-query-detection_sample-configuration"></a>6.2.1. Sample Configuration (After Execution)</h4>
+<div class="paragraph">
+<p>After a query completes, check whether the execution time exceeds the threshold and then perform an action.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">Duration threshold = Duration.of(...);
+
+ConnectionFactory proxyConnectionFactory =
+  ProxyConnectionFactory.builder(connectionFactory)  // wrap the original ConnectionFactory
+    .onAfterQuery(execInfo -&gt; {
+       if (threshold.minus(execInfo.getExecuteDuration()).isNegative()) {
+         // slow-query logic
+       }
+    })
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_method-tracing"><a class="anchor" href="#use-cases_method-tracing"></a>6.3. Method Tracing</h3>
+<div class="paragraph">
+<p>When a caller invokes a method on the proxy classes (<code>ConnectionFactory</code>, <code>Connection</code>, <code>Batch</code>, <code>Statement</code>,
+or <code>Result</code>), the registered listeners receive callbacks before and after the target method invocation.</p>
+</div>
+<div class="paragraph">
+<p>By logging the contextual information of each invoked method, you can effectively observe the caller&#8217;s
+interaction with the R2DBC SPI objects.</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample: Method tracing with transactional calls</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="sql" class="language-sql hljs">  1: Thread:34 Connection:1 Time:16  PostgresqlConnectionFactory#create()
+  2: Thread:34 Connection:1 Time:0  PostgresqlConnection#createStatement()
+  3: Thread:34 Connection:1 Time:0  ExtendedQueryPostgresqlStatement#bind()
+  4: Thread:34 Connection:1 Time:0  ExtendedQueryPostgresqlStatement#add()
+  5: Thread:34 Connection:1 Time:5  PostgresqlConnection#beginTransaction()
+  6: Thread:34 Connection:1 Time:5  ExtendedQueryPostgresqlStatement#execute()
+  7: Thread:34 Connection:1 Time:3  PostgresqlConnection#commitTransaction()
+  8: Thread:34 Connection:1 Time:4  PostgresqlConnection#close()</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="use-cases_sample-configuration"><a class="anchor" href="#use-cases_sample-configuration"></a>6.3.1. Sample Configuration</h4>
+<div class="paragraph">
+<p>In <code>[before|after]Method</code> callbacks, you can perform actions such as printing the invoked method,
+creating a span, or updating metrics.</p>
+</div>
+<div class="paragraph">
+<p><code>MethodExecutionInfoFormatter</code> converts <code>MethodExecutionInfo</code> into a <code>String</code> for log entries.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">MethodExecutionInfoFormatter methodExecutionFormatter = MethodExecutionInfoFormatter.withDefault();
+
+ConnectionFactory proxyConnectionFactory =
+  ProxyConnectionFactory.builder(connectionFactory)  // wrap the original ConnectionFactory
+    // on every method invocation
+    .onAfterMethod(execInfo -&gt;
+      System.out.println(methodExecutionFormatter.format(execInfo))  // print method execution details
+    )
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_metrics"><a class="anchor" href="#use-cases_metrics"></a>6.4. Metrics</h3>
+<div class="paragraph">
+<p>In method or query callbacks, you can update metrics using the provided contextual information.</p>
+</div>
+<div class="paragraph">
+<p>Examples include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Number of opened connections</p>
+</li>
+<li>
+<p>Number of rollbacks</p>
+</li>
+<li>
+<p>Method execution time</p>
+</li>
+<li>
+<p>Number of queries</p>
+</li>
+<li>
+<p>Query type (SELECT, DELETE, &#8230;&#8203;)</p>
+</li>
+<li>
+<p>Query execution time</p>
+</li>
+<li>
+<p>etc.</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="use-cases_metrics_sample-implementation"><a class="anchor" href="#use-cases_metrics_sample-implementation"></a>6.4.1. Sample Implementation</h4>
+<div class="paragraph">
+<p>This sample <a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/MetricsExecutionListener.java">MetricsExecutionListener</a> implementation populates the following metrics:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Time taken to create a connection</p>
+</li>
+<li>
+<p>Commit and rollback counts</p>
+</li>
+<li>
+<p>Executed query count</p>
+</li>
+<li>
+<p>Slow-query count</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition, this listener logs slow queries.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/metrics-jmx-connection.png" alt="Connection JMX">
+</div>
+<div class="title">Figure 1. Connection metrics on JMX</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/metrics-jmx-query.png" alt="Query JMX">
+</div>
+<div class="title">Figure 2. Query metrics on JMX</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/metrics-actuator-connection.png" alt="Transaction Actuator">
+</div>
+<div class="title">Figure 3. Transaction metrics on Spring Boot actuator (<code>/actuator/metrics/r2dbc.transaction</code>)</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_distributed-tracing"><a class="anchor" href="#use-cases_distributed-tracing"></a>6.5. Distributed Tracing</h3>
+<div class="paragraph">
+<p>Construct tracing spans in the appropriate callbacks.</p>
+</div>
+<div class="sect3">
+<h4 id="use-cases_distributed-tracing_sample-implementation"><a class="anchor" href="#use-cases_distributed-tracing_sample-implementation"></a>6.5.1. Sample implementation</h4>
+<div class="paragraph">
+<p>This sample <a href="https://github.com/ttddyy/r2dbc-proxy-examples/blob/master/listener-example/src/main/java/io/r2dbc/examples/TracingExecutionListener.java">TracingExecutionListener</a> implementation creates spans.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/zipkin-tracing-rollback.png" alt="Tracing">
+</div>
+<div class="title">Figure 4. Tracing</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/zipkin-span-connection.png" alt="Connection Span">
+</div>
+<div class="title">Figure 5. Connection span</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/zipkin-span-batch-query.png" alt="Query Span">
+</div>
+<div class="title">Figure 6. Query span</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_assertion-verification"><a class="anchor" href="#use-cases_assertion-verification"></a>6.6. Assertion/Verification</h3>
+<div class="paragraph">
+<p>By inspecting invoked methods and/or executed queries, you can verify whether the logic under inspection has
+performed as expected.</p>
+</div>
+<div class="paragraph">
+<p>For example, by tracking connection open/close calls, connection leaks can be detected or verified.</p>
+</div>
+<div class="paragraph">
+<p>Another example is to check that a group of queries is executed on the same connection. This verifies the
+transaction assumption that the same connection must execute all of the queries in order for them to belong to
+one transaction.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_own-action"><a class="anchor" href="#use-cases_own-action"></a>6.7. Own Action (Custom Listener)</h3>
+<div class="paragraph">
+<p>You can write custom callback logic to perform actions such as audit logging, sending notifications, or
+calling external systems.</p>
+</div>
+<div class="sect3">
+<h4 id="use-cases_own-action_implementing-custom-listener"><a class="anchor" href="#use-cases_own-action_implementing-custom-listener"></a>6.7.1. Implementing a Custom Listener</h4>
+<div class="paragraph">
+<p>To create a custom listener, implement the <code>ProxyExecutionListener</code> or <code>ProxyMethodExecutionListener</code>
+interface.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">static class MyListener implements ProxyMethodExecutionListener {
+    @Override
+    public void afterCreateOnConnectionFactory(MethodExecutionInfo methodExecutionInfo) {
+        System.out.println("connection created");
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_support-primitive-and-null-in-result-mapping"><a class="anchor" href="#use-cases_support-primitive-and-null-in-result-mapping"></a>6.8. Support for Primitive and Null Values in Result Mapping</h3>
+<div class="paragraph">
+<p>To consume query results, the <code>Result#map</code> method accepts a mapping function (<code>BiFunction</code>) that takes a <code>Row</code>
+and a <code>RowMetadata</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">result.map((row, rowMetadata) -&gt; row.get("name", String.class));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>Row#get</code> method accepts a <code>Class</code> as the second argument to represent the return value type (data type).
+The R2DBC specification does not support primitive types for this value type; only boxed (wrapper) types are
+supported.</p>
+</div>
+<div class="paragraph">
+<p><code>ResultRowConverter</code> can provide support for primitive values by modifying the behavior of <code>Row#get</code>.</p>
+</div>
+<div class="paragraph">
+<p>The following converter transforms a primitive into the corresponding wrapper type.
+For example, <code>row.get(0, int.class)</code> becomes <code>row.get(0, Integer.class)</code>. This converter also handles a
+<code>null</code> return value.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+    if (args.length == 2 &amp;&amp; ((Class&lt;?&gt;) args[1]).isPrimitive()) {
+        Class&lt;?&gt; boxedType = getWrapperType(args[1]);
+        Object result = proxyRow.get((int) args[0], boxedType);
+        if (result == null) {
+            return getDefaultValue(boxedType);  // null handling
+        }
+        return result;
+    }
+    return getOperation.proceed();
+};
+// implement `getWrapperType()` and `getDefaultValue()` with your own strategy
+
+// register to ProxyConfig
+ProxyConfig proxyConfig = ProxyConfig.builder().resultRowConverter(converter).build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-cases_call-different-methods-in-result-mapping"><a class="anchor" href="#use-cases_call-different-methods-in-result-mapping"></a>6.9. Calling Different Methods in Result Mapping</h3>
+<div class="paragraph">
+<p>By modifying <code>Row#get</code> behavior with <code>ResultRowConverter</code>, you can support column names that do not exist or
+map them to derived values.</p>
+</div>
+<div class="listingblock">
+<div class="title">Support a virtual/derived column</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+   if ("full_name".equals(args[0])) {
+       String firstName = proxyRow.get("first_name", String.class);
+       String lastName = proxyRow.get("last_name", String.class);
+       return firstName + " " + lastName;
+   }
+   return getOperation.proceed();   // invoke the original method
+};</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Support a renamed column</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResultRowConverter converter = (proxyRow, method, args, getOperation) -&gt; {
+    if ("column_old".equals(args[0])) {
+        if (args.length == 1) {
+            return proxyRow.get("column_new");
+        }
+        return proxyRow.get("column_new", (Class&lt;?&gt;) args[1]);
+    }
+    return getOperation.proceed();   // invoke the original method
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="features"><a class="anchor" href="#features"></a>7. Features</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="features_accessing-reactor-context-values"><a class="anchor" href="#features_accessing-reactor-context-values"></a>7.1. Accessing Reactor Context Values</h3>
+<div class="paragraph">
+<p>In the callbacks, <code>ValueSource</code> contains a Reactor <code>ContextView</code> object under the <code>ContextView.class</code> key.
+This provides read-only access to the Reactor context.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">@Override
+public void beforeQuery(QueryExecutionInfo execInfo) {
+    // query execution scoped context
+    ContextView contextViewForQuery = execInfo.getValueStore().get(ContextView.class, ContextView.class);
+    // connection scoped context
+    ContextView contextViewForConnection = execInfo.getConnectionInfo().getValueStore().get(ContextView.class, ContextView.class);
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4>7.1.1. Available <code>ContextView</code> scopes</h4>
+<div class="paragraph">
+<p>As you interact with R2DBC APIs, values may be written to Reactor contexts in several places. The following
+example shows which context values are available in the corresponding callback APIs.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">Mono.from(connectionFactory.create()).contextWrite(context -&gt; context.put("foo", "FOO"))   <i class="conum" data-value="1"></i><b>(1)</b>
+    .flatMapMany(connection -&gt; Mono.from(connection
+        .createStatement("SELECT id, name FROM emp WHERE id = ?")
+        .bind(0, 20)
+        .execute()).contextWrite(context -&gt; context.put("bar", "BAR")))    <i class="conum" data-value="2"></i><b>(2)</b>
+    .flatMap(result -&gt; Mono.from(result
+        .map((row, rowMetadata) -&gt; row.get("name", String.class)))
+        .contextWrite(context -&gt; context.put("qux", "QUX"))    <i class="conum" data-value="3"></i><b>(3)</b>
+    )
+    .contextWrite(context -&gt; context.put("baz", "BAZ"))    <i class="conum" data-value="4"></i><b>(4)</b>
+    ...</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Context for the connection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Context for query execution</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Context for result-set retrieval</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Context for the entire flow</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>BindParameterConverter#onCreateStatement</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>StatementInfo#getValueStore</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>BindParameterConverter#onBind</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>StatementInfo#getValueStore</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>ProxyExecutionListener#[before|after]Query</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>QueryExecutionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>bar</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>ProxyExecutionListener#[before|after]Method</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>create</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>createStatement</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>bind</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>execute</code> has a <code>ContextView</code> containing keys <code>bar</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>map</code> has a <code>ContextView</code> containing keys <code>baz</code> and <code>qux</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>get</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> for all methods (<code>create</code>, <code>createStatement</code>, <code>bind</code>, <code>execute</code>, <code>map</code>, <code>get</code>) has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="features_micrometer-observation-support"><a class="anchor" href="#features_micrometer-observation-support"></a>7.2. Micrometer Observation Support</h3>
+<div class="paragraph">
+<p>R2DBC Proxy has an optional dependency on Micrometer to provide <a href="https://micrometer.io/docs/observation">Micrometer Observation</a> support.
+The <code>ObservationProxyExecutionListener</code> creates observations for query execution.</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuration sample</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory connectionFactory = ...
+ObservationRegistry observationRegistry = ...
+String r2dbcUrl = ...
+
+ObservationProxyExecutionListener listener = new ObservationProxyExecutionListener(
+observationRegistry, connectionFactory, r2dbcUrl);
+listener.setIncludeParameterValues(true);  // include binding params (default is false)
+
+ConnectionFactory proxyConnectionFactory = ProxyConnectionFactory.builder(connectionFactory)
+    .listener(listener)
+    .build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All <a href="https://micrometer.io/docs/observation">Micrometer Observation</a> implementation classes live in the
+<code>io.r2dbc.proxy.observation</code> package. Because this dependency is optional, users must explicitly add the
+<code>micrometer-observation</code> dependency.</p>
+</div>
+<div class="paragraph">
+<p>For Spring Boot 3, a separate project, <em>TBD</em>, provides auto-configuration.</p>
+</div>
+<div class="sect3">
+<h4 id="observability-conventions"><a class="anchor" href="#observability-conventions"></a>7.2.1. Observability - Conventions</h4>
+<div class="paragraph">
+<p>Below you can find a list of all <code>GlobalObservationConvention</code> and <code>ObservationConvention</code> declared by this project.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. ObservationConvention implementations</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ObservationConvention Class Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Applicable ObservationContext Class Name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.r2dbc.proxy.observation.QueryObservationConvention</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QueryContext</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.r2dbc.proxy.observation.VirtualThreadQueryObservationConvention</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QueryContext</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">Virtual Thread Environment</div>
+<div class="paragraph">
+<p>The default <code>QueryObservationConvention</code> includes the thread name as a low-cardinality tag in spans.</p>
+</div>
+<div class="paragraph">
+<p>In a virtual-thread environment, each thread has a unique name. As a result, tagging thread names as a
+low-cardinality key-value pair can lead to cardinality explosion in tracing backends.</p>
+</div>
+<div class="paragraph">
+<p>To avoid this, use <code>VirtualThreadQueryObservationConvention</code>, a subclass of <code>QueryObservationConvention</code>,
+which omits the thread-name tag. This convention is recommended when running in a virtual-thread environment.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="observability-metrics"><a class="anchor" href="#observability-metrics"></a>7.2.2. Observability - Metrics</h4>
+<div class="paragraph">
+<p>Below you can find a list of all metrics declared by this project.</p>
+</div>
+<div class="sect4">
+<h5 id="observability-metrics-rdbc-query-observation"><a class="anchor" href="#observability-metrics-rdbc-query-observation"></a>R2dbc Query Observation</h5>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>R2DBC Query Observation.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><strong>Metric name</strong> <code>r2dbc.query</code> (defined by convention class <code>io.r2dbc.proxy.observation.QueryObservationConvention</code>). <strong>Type</strong> <code>timer</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Metric name</strong> <code>r2dbc.query.active</code> (defined by convention class <code>io.r2dbc.proxy.observation.QueryObservationConvention</code>). <strong>Type</strong> <code>long task timer</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+KeyValues that are added after starting the Observation might be missing from the *.active metrics.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Micrometer internally uses <code>nanoseconds</code> for the baseunit. However, each backend determines the actual baseunit. (i.e. Prometheus uses seconds)
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Fully qualified name of the enclosing class <code>io.r2dbc.proxy.observation.R2dbcObservationDocumentation</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+All tags must be prefixed with <code>r2dbc.</code> prefix!
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Low cardinality Keys</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Name</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Description</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>r2dbc.connection</code> <em>(required)</em></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Name of the R2DBC connection.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>r2dbc.thread</code> <em>(required)</em></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Name of the R2DBC thread.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Since, events were set on this documented entry, they will be converted to the following counters.</p>
+</div>
+<div class="sect5">
+<h6 id="observability-metrics-rdbc-query-observation-r2dbc-query-r2dbc-query_result"><a class="anchor" href="#observability-metrics-rdbc-query-observation-r2dbc-query-r2dbc-query_result"></a>R2dbc Query Observation - r2dbc query r2dbc query_result</h6>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Retrieving query result.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><strong>Metric name</strong> <code>r2dbc.query.r2dbc.query_result</code>. <strong>Type</strong> <code>counter</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="observability-spans"><a class="anchor" href="#observability-spans"></a>7.2.3. Observability - Spans</h4>
+<div class="paragraph">
+<p>Below you can find a list of all spans declared by this project.</p>
+</div>
+<div class="sect4">
+<h5 id="observability-spans-rdbc-query-observation"><a class="anchor" href="#observability-spans-rdbc-query-observation"></a>R2dbc Query Observation Span</h5>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>R2DBC Query Observation.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><strong>Span name</strong> <code>r2dbc.query</code> (defined by convention class <code>io.r2dbc.proxy.observation.QueryObservationConvention</code>).</p>
+</div>
+<div class="paragraph">
+<p>Fully qualified name of the enclosing class <code>io.r2dbc.proxy.observation.R2dbcObservationDocumentation</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+All tags must be prefixed with <code>r2dbc.</code> prefix!
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. Tag Keys</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r2dbc.connection</code> <em>(required)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the R2DBC connection.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r2dbc.params[%s]</code> <em>(required)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Query parameter values. (since the name contains <code>%s</code> the final value will be resolved at runtime)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r2dbc.query[%s]</code> <em>(required)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the R2DBC query. (since the name contains <code>%s</code> the final value will be resolved at runtime)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r2dbc.thread</code> <em>(required)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the R2DBC thread.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. Event Values</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Query Result</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Retrieving query result.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 1.1.7.RELEASE<br>
+Last updated 2026-10-14 01:39:56 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
