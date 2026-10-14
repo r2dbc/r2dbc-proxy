@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Features</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- Generate a nice TOC -->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>
+<!-- We do not need the tocify CSS because the asciidoc CSS already provides most of what we neeed -->
+
+<style>
+.tocify-subheader {
+		font-style: normal;
+		font-size: 95%;
+}
+.tocify ul {
+		margin: 0;
+}
+.tocify-focus {
+		background-color: #D3D3D3;
+}
+.tocify-focus > a {
+		color: black;
+}
+</style>
+
+<script type="text/javascript">
+		$(function () {
+				// Add a new container for the tocify toc into the existing toc so we can re-use its
+				// styling
+				$("#toc").append("<div id='generated-toc'></div>");
+				$("#generated-toc").tocify({
+						extendPage: true,
+						context: "#content",
+						highlightOnScroll: true,
+						hideEffect: "slideUp",
+						// Use the IDs that asciidoc already provides so that TOC links and intra-document
+						// links are the same. Anything else might confuse users when they create bookmarks.
+						hashGenerator: function(text, element) {
+								return $(element).attr("id");
+						},
+						// Smooth scrolling doesn't work properly if we use the asciidoc IDs
+						smoothScroll: false,
+						// Set to 'none' to use the tocify classes
+						theme: "none",
+						// Handle book (may contain h1) and article (only h2 deeper)
+						selectors: $( "#content" ).has( "h1" ).size() > 0 ? "h1,h2,h3,h4,h5" : "h2,h3,h4,h5",
+						ignoreSelector: ".discrete"
+				});
+				// Switch between static asciidoc toc and dynamic tocify toc based on browser size
+				// This is set to match the media selectors in the asciidoc CSS
+				// Without this, we keep the dynamic toc even if it is moved from the side to preamble
+				// position which will cause odd scrolling behavior
+				var handleTocOnResize = function() {
+						if ($(document).width() < 768) {
+								$("#generated-toc").hide();
+								$(".sectlevel0").show();
+								$(".sectlevel1").show();
+						}
+						else {
+								$("#generated-toc").show();
+								$(".sectlevel0").hide();
+								$(".sectlevel1").hide();
+						}
+				}
+				$(window).resize(handleTocOnResize);
+				handleTocOnResize();
+				// Hide level 4
+				$("ul.tocify-subheader[data-tag='4']").hide();
+		});
+</script>
+</head>
+<body id="features" class="book toc2 toc-left">
+<div id="header">
+<h1>Features</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#features_accessing-reactor-context-values">1. Accessing Reactor Context Values</a>
+<ul class="sectlevel2">
+<li><a href="#">1.1. Available <code>ContextView</code> scopes</a></li>
+</ul>
+</li>
+<li><a href="#features_micrometer-observation-support">2. Micrometer Observation Support</a>
+<ul class="sectlevel2">
+<li><a href="#observability-conventions">2.1. Observability - Conventions</a></li>
+<li><a href="#observability-metrics">2.2. Observability - Metrics</a>
+<ul class="sectlevel3">
+<li><a href="#observability-metrics-rdbc-query-observation">2.2.1. R2dbc Query Observation</a>
+<ul class="sectlevel4">
+<li><a href="#observability-metrics-rdbc-query-observation-r2dbc-query-r2dbc-query_result">R2dbc Query Observation - r2dbc query r2dbc query_result</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#observability-spans">2.3. Observability - Spans</a>
+<ul class="sectlevel3">
+<li><a href="#observability-spans-rdbc-query-observation">2.3.1. R2dbc Query Observation Span</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="features_accessing-reactor-context-values"><a class="anchor" href="#features_accessing-reactor-context-values"></a>1. Accessing Reactor Context Values</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the callbacks, <code>ValueSource</code> contains a Reactor <code>ContextView</code> object under the <code>ContextView.class</code> key.
+This provides read-only access to the Reactor context.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">@Override
+public void beforeQuery(QueryExecutionInfo execInfo) {
+    // query execution scoped context
+    ContextView contextViewForQuery = execInfo.getValueStore().get(ContextView.class, ContextView.class);
+    // connection scoped context
+    ContextView contextViewForConnection = execInfo.getConnectionInfo().getValueStore().get(ContextView.class, ContextView.class);
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3>1.1. Available <code>ContextView</code> scopes</h3>
+<div class="paragraph">
+<p>As you interact with R2DBC APIs, values may be written to Reactor contexts in several places. The following
+example shows which context values are available in the corresponding callback APIs.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">Mono.from(connectionFactory.create()).contextWrite(context -&gt; context.put("foo", "FOO"))   <i class="conum" data-value="1"></i><b>(1)</b>
+    .flatMapMany(connection -&gt; Mono.from(connection
+        .createStatement("SELECT id, name FROM emp WHERE id = ?")
+        .bind(0, 20)
+        .execute()).contextWrite(context -&gt; context.put("bar", "BAR")))    <i class="conum" data-value="2"></i><b>(2)</b>
+    .flatMap(result -&gt; Mono.from(result
+        .map((row, rowMetadata) -&gt; row.get("name", String.class)))
+        .contextWrite(context -&gt; context.put("qux", "QUX"))    <i class="conum" data-value="3"></i><b>(3)</b>
+    )
+    .contextWrite(context -&gt; context.put("baz", "BAZ"))    <i class="conum" data-value="4"></i><b>(4)</b>
+    ...</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Context for the connection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Context for query execution</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Context for result-set retrieval</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Context for the entire flow</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>BindParameterConverter#onCreateStatement</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>StatementInfo#getValueStore</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>BindParameterConverter#onBind</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>StatementInfo#getValueStore</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>ProxyExecutionListener#[before|after]Query</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>QueryExecutionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>bar</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>ProxyExecutionListener#[before|after]Method</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>create</code> has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>createStatement</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>bind</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>execute</code> has a <code>ContextView</code> containing keys <code>bar</code> and <code>baz</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>map</code> has a <code>ContextView</code> containing keys <code>baz</code> and <code>qux</code></p>
+</li>
+<li>
+<p><code>MethodExecutionInfo#getValueStore</code> for <code>get</code> has no <code>ContextView</code></p>
+</li>
+<li>
+<p><code>ConnectionInfo#getValueStore</code> for all methods (<code>create</code>, <code>createStatement</code>, <code>bind</code>, <code>execute</code>, <code>map</code>, <code>get</code>) has a <code>ContextView</code> containing keys <code>foo</code> and <code>baz</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="features_micrometer-observation-support"><a class="anchor" href="#features_micrometer-observation-support"></a>2. Micrometer Observation Support</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>R2DBC Proxy has an optional dependency on Micrometer to provide <a href="https://micrometer.io/docs/observation">Micrometer Observation</a> support.
+The <code>ObservationProxyExecutionListener</code> creates observations for query execution.</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuration sample</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ConnectionFactory connectionFactory = ...
+ObservationRegistry observationRegistry = ...
+String r2dbcUrl = ...
+
+ObservationProxyExecutionListener listener = new ObservationProxyExecutionListener(
+observationRegistry, connectionFactory, r2dbcUrl);
+listener.setIncludeParameterValues(true);  // include binding params (default is false)
+
+ConnectionFactory proxyConnectionFactory = ProxyConnectionFactory.builder(connectionFactory)
+    .listener(listener)
+    .build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All <a href="https://micrometer.io/docs/observation">Micrometer Observation</a> implementation classes live in the
+<code>io.r2dbc.proxy.observation</code> package. Because this dependency is optional, users must explicitly add the
+<code>micrometer-observation</code> dependency.</p>
+</div>
+<div class="paragraph">
+<p>For Spring Boot 3, a separate project, <em>TBD</em>, provides auto-configuration.</p>
+</div>
+<div class="sect2">
+<h3 id="observability-conventions"><a class="anchor" href="#observability-conventions"></a>2.1. Observability - Conventions</h3>
+<div class="paragraph">
+<p>Below you can find a list of all <code>GlobalObservationConvention</code> and <code>ObservationConvention</code> declared by this project.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. ObservationConvention implementations</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ObservationConvention Class Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Applicable ObservationContext Class Name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.r2dbc.proxy.observation.QueryObservationConvention</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QueryContext</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.r2dbc.proxy.observation.VirtualThreadQueryObservationConvention</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QueryContext</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">Virtual Thread Environment</div>
+<div class="paragraph">
+<p>The default <code>QueryObservationConvention</code> includes the thread name as a low-cardinality tag in spans.</p>
+</div>
+<div class="paragraph">
+<p>In a virtual-thread environment, each thread has a unique name. As a result, tagging thread names as a
+low-cardinality key-value pair can lead to cardinality explosion in tracing backends.</p>
+</div>
+<div class="paragraph">
+<p>To avoid this, use <code>VirtualThreadQueryObservationConvention</code>, a subclass of <code>QueryObservationConvention</code>,
+which omits the thread-name tag. This convention is recommended when running in a virtual-thread environment.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="observability-metrics"><a class="anchor" href="#observability-metrics"></a>2.2. Observability - Metrics</h3>
+<div class="paragraph">
+<p>Below you can find a list of all metrics declared by this project.</p>
+</div>
+<div class="sect3">
+<h4 id="observability-metrics-rdbc-query-observation"><a class="anchor" href="#observability-metrics-rdbc-query-observation"></a>2.2.1. R2dbc Query Observation</h4>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>R2DBC Query Observation.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><strong>Metric name</strong> <code>r2dbc.query</code> (defined by convention class <code>io.r2dbc.proxy.observation.QueryObservationConvention</code>). <strong>Type</strong> <code>timer</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Metric name</strong> <code>r2dbc.query.active</code> (defined by convention class <code>io.r2dbc.proxy.observation.QueryObservationConvention</code>). <strong>Type</strong> <code>long task timer</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+KeyValues that are added after starting the Observation might be missing from the *.active metrics.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Micrometer internally uses <code>nanoseconds</code> for the baseunit. However, each backend determines the actual baseunit. (i.e. Prometheus uses seconds)
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Fully qualified name of the enclosing class <code>io.r2dbc.proxy.observation.R2dbcObservationDocumentation</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+All tags must be prefixed with <code>r2dbc.</code> prefix!
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Low cardinality Keys</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Name</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Description</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>r2dbc.connection</code> <em>(required)</em></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Name of the R2DBC connection.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>r2dbc.thread</code> <em>(required)</em></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Name of the R2DBC thread.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Since, events were set on this documented entry, they will be converted to the following counters.</p>
+</div>
+<div class="sect4">
+<h5 id="observability-metrics-rdbc-query-observation-r2dbc-query-r2dbc-query_result"><a class="anchor" href="#observability-metrics-rdbc-query-observation-r2dbc-query-r2dbc-query_result"></a>R2dbc Query Observation - r2dbc query r2dbc query_result</h5>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Retrieving query result.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><strong>Metric name</strong> <code>r2dbc.query.r2dbc.query_result</code>. <strong>Type</strong> <code>counter</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="observability-spans"><a class="anchor" href="#observability-spans"></a>2.3. Observability - Spans</h3>
+<div class="paragraph">
+<p>Below you can find a list of all spans declared by this project.</p>
+</div>
+<div class="sect3">
+<h4 id="observability-spans-rdbc-query-observation"><a class="anchor" href="#observability-spans-rdbc-query-observation"></a>2.3.1. R2dbc Query Observation Span</h4>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>R2DBC Query Observation.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><strong>Span name</strong> <code>r2dbc.query</code> (defined by convention class <code>io.r2dbc.proxy.observation.QueryObservationConvention</code>).</p>
+</div>
+<div class="paragraph">
+<p>Fully qualified name of the enclosing class <code>io.r2dbc.proxy.observation.R2dbcObservationDocumentation</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+All tags must be prefixed with <code>r2dbc.</code> prefix!
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Tag Keys</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r2dbc.connection</code> <em>(required)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the R2DBC connection.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r2dbc.params[%s]</code> <em>(required)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Query parameter values. (since the name contains <code>%s</code> the final value will be resolved at runtime)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r2dbc.query[%s]</code> <em>(required)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the R2DBC query. (since the name contains <code>%s</code> the final value will be resolved at runtime)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r2dbc.thread</code> <em>(required)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the R2DBC thread.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. Event Values</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Query Result</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Retrieving query result.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2026-10-14 01:49:37 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark-reasonable.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
