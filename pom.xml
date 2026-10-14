@@ -415,6 +415,7 @@
                 <version>0.8.0</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <deploymentName>R2DBC Proxy ${project.version}</deploymentName>
                     <publishingServerId>central</publishingServerId>
                     <autoPublish>true</autoPublish>
                 </configuration>
