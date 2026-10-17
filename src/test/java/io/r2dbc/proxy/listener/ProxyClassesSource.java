@@ -28,9 +28,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Provides classes that datasource-proxy-r2dbc generates proxies.
+ * Supplies the R2DBC SPI types for which r2dbc-proxy generates proxies as arguments to a
+ * {@link org.junit.jupiter.params.ParameterizedTest} method.
  *
- * Composed annotation for {@link org.junit.jupiter.params.ParameterizedTest}.
+ * <p>The supplied types are {@link ConnectionFactory}, {@link Connection}, {@link Batch},
+ * {@link Statement}, {@link Result}, and {@link Row}.</p>
  *
  * @author Tadaya Tsuyukubo
  */
